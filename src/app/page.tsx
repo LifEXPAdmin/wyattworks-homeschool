@@ -91,7 +91,7 @@ export default function Home() {
               <CardHeader>
                 <CardTitle>Progress Tracking</CardTitle>
                 <CardDescription>
-                  Monitor your child's learning progress with built-in analytics
+                  Monitor your child&apos;s learning progress with built-in analytics
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -110,7 +110,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Flexible delivery options to fit your teaching style and your child's learning preferences.
+                  Flexible delivery options to fit your teaching style and your child&apos;s learning preferences.
                 </p>
               </CardContent>
             </Card>
