@@ -1,36 +1,265 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Wyatt Works – Homeschool
+
+A modern worksheet builder for homeschooling parents. Create custom worksheets, track progress, and make learning fun with our intuitive builder designed specifically for homeschool education.
+
+## Tech Stack
+
+- **Framework:** Next.js 15 (App Router)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS v4
+- **UI Components:** shadcn/ui
+- **Authentication:** Clerk
+- **Code Quality:** ESLint, Prettier, Husky
+
+## Features
+
+- 🎨 Modern, responsive UI with shadcn/ui components
+- 🔐 Secure authentication with Clerk
+- 📝 Landing page with feature showcase
+- 📊 Protected dashboard for authenticated users
+- 🛡️ Automated quality gates (ESLint, TypeScript, Prettier)
+- 🚀 CI/CD ready with GitHub Actions
+- ✨ Pre-commit and pre-push hooks
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Node.js 20.x or later
+- npm or yarn
+- A Clerk account (free tier available)
+
+### Installation
+
+1. **Clone the repository**
+
+   ```bash
+   git clone <your-repo-url>
+   cd wyattworks-homeschool
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   npm install
+   ```
+
+3. **Set up Clerk Authentication**
+   - Go to [https://dashboard.clerk.com](https://dashboard.clerk.com)
+   - Create a new application
+   - Copy your API keys
+
+4. **Configure environment variables**
+
+   ```bash
+   cp .env.example .env.local
+   ```
+
+   Edit `.env.local` and add your Clerk keys:
+
+   ```env
+   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_your_key_here
+   CLERK_SECRET_KEY=sk_test_your_key_here
+   ```
+
+5. **Run the development server**
+
+   ```bash
+   npm run dev
+   ```
+
+   Open [http://localhost:3000](http://localhost:3000) to see your application.
+
+## Environment Variables
+
+Create a `.env.local` file with the following variables:
+
+```env
+# Clerk Authentication (Required)
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_your_key_here
+CLERK_SECRET_KEY=sk_test_your_key_here
+
+# Clerk URLs (Pre-configured)
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+See `.env.example` for a template.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Available Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# Development
+npm run dev              # Start dev server with Turbopack
+npm run build            # Build for production
+npm start                # Start production server
 
-## Learn More
+# Code Quality
+npm run lint             # Run ESLint
+npm run lint:fix         # Run ESLint with auto-fix
+npm run format           # Format all files with Prettier
+npm run format:check     # Check if files are formatted
+npm run typecheck        # Run TypeScript type checking
 
-To learn more about Next.js, take a look at the following resources:
+# CI/CD
+npm run build:ci         # Full CI build (typecheck + lint + build)
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+wyattworks-homeschool/
+├── src/
+│   ├── app/
+│   │   ├── api/
+│   │   │   └── health/         # Health check endpoint
+│   │   ├── dashboard/          # Protected dashboard page
+│   │   ├── sign-in/            # Clerk sign-in page
+│   │   ├── sign-up/            # Clerk sign-up page
+│   │   ├── layout.tsx          # Root layout with ClerkProvider
+│   │   ├── page.tsx            # Landing page
+│   │   └── globals.css         # Global styles
+│   ├── components/
+│   │   └── ui/                 # shadcn/ui components
+│   ├── lib/
+│   │   ├── utils.ts            # Utility functions
+│   │   └── text.tsx            # Safe text rendering utilities
+│   └── middleware.ts           # Clerk auth middleware
+├── .github/
+│   └── workflows/
+│       └── ci.yml              # GitHub Actions CI
+├── .husky/                     # Git hooks
+├── .env.example                # Environment variables template
+└── package.json
+```
 
-## Deploy on Vercel
+## Authentication Routes
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `/` - Public landing page
+- `/sign-in` - Sign in page (Clerk)
+- `/sign-up` - Sign up page (Clerk)
+- `/dashboard` - Protected dashboard (requires authentication)
+- `/api/health` - Public health check endpoint
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Code Quality & CI/CD
+
+This project includes automated quality gates:
+
+### Pre-commit Hook
+
+Automatically runs on `git commit`:
+
+- Formats and lints staged files with ESLint and Prettier
+
+### Pre-push Hook
+
+Automatically runs on `git push`:
+
+- TypeScript type checking
+- ESLint validation
+- Production build
+
+### GitHub Actions CI
+
+Runs on every push to `main` and on pull requests:
+
+- Format check
+- Type check
+- Linting
+- Production build
+- Artifact upload
+
+See `QUALITY_GATE.md` for detailed documentation.
+
+## Customization
+
+### Adding New UI Components
+
+This project uses shadcn/ui. To add new components:
+
+```bash
+npx shadcn@latest add [component-name]
+```
+
+Example:
+
+```bash
+npx shadcn@latest add dropdown-menu
+```
+
+### Modifying Theme
+
+Edit `src/app/globals.css` to customize colors, borders, and other design tokens. The project uses Tailwind CSS v4 with CSS variables for theming.
+
+## Deployment
+
+### Vercel (Recommended)
+
+1. Push your code to GitHub
+2. Import your repository in [Vercel](https://vercel.com)
+3. Add environment variables in Vercel project settings
+4. Deploy!
+
+**Recommended Vercel Settings:**
+
+- Build Command: `npm run build:ci`
+- Install Command: `npm ci`
+- Enable "Only deploy if checks pass"
+
+### Other Platforms
+
+This is a standard Next.js app and can be deployed to any platform that supports Next.js:
+
+- AWS Amplify
+- Netlify
+- Railway
+- Self-hosted with Docker
+
+## Troubleshooting
+
+### Clerk Authentication Not Working
+
+1. Verify your environment variables are set correctly
+2. Check that `.env.local` is not committed to git
+3. Restart the dev server after changing environment variables
+4. Ensure your Clerk application is in the correct environment (development/production)
+
+### Git Hooks Not Running
+
+```bash
+# Reinstall hooks
+rm -rf .husky
+npm run prepare
+chmod +x .husky/pre-commit .husky/pre-push
+```
+
+### Build Errors
+
+Run the CI build locally to debug:
+
+```bash
+npm run build:ci
+```
+
+This will show the same errors that CI would encounter.
+
+## Contributing
+
+1. Create a feature branch
+2. Make your changes
+3. Ensure all quality checks pass: `npm run build:ci`
+4. Submit a pull request
+
+## License
+
+This project is private and proprietary.
+
+## Support
+
+For issues or questions, please open an issue on GitHub or contact the development team.
+
+---
+
+**Built with ❤️ for homeschooling families**

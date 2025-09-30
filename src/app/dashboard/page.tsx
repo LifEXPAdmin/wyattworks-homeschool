@@ -1,8 +1,11 @@
 import Link from "next/link";
+import { UserButton } from "@clerk/nextjs";
+import { currentUser } from "@clerk/nextjs/server";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default function Dashboard() {
+export default async function Dashboard() {
+  const user = await currentUser();
   return (
     <div className="bg-background min-h-screen">
       {/* Navbar */}
@@ -15,8 +18,13 @@ export default function Dashboard() {
               </Link>
             </div>
             <div className="flex items-center space-x-4">
-              <Button variant="outline">Profile</Button>
-              <Button variant="outline">Sign Out</Button>
+              <UserButton
+                appearance={{
+                  elements: {
+                    avatarBox: "w-10 h-10",
+                  },
+                }}
+              />
             </div>
           </div>
         </div>
@@ -26,7 +34,9 @@ export default function Dashboard() {
       <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-foreground mb-2 text-3xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground">Welcome to your worksheet builder workspace</p>
+          <p className="text-muted-foreground">
+            Welcome back, {user?.firstName || "there"}! Let&apos;s build some worksheets.
+          </p>
         </div>
 
         {/* Quick Actions */}
