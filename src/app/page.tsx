@@ -4,13 +4,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background min-h-screen">
       {/* Navbar */}
-      <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <nav className="bg-background/95 supports-[backdrop-filter]:bg-background/60 border-b backdrop-blur">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex h-16 items-center justify-between">
             <div className="flex items-center">
-              <Link href="/" className="text-2xl font-bold text-primary">
+              <Link href="/" className="text-primary text-2xl font-bold">
                 Wyatt Works
               </Link>
             </div>
@@ -24,22 +24,23 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      <section className="px-4 py-20 sm:px-6 lg:px-8">
         <div className="container mx-auto text-center">
-          <h1 className="text-4xl sm:text-6xl font-bold text-foreground mb-6">
+          <h1 className="text-foreground mb-6 text-4xl font-bold sm:text-6xl">
             Build Amazing Worksheets
-            <span className="block text-primary">for Your Homeschool</span>
+            <span className="text-primary block">for Your Homeschool</span>
           </h1>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Create custom worksheets, track progress, and make learning fun with our intuitive worksheet builder designed specifically for homeschooling parents.
+          <p className="text-muted-foreground mx-auto mb-8 max-w-2xl text-xl">
+            Create custom worksheets, track progress, and make learning fun with our intuitive
+            worksheet builder designed specifically for homeschooling parents.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col justify-center gap-4 sm:flex-row">
             <Link href="/dashboard">
-              <Button size="lg" className="text-lg px-8 py-6">
+              <Button size="lg" className="px-8 py-6 text-lg">
                 Start Building
               </Button>
             </Link>
-            <Button variant="outline" size="lg" className="text-lg px-8 py-6">
+            <Button variant="outline" size="lg" className="px-8 py-6 text-lg">
               Learn More
             </Button>
           </div>
@@ -47,18 +48,19 @@ export default function Home() {
       </section>
 
       {/* Features Grid */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-muted/50">
+      <section className="bg-muted/50 px-4 py-20 sm:px-6 lg:px-8">
         <div className="container mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
+          <div className="mb-16 text-center">
+            <h2 className="text-foreground mb-4 text-3xl font-bold sm:text-4xl">
               Everything You Need to Create
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Powerful tools designed specifically for homeschooling parents to create engaging educational content.
+            <p className="text-muted-foreground mx-auto max-w-2xl text-xl">
+              Powerful tools designed specifically for homeschooling parents to create engaging
+              educational content.
             </p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             <Card>
               <CardHeader>
                 <CardTitle>Easy Worksheet Builder</CardTitle>
@@ -67,8 +69,9 @@ export default function Home() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  No design skills needed. Choose from templates or start from scratch with our intuitive builder.
+                <p className="text-muted-foreground text-sm">
+                  No design skills needed. Choose from templates or start from scratch with our
+                  intuitive builder.
                 </p>
               </CardContent>
             </Card>
@@ -81,8 +84,9 @@ export default function Home() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Save time with professionally designed templates that align with educational standards.
+                <p className="text-muted-foreground text-sm">
+                  Save time with professionally designed templates that align with educational
+                  standards.
                 </p>
               </CardContent>
             </Card>
@@ -95,8 +99,9 @@ export default function Home() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Track completion rates, identify areas for improvement, and celebrate achievements.
+                <p className="text-muted-foreground text-sm">
+                  Track completion rates, identify areas for improvement, and celebrate
+                  achievements.
                 </p>
               </CardContent>
             </Card>
@@ -109,8 +114,9 @@ export default function Home() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Flexible delivery options to fit your teaching style and your child&apos;s learning preferences.
+                <p className="text-muted-foreground text-sm">
+                  Flexible delivery options to fit your teaching style and your child&apos;s
+                  learning preferences.
                 </p>
               </CardContent>
             </Card>
@@ -123,8 +129,9 @@ export default function Home() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  From kindergarten to high school, find the right level of challenge for your student.
+                <p className="text-muted-foreground text-sm">
+                  From kindergarten to high school, find the right level of challenge for your
+                  student.
                 </p>
               </CardContent>
             </Card>
@@ -137,8 +144,9 @@ export default function Home() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Build a community by sharing your creations and discovering worksheets from other parents.
+                <p className="text-muted-foreground text-sm">
+                  Build a community by sharing your creations and discovering worksheets from other
+                  parents.
                 </p>
               </CardContent>
             </Card>
@@ -147,16 +155,17 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      <section className="px-4 py-20 sm:px-6 lg:px-8">
         <div className="container mx-auto text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
+          <h2 className="text-foreground mb-4 text-3xl font-bold sm:text-4xl">
             Ready to Transform Your Homeschooling?
           </h2>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Join thousands of homeschooling parents who are already creating amazing worksheets with Wyatt Works.
+          <p className="text-muted-foreground mx-auto mb-8 max-w-2xl text-xl">
+            Join thousands of homeschooling parents who are already creating amazing worksheets with
+            Wyatt Works.
           </p>
           <Link href="/dashboard">
-            <Button size="lg" className="text-lg px-8 py-6">
+            <Button size="lg" className="px-8 py-6 text-lg">
               Start Building Today
             </Button>
           </Link>
@@ -164,8 +173,8 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t py-8 px-4 sm:px-6 lg:px-8">
-        <div className="container mx-auto text-center text-muted-foreground">
+      <footer className="border-t px-4 py-8 sm:px-6 lg:px-8">
+        <div className="text-muted-foreground container mx-auto text-center">
           <p>&copy; 2024 Wyatt Works. All rights reserved.</p>
         </div>
       </footer>

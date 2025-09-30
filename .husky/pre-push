@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run full CI build before push to catch issues early
+echo "🔍 Running type check, lint, and build..."
+npm run build:ci
+
+if [ $? -ne 0 ]; then
+  echo "❌ Pre-push checks failed. Fix the errors before pushing."
+  exit 1
+fi
+
+echo "✅ Pre-push checks passed!"
+

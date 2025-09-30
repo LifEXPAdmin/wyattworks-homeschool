@@ -3,7 +3,6 @@
  * to prevent ESLint react/no-unescaped-entities errors
  */
 
-
 /**
  * Replaces unescaped apostrophes and quotes with safe HTML entities
  * @param text - The text string to process
@@ -22,10 +21,10 @@ export function safeText(text: string): string {
 /**
  * Component that renders text with safe apostrophes and quotes
  * Useful for dynamic content or copy-pasted text
- * 
+ *
  * @example
  * <SafeText>Don't worry, it's all safe!</SafeText>
- * 
+ *
  * @example
  * <SafeText>She said "Hello" and he replied "Hi"</SafeText>
  */
@@ -35,7 +34,7 @@ export function SafeText({ children }: { children: string }) {
 
 /**
  * Template literal tag function for safe text
- * 
+ *
  * @example
  * const message = safe`Don't worry, it's all safe!`;
  */
@@ -65,4 +64,3 @@ export const entities = {
   lessThan: "&lt;",
   greaterThan: "&gt;",
 } as const;
-
