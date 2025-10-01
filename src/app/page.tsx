@@ -195,7 +195,8 @@ export default function Home() {
       <footer className="border-t px-4 py-8 sm:px-6 lg:px-8">
         <div className="text-muted-foreground container mx-auto text-center">
           <p>
-            &copy; 2024 Astra Academy. Made with ❤️ by <strong>Wyatt Works</strong>.
+            &copy; {new Date().getFullYear()} Astra Academy. Made with ❤️ by{" "}
+            <strong>Wyatt Works</strong>.
           </p>
         </div>
       </footer>
