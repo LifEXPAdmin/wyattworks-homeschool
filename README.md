@@ -52,6 +52,7 @@ A modern worksheet builder for homeschooling parents. Create custom worksheets, 
 4. **Set up Database**
 
    **For Development (SQLite):**
+
    ```bash
    # Create .env.local file
    echo 'DATABASE_URL="file:./dev.db"' > .env.local
@@ -62,6 +63,7 @@ A modern worksheet builder for homeschooling parents. Create custom worksheets, 
    - Create a new project
    - Copy the database URL from Settings > Database
    - Add to `.env.local`:
+
    ```env
    DATABASE_URL="postgresql://postgres:[password]@[host]:5432/postgres"
    ```
@@ -74,7 +76,7 @@ A modern worksheet builder for homeschooling parents. Create custom worksheets, 
    # Clerk Authentication (Required)
    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_your_key_here
    CLERK_SECRET_KEY=sk_test_your_key_here
-   
+
    # Database (Required)
    DATABASE_URL="postgresql://username:password@localhost:5432/astra_academy"
    ```
@@ -84,10 +86,10 @@ A modern worksheet builder for homeschooling parents. Create custom worksheets, 
    ```bash
    # Generate Prisma client
    npm run db:generate
-   
+
    # Push schema to database
    npm run db:push
-   
+
    # Seed the database (optional)
    npm run db:seed
    ```
@@ -298,5 +300,47 @@ For issues or questions, please open an issue on GitHub or contact the developme
 ---
 
 **Built with ❤️ for homeschooling families**
-# Build Status Update - Wed Oct  1 18:18:10 CDT 2025
-# Deployment Status - Wed Oct  1 18:22:38 CDT 2025
+
+# Build Status Update - Wed Oct 1 18:18:10 CDT 2025
+
+# Deployment Status - Wed Oct 1 18:22:38 CDT 2025
+
+## Stripe Integration
+
+Astra Academy now includes full Stripe integration for subscription management. To enable payments:
+
+### Required Environment Variables
+
+Add these to your `.env.local` file:
+
+```bash
+# Stripe Configuration
+STRIPE_SECRET_KEY=sk_test_...
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+
+# Stripe Price IDs (create these in your Stripe dashboard)
+STRIPE_HOMESCHOOL_PRICE_ID=price_...
+STRIPE_HOMESCHOOL_YEARLY_PRICE_ID=price_...
+STRIPE_SCHOOL_PRICE_ID=price_...
+STRIPE_SCHOOL_YEARLY_PRICE_ID=price_...
+
+# App URL for redirects
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+### Setting Up Stripe
+
+1. **Create Stripe Account**: Sign up at [stripe.com](https://stripe.com)
+2. **Create Products**: Create "Homeschool" and "School" products in Stripe dashboard
+3. **Create Prices**: Create monthly and yearly prices for each product
+4. **Set Price IDs**: Update environment variables with your price IDs
+5. **Configure Webhooks**: Add webhook endpoint `/api/stripe/webhook` in Stripe dashboard
+
+### Features
+
+- ✅ **Real Payment Processing**: Secure checkout with Stripe
+- ✅ **Subscription Management**: Customer portal for billing management
+- ✅ **Webhook Handling**: Automatic subscription status updates
+- ✅ **Multiple Plans**: Free, Homeschool ($9.99/month), School ($29.99/month)
+- ✅ **Yearly Discounts**: Save money with annual subscriptions
