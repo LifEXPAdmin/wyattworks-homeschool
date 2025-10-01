@@ -861,19 +861,33 @@ function generateMathPrintHTML(
     <head>
       <title>${title}</title>
       <style>
+        * { 
+          margin: 0; 
+          padding: 0; 
+          box-sizing: border-box;
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+          color-adjust: exact !important;
+        }
+        
         @media print {
           .no-print { display: none; }
           .page-break { page-break-before: always; }
-          body { ${backgroundStyle} -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+          }
         }
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body { 
           font-family: 'Georgia', 'Times New Roman', serif; 
           padding: 40px; 
           line-height: 1.6;
           ${backgroundStyle}
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+          color-adjust: exact;
         }
         
         .controls { 
@@ -940,11 +954,26 @@ function generateMathPrintHTML(
           background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
           border-radius: 10px;
           font-size: 14pt;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+          color-adjust: exact;
+        }
+        
+        .meta > div {
+          display: flex;
+          align-items: center;
+          gap: 8px;
         }
         
         .meta strong { 
-          color: #667eea; 
-          margin-right: 8px; 
+          color: #667eea;
+          white-space: nowrap;
+        }
+        
+        .meta .line {
+          border-bottom: 2px solid #667eea;
+          width: 200px;
+          display: inline-block;
         }
         
         .problems { 
@@ -996,6 +1025,9 @@ function generateMathPrintHTML(
           border: 3px solid #ffa726; 
           border-radius: 16px; 
           box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+          color-adjust: exact;
         }
         
         .answer-key h3 { 
@@ -1049,6 +1081,9 @@ function generateMathPrintHTML(
           background: rgba(255, 255, 255, 0.9);
           border-radius: 16px;
           border: 3px dashed #ffa726;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+          color-adjust: exact;
         }
         
         .encourage-text {
@@ -1078,8 +1113,8 @@ function generateMathPrintHTML(
         </div>
         
         <div class="meta">
-          <div><strong>Name:</strong> ______________________________</div>
-          <div><strong>Date:</strong> ______________________________</div>
+          <div><strong>Name:</strong> <span class="line"></span></div>
+          <div><strong>Date:</strong> <span class="line"></span></div>
         </div>
         
         <div class="problems">
