@@ -18,7 +18,7 @@ import {
   PieChart
 } from "lucide-react";
 import { 
-  mobileDetector, 
+  MobileDetector, 
   TouchGestureDetector, 
   responsiveUtils, 
   mobileOptimizations,
@@ -32,7 +32,7 @@ interface MobileLayoutProps {
 }
 
 export function MobileLayout({ children, className }: MobileLayoutProps) {
-  const [mobileConfig, setMobileConfig] = useState<MobileConfig>(() => mobileDetector.getConfig());
+  const [mobileConfig, setMobileConfig] = useState<MobileConfig>(() => MobileDetector.getInstance().getConfig());
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -49,7 +49,7 @@ export function MobileLayout({ children, className }: MobileLayoutProps) {
       setMobileConfig(config);
     };
 
-    mobileDetector.addListener(handleConfigChange);
+    MobileDetector.getInstance().addListener(handleConfigChange);
 
     // Setup gesture detection
     if (layoutRef.current && mobileConfig.touchSupport) {
@@ -59,7 +59,7 @@ export function MobileLayout({ children, className }: MobileLayoutProps) {
     }
 
     return () => {
-      mobileDetector.removeListener(handleConfigChange);
+      MobileDetector.getInstance().removeListener(handleConfigChange);
       if (gestureDetectorRef.current) {
         gestureDetectorRef.current.destroy();
       }
@@ -309,7 +309,7 @@ interface MobileCardProps {
 }
 
 export function MobileCard({ title, description, children, className, onClick }: MobileCardProps) {
-  const [mobileConfig] = useState<MobileConfig>(() => mobileDetector.getConfig());
+  const [mobileConfig] = useState<MobileConfig>(() => MobileDetector.getInstance().getConfig());
   const spacing = responsiveUtils.getSpacing(mobileConfig);
   const fontSizes = responsiveUtils.getFontSizes(mobileConfig);
 
@@ -349,7 +349,7 @@ export function MobileButton({
   onClick, 
   disabled 
 }: MobileButtonProps) {
-  const [mobileConfig] = useState<MobileConfig>(() => mobileDetector.getConfig());
+  const [mobileConfig] = useState<MobileConfig>(() => MobileDetector.getInstance().getConfig());
   const buttonSizes = responsiveUtils.getButtonSizes(mobileConfig);
 
   return (
@@ -373,7 +373,7 @@ interface MobileGridProps {
 }
 
 export function MobileGrid({ children, columns = 2, gap = "md", className }: MobileGridProps) {
-  const [mobileConfig] = useState<MobileConfig>(() => mobileDetector.getConfig());
+  const [mobileConfig] = useState<MobileConfig>(() => MobileDetector.getInstance().getConfig());
   const responsiveColumns = responsiveUtils.getGridColumns(mobileConfig, columns);
   
   const gapClasses = {

@@ -214,7 +214,6 @@ export class ProgressTracker {
 
   // Generate difficulty recommendations
   generateDifficultyRecommendation(studentId: string, subject: string, currentDifficulty: string): DifficultyRecommendation {
-    const progress = this.getStudentProgress(studentId);
     const sessions = this.getStudentSessions(studentId);
     const recentSessions = sessions.filter(s => s.subject === subject).slice(-10);
 
