@@ -24,7 +24,8 @@ import {
   type StudentProgress, 
   type LearningInsight, 
   type DifficultyRecommendation,
-  type SpacedRepetitionItem 
+  type SpacedRepetitionItem,
+  type ProblemAttempt
 } from "@/lib/progress-tracker";
 
 interface ProgressDashboardProps {
