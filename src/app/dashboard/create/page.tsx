@@ -85,77 +85,6 @@ type MathOperation = "addition" | "subtraction" | "multiplication" | "division";
 type LanguageArtsType = "spelling" | "vocabulary" | "writing";
 type GradeLevel = "K" | "1-2" | "3-4" | "5-6" | "7-8";
 
-// Helper function to generate and download PDF
-async function generateAndDownloadPDF(
-  subject: string,
-  data: {
-    problems?: MathProblem[];
-    title?: string;
-    subtitle?: string;
-    spellingWords?: SpellingWord[];
-    vocabularyWords?: VocabularyItem[];
-    writingPrompts?: WritingPrompt[];
-  },
-  backgroundStyle: string,
-  filename: string
-) {
-  // Create a temporary container off-screen
-  const container = document.createElement("div");
-  container.style.position = "absolute";
-  container.style.left = "-9999px";
-  container.style.top = "0";
-  container.style.width = "816px"; // 8.5" at 96 DPI
-  document.body.appendChild(container);
-
-  // Generate the HTML content
-  const html = generatePrintHTML(subject, data, backgroundStyle);
-  container.innerHTML = html;
-
-  // Wait for fonts and images to load
-  await new Promise((resolve) => setTimeout(resolve, 500));
-
-  // Capture the worksheet (page 1)
-  const worksheetElement = container.querySelector(".worksheet-container") as HTMLElement;
-  const worksheetCanvas = await html2canvas(worksheetElement, {
-    scale: 2,
-    useCORS: true,
-    allowTaint: true,
-    backgroundColor: null,
-  });
-
-  // Capture the answer key (page 2)
-  const answerKeyElement = container.querySelector(".answer-key") as HTMLElement;
-  const answerKeyCanvas = await html2canvas(answerKeyElement, {
-    scale: 2,
-    useCORS: true,
-    allowTaint: true,
-    backgroundColor: null,
-  });
-
-  // Create PDF
-  const pdf = new jsPDF({
-    orientation: "portrait",
-    unit: "in",
-    format: "letter",
-  });
-
-  // Add worksheet (page 1)
-  const worksheetImgData = worksheetCanvas.toDataURL("image/png");
-  pdf.addImage(worksheetImgData, "PNG", 0, 0, 8.5, 11);
-
-  // Add answer key (page 2)
-  pdf.addPage();
-  const answerKeyImgData = answerKeyCanvas.toDataURL("image/png");
-  pdf.addImage(answerKeyImgData, "PNG", 0, 0, 8.5, 11);
-
-  // Clean up
-  document.body.removeChild(container);
-
-  // Download the PDF
-  const sanitizedFilename = filename.replace(/[^a-z0-9]/gi, "_").toLowerCase();
-  pdf.save(`${sanitizedFilename}_${Date.now()}.pdf`);
-}
-
 export default function CreateWorksheet() {
   const [subject, setSubject] = useState<SubjectType>("math");
   const [title, setTitle] = useState("Math Practice Worksheet");
@@ -395,11 +324,19 @@ export default function CreateWorksheet() {
             ? { spellingWords, vocabularyWords, writingPrompts, title }
             : {};
 
-      await generateAndDownloadPDF(subject, result.data || contentData, bgStyle, title);
-
-      alert(
-        "✅ PDF Downloaded!\n\nCheck your Downloads folder for the worksheet PDF.\n\n(Unlimited exports available)"
-      );
+      try {
+        await generateAndDownloadPDF(subject, result.data || contentData, bgStyle, title);
+        alert(
+          "✅ PDF Downloaded!\n\nCheck your Downloads folder for the worksheet PDF.\n\n(Unlimited exports available)"
+        );
+      } catch (pdfError) {
+        console.error("PDF generation error:", pdfError);
+        alert(
+          "Failed to generate PDF. Error: " +
+            (pdfError instanceof Error ? pdfError.message : "Unknown error") +
+            "\n\nPlease try again."
+        );
+      }
     } catch (error) {
       console.error("Export error:", error);
       alert("Failed to export worksheet. Please try again.");
@@ -1218,4 +1155,88 @@ function generateMathPrintHTML(
     </body>
     </html>
   `;
+}
+
+// Helper function to generate and download PDF
+async function generateAndDownloadPDF(
+  subject: string,
+  data: {
+    problems?: MathProblem[];
+    title?: string;
+    subtitle?: string;
+    spellingWords?: SpellingWord[];
+    vocabularyWords?: VocabularyItem[];
+    writingPrompts?: WritingPrompt[];
+  },
+  backgroundStyle: string,
+  filename: string
+) {
+  try {
+    // Create a temporary container off-screen
+    const container = document.createElement("div");
+    container.style.position = "absolute";
+    container.style.left = "-9999px";
+    container.style.top = "0";
+    container.style.width = "816px"; // 8.5" at 96 DPI
+    document.body.appendChild(container);
+
+    // Generate the HTML content
+    const html = generatePrintHTML(subject, data, backgroundStyle);
+    container.innerHTML = html;
+
+    // Wait for fonts and images to load
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // Capture the worksheet (page 1)
+    const worksheetElement = container.querySelector(".worksheet-container") as HTMLElement;
+    if (!worksheetElement) {
+      throw new Error("Could not find worksheet container");
+    }
+
+    const worksheetCanvas = await html2canvas(worksheetElement, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: "#ffffff",
+    });
+
+    // Capture the answer key (page 2)
+    const answerKeyElement = container.querySelector(".answer-key") as HTMLElement;
+    if (!answerKeyElement) {
+      throw new Error("Could not find answer key container");
+    }
+
+    const answerKeyCanvas = await html2canvas(answerKeyElement, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: "#ffffff",
+    });
+
+    // Create PDF
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "in",
+      format: "letter",
+    });
+
+    // Add worksheet (page 1)
+    const worksheetImgData = worksheetCanvas.toDataURL("image/png");
+    pdf.addImage(worksheetImgData, "PNG", 0, 0, 8.5, 11);
+
+    // Add answer key (page 2)
+    pdf.addPage();
+    const answerKeyImgData = answerKeyCanvas.toDataURL("image/png");
+    pdf.addImage(answerKeyImgData, "PNG", 0, 0, 8.5, 11);
+
+    // Clean up
+    document.body.removeChild(container);
+
+    // Download the PDF
+    const sanitizedFilename = filename.replace(/[^a-z0-9]/gi, "_").toLowerCase();
+    pdf.save(`${sanitizedFilename}_${Date.now()}.pdf`);
+  } catch (error) {
+    console.error("PDF generation failed:", error);
+    throw error;
+  }
 }
