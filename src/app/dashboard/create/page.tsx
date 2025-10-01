@@ -154,17 +154,23 @@ export default function CreateWorksheet() {
         return;
       }
 
-      alert(
-        result.cached
-          ? "Using cached worksheet (no quota used)!"
-          : `Worksheet created! ${result.quota?.remaining || 0} exports remaining this month.`
-      );
-
       // Client-side: Create a printable version
       const printWindow = window.open("", "_blank");
       if (printWindow) {
         printWindow.document.write(generatePrintHTML(result.data));
         printWindow.document.close();
+        alert(
+          result.cached
+            ? "Using cached worksheet (no quota used)! Check the new window/tab."
+            : `Worksheet created! Check the new window/tab to print. (Unlimited exports available)`
+        );
+      } else {
+        alert(
+          "Popup blocked! Please allow popups for this site, then try again.\n\n" +
+            "Or click OK and I'll show the worksheet on this page instead."
+        );
+        // Fallback: Replace current page
+        document.body.innerHTML = generatePrintHTML(result.data);
       }
     } catch (error) {
       console.error("Export error:", error);
