@@ -5,7 +5,7 @@
  */
 
 import puppeteer, { type Browser, type Page } from "puppeteer";
-import { writeFile, mkdir } from "fs/promises";
+import { mkdir } from "fs/promises";
 import { join } from "path";
 import type { MathProblem, FractionProblem } from "./generators/math";
 

@@ -51,7 +51,7 @@ export interface ExportError {
     plan: string;
     currentMonth: string;
   };
-  details?: any;
+  details?: unknown;
 }
 
 /**
@@ -101,7 +101,7 @@ export async function exportWorksheet(
     body: JSON.stringify(request),
   });
 
-  const data = await response.json();
+  const data: ExportResponse | ExportError = await response.json();
 
   if (!response.ok) {
     return data as ExportError;

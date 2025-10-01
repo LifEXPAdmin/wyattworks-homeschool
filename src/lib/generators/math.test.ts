@@ -13,7 +13,6 @@ import {
   hasDuplicates,
   verifyConstraints,
   type MathProblem,
-  type FractionProblem,
 } from "./math";
 
 describe("SeededRandom", () => {
@@ -344,7 +343,7 @@ describe("generateDivision", () => {
 
     // Divisors and quotients should be in range
     problems.forEach((problem) => {
-      const [dividend, divisor] = problem.operands;
+      const [, divisor] = problem.operands;
       const quotient = problem.answer;
       expect(divisor).toBeGreaterThanOrEqual(2);
       expect(divisor).toBeLessThanOrEqual(10);
@@ -459,7 +458,7 @@ describe("generateFractions", () => {
     });
 
     problems.forEach((problem) => {
-      const [num1, den1, num2, den2] = problem.operands;
+      const [, den1, , den2] = problem.operands;
       expect(den1).toBeLessThanOrEqual(maxDen);
       expect(den2).toBeLessThanOrEqual(maxDen);
     });

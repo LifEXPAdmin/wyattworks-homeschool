@@ -10,15 +10,8 @@ import { z } from "zod";
 import { WorksheetConfigSchema, hashConfig } from "@/lib/config";
 import { checkQuota, findExistingExport } from "@/lib/quota";
 import { generateWorksheetPDF } from "@/lib/pdf-generator";
-import {
-  generateAddition,
-  generateSubtraction,
-  generateMultiplication,
-  generateDivision,
-  generateFractions,
-} from "@/lib/generators/math";
+import { generateAddition } from "@/lib/generators/math";
 import prisma from "@/lib/prisma";
-import { readFile } from "fs/promises";
 
 /**
  * Export request schema
@@ -30,8 +23,6 @@ const ExportRequestSchema = z.object({
   subtitle: z.string().optional(),
   instructions: z.string().optional(),
 });
-
-type ExportRequest = z.infer<typeof ExportRequestSchema>;
 
 /**
  * POST /api/export
@@ -161,11 +152,24 @@ export async function POST(request: NextRequest) {
     }
 
     // 7. Generate PDFs
-    const pdfOptions = {
+    const pdfOptions: {
+      format: "letter" | "a4" | "legal";
+      orientation: "portrait" | "landscape";
+      margin?: { top: string; right: string; bottom: string; left: string };
+    } = {
       format: config.layout?.pageSize || "letter",
       orientation: config.layout?.orientation || "portrait",
-      margin: config.layout?.margins,
     };
+
+    // Convert number margins to string margins if provided
+    if (config.layout?.margins) {
+      pdfOptions.margin = {
+        top: `${config.layout.margins.top}in`,
+        right: `${config.layout.margins.right}in`,
+        bottom: `${config.layout.margins.bottom}in`,
+        left: `${config.layout.margins.left}in`,
+      };
+    }
 
     const pdfs = await generateWorksheetPDF(
       {
@@ -180,7 +184,7 @@ export async function POST(request: NextRequest) {
         problems,
       },
       "/tmp",
-      pdfOptions as any
+      pdfOptions
     );
 
     // 8. Create or get worksheet

@@ -1,6 +1,3 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 # Run full CI build before push to catch issues early
 echo "🔍 Running type check, lint, and build..."
 npm run build:ci

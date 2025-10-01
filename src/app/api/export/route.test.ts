@@ -145,8 +145,7 @@ describe("Export API Flow", () => {
       const previousMonth = "2024-05";
       const currentMonth = "2024-06";
 
-      const isNewMonth = previousMonth !== (currentMonth as any);
-      expect(isNewMonth).toBe(true);
+      expect(previousMonth).not.toBe(currentMonth);
 
       // In new month, quota should reset
       const previousUsed = 15; // Used all quota last month
@@ -234,7 +233,7 @@ describe("Export API Flow", () => {
     });
 
     it("should have correct cached response structure", () => {
-      const response: any = {
+      const response = {
         success: true,
         cached: true,
         urls: {
@@ -248,7 +247,7 @@ describe("Export API Flow", () => {
       expect(response.cached).toBe(true);
       expect(response.success).toBe(true);
       // Cached responses don't update quota
-      expect(response.quota).toBeUndefined();
+      expect("quota" in response).toBe(false);
     });
   });
 });
