@@ -1,18 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Check, 
   X, 
   Crown, 
   Star, 
-  Zap, 
-  Users, 
   BarChart3, 
   CreditCard,
   Calendar,
@@ -25,9 +22,7 @@ import {
   SUBSCRIPTION_TIERS,
   subscriptionManager,
   paymentProcessor,
-  type SubscriptionTier,
-  type UserSubscription,
-  type PaymentIntent
+  type UserSubscription
 } from "@/lib/subscription";
 
 interface SubscriptionDashboardProps {
@@ -39,22 +34,21 @@ export function SubscriptionDashboard({ userId, className }: SubscriptionDashboa
   const [currentSubscription, setCurrentSubscription] = useState<UserSubscription | null>(null);
   const [usageSummary, setUsageSummary] = useState<Record<string, { used: number; limit: number; unlimited: boolean }>>({});
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  const [selectedTier, setSelectedTier] = useState<string>('homeschool');
   const [isYearly, setIsYearly] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadSubscriptionData();
-  }, [userId]);
+  }, [userId, loadSubscriptionData]);
 
-  const loadSubscriptionData = () => {
+  const loadSubscriptionData = useCallback(() => {
     const subscription = subscriptionManager.getUserSubscription(userId);
     const usage = subscriptionManager.getUserUsageSummary(userId);
     
     setCurrentSubscription(subscription);
     setUsageSummary(usage);
     setLoading(false);
-  };
+  }, [userId]);
 
   const handleUpgrade = async (tierId: string, yearly: boolean) => {
     setIsProcessingPayment(true);
@@ -113,11 +107,6 @@ export function SubscriptionDashboard({ userId, className }: SubscriptionDashboa
     return Math.min((used / limit) * 100, 100);
   };
 
-  const getUsageColor = (percentage: number) => {
-    if (percentage >= 90) return 'bg-red-500';
-    if (percentage >= 70) return 'bg-yellow-500';
-    return 'bg-green-500';
-  };
 
   if (loading) {
     return (

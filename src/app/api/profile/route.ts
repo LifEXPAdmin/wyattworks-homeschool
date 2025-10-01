@@ -12,20 +12,11 @@ const UserProfileSchema = z.object({
   settings: z.record(z.string(), z.unknown()).optional(),
 });
 
-const StudentSchema = z.object({
-  firstName: z.string().min(1),
-  lastName: z.string().optional(),
-  gradeLevel: z.string().optional(),
-  birthDate: z.string().datetime().optional(),
-  avatar: z.string().url().optional(),
-  preferences: z.record(z.string(), z.unknown()).optional(),
-});
-
 /**
  * GET /api/profile
  * Get current user's profile and students
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const user = await currentUser();
     if (!user) {
@@ -120,15 +111,15 @@ export async function PUT(request: NextRequest) {
       where: { userId: dbUser.id },
       update: {
         ...validation.data,
-        preferences: validation.data.preferences as any,
-        settings: validation.data.settings as any,
+        preferences: validation.data.preferences as Record<string, unknown>,
+        settings: validation.data.settings as Record<string, unknown>,
         updatedAt: new Date(),
       },
       create: {
         userId: dbUser.id,
         ...validation.data,
-        preferences: validation.data.preferences as any,
-        settings: validation.data.settings as any,
+        preferences: validation.data.preferences as Record<string, unknown>,
+        settings: validation.data.settings as Record<string, unknown>,
       },
     });
 

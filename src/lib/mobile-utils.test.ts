@@ -4,9 +4,7 @@ import {
   TouchGestureDetector,
   responsiveUtils,
   mobileOptimizations,
-  mobileDetector,
   type MobileConfig,
-  type TouchGesture,
 } from "./mobile-utils";
 
 // Mock window and navigator

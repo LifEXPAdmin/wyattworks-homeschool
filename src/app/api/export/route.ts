@@ -9,7 +9,6 @@ import { currentUser } from "@clerk/nextjs/server";
 import { z } from "zod";
 import { WorksheetConfigSchema, hashConfig } from "@/lib/config";
 import { checkQuota, findExistingExport } from "@/lib/quota";
-import { generateWorksheetPDF } from "@/lib/pdf-generator";
 import prisma from "@/lib/prisma";
 import { generateAddition } from "@/lib/generators/math";
 

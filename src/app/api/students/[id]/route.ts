@@ -108,7 +108,7 @@ export async function PUT(
       data: {
         ...validation.data,
         birthDate: validation.data.birthDate ? new Date(validation.data.birthDate) : undefined,
-        preferences: validation.data.preferences as any,
+        preferences: validation.data.preferences as Record<string, unknown>,
         updatedAt: new Date(),
       },
     });

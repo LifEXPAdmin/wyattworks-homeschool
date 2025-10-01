@@ -12,21 +12,11 @@ const StudentSchema = z.object({
   preferences: z.record(z.string(), z.unknown()).optional(),
 });
 
-const UpdateStudentSchema = z.object({
-  firstName: z.string().min(1).optional(),
-  lastName: z.string().optional(),
-  gradeLevel: z.string().optional(),
-  birthDate: z.string().datetime().optional(),
-  avatar: z.string().url().optional(),
-  preferences: z.record(z.string(), z.unknown()).optional(),
-  isActive: z.boolean().optional(),
-});
-
 /**
  * GET /api/students
  * Get all students for the current user
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const user = await currentUser();
     if (!user) {
@@ -93,7 +83,7 @@ export async function POST(request: NextRequest) {
         userId: dbUser.id,
         ...validation.data,
         birthDate: validation.data.birthDate ? new Date(validation.data.birthDate) : null,
-        preferences: validation.data.preferences as any,
+        preferences: validation.data.preferences as Record<string, unknown>,
       },
     });
 

@@ -1,9 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { 
   analyticsStorage, 
-  AnalyticsEvent, 
-  LearningMetrics, 
-  ParentReport,
   ExportData 
 } from './analytics';
 

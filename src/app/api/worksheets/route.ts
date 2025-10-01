@@ -11,13 +11,6 @@ const CreateWorksheetSchema = z.object({
   content: z.record(z.string(), z.unknown()),
 });
 
-const UpdateWorksheetSchema = z.object({
-  title: z.string().min(1).optional(),
-  description: z.string().optional(),
-  content: z.record(z.string(), z.unknown()).optional(),
-  status: z.enum(["draft", "published", "archived"]).optional(),
-});
-
 /**
  * GET /api/worksheets
  * Get all worksheets for the current user

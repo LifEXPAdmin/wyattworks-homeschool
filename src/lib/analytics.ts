@@ -408,7 +408,7 @@ class AnalyticsStorage {
       timeBreakdown: timeAnalytics,
       difficultyProgress,
       insights: this.generateInsights(metrics, subjectAnalytics, timeAnalytics),
-      goals: this.generateGoals(metrics, subjectAnalytics),
+      goals: this.generateGoals(metrics),
     };
 
     this.reports.push(report);
@@ -523,7 +523,7 @@ class AnalyticsStorage {
     return insights;
   }
 
-  private generateGoals(metrics: LearningMetrics, subjectAnalytics: SubjectAnalytics[]): {
+  private generateGoals(metrics: LearningMetrics): {
     current: string[];
     achieved: string[];
     next: string[];
