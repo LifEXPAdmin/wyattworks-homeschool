@@ -13,6 +13,12 @@ import {
   generateDivision,
 } from "@/lib/generators/math";
 import type { MathProblem } from "@/lib/generators/math";
+import {
+  generateSpellingWords,
+  generateVocabularyWords,
+  generateWritingPrompts,
+} from "@/lib/generators/language-arts";
+import type { SpellingWord, VocabularyItem, WritingPrompt } from "@/lib/generators/language-arts";
 import type { WorksheetConfig } from "@/lib/config";
 
 type DifficultyLevel = "very_easy" | "easy" | "medium" | "hard" | "very_hard" | "custom";
@@ -72,18 +78,28 @@ const BACKGROUND_TEMPLATES = [
   },
 ];
 
+type SubjectType = "math" | "language_arts" | "science";
+type MathOperation = "addition" | "subtraction" | "multiplication" | "division";
+type LanguageArtsType = "spelling" | "vocabulary" | "writing";
+
 export default function CreateWorksheet() {
+  const [subject, setSubject] = useState<SubjectType>("math");
   const [title, setTitle] = useState("Math Practice Worksheet");
   const [difficulty, setDifficulty] = useState<DifficultyLevel>("medium");
   const [customMin, setCustomMin] = useState(1);
   const [customMax, setCustomMax] = useState(20);
   const [problemCount, setProblemCount] = useState(20);
-  const [operation, setOperation] = useState<
-    "addition" | "subtraction" | "multiplication" | "division"
-  >("addition");
+  const [operation, setOperation] = useState<MathOperation>("addition");
+  const [languageArtsType, setLanguageArtsType] = useState<LanguageArtsType>("spelling");
+  const [writingType, setWritingType] = useState<
+    "narrative" | "expository" | "persuasive" | "descriptive" | "mixed"
+  >("mixed");
   const [background, setBackground] = useState("none");
   const [customImage, setCustomImage] = useState<string | null>(null);
   const [problems, setProblems] = useState<MathProblem[]>([]);
+  const [spellingWords, setSpellingWords] = useState<SpellingWord[]>([]);
+  const [vocabularyWords, setVocabularyWords] = useState<VocabularyItem[]>([]);
+  const [writingPrompts, setWritingPrompts] = useState<WritingPrompt[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
 
@@ -91,53 +107,129 @@ export default function CreateWorksheet() {
     setIsGenerating(true);
     const seed = Date.now();
 
-    const range =
-      difficulty === "custom" ? { min: customMin, max: customMax } : DIFFICULTY_RANGES[difficulty];
-
-    let generated: MathProblem[] = [];
+    // Reset all content
+    setProblems([]);
+    setSpellingWords([]);
+    setVocabularyWords([]);
+    setWritingPrompts([]);
 
     try {
-      switch (operation) {
-        case "addition":
-          generated = generateAddition({
-            count: problemCount,
-            minValue: range.min,
-            maxValue: range.max,
-            seed,
-          });
-          break;
-        case "subtraction":
-          generated = generateSubtraction({
-            count: problemCount,
-            minValue: range.min,
-            maxValue: range.max,
-            seed,
-            allowNegativeResults: false,
-          });
-          break;
-        case "multiplication":
-          generated = generateMultiplication({
-            count: problemCount,
-            minValue: Math.max(range.min, 1),
-            maxValue: Math.min(range.max, 20),
-            seed,
-          });
-          break;
-        case "division":
-          generated = generateDivision({
-            count: problemCount,
-            minValue: Math.max(range.min, 2),
-            maxValue: Math.min(range.max, 20),
-            seed,
-            requireWholeNumbers: true,
-          });
-          break;
-      }
+      if (subject === "math") {
+        const range =
+          difficulty === "custom"
+            ? { min: customMin, max: customMax }
+            : DIFFICULTY_RANGES[difficulty];
+        let generated: MathProblem[] = [];
 
-      setProblems(generated);
+        switch (operation) {
+          case "addition":
+            generated = generateAddition({
+              count: problemCount,
+              minValue: range.min,
+              maxValue: range.max,
+              seed,
+            });
+            break;
+          case "subtraction":
+            generated = generateSubtraction({
+              count: problemCount,
+              minValue: range.min,
+              maxValue: range.max,
+              seed,
+              allowNegativeResults: false,
+            });
+            break;
+          case "multiplication":
+            // For multiplication, use smaller ranges to keep products reasonable
+            const multMax = Math.min(
+              range.max,
+              difficulty === "very_easy"
+                ? 5
+                : difficulty === "easy"
+                  ? 10
+                  : difficulty === "medium"
+                    ? 12
+                    : difficulty === "hard"
+                      ? 15
+                      : 20
+            );
+            generated = generateMultiplication({
+              count: problemCount,
+              minValue: Math.max(range.min, 2),
+              maxValue: multMax,
+              seed,
+              maxProduct:
+                difficulty === "very_easy"
+                  ? 25
+                  : difficulty === "easy"
+                    ? 100
+                    : difficulty === "medium"
+                      ? 144
+                      : difficulty === "hard"
+                        ? 225
+                        : undefined,
+            });
+            break;
+          case "division":
+            // For division, keep divisor and quotient in the difficulty range
+            const divMax = Math.min(
+              range.max,
+              difficulty === "very_easy"
+                ? 5
+                : difficulty === "easy"
+                  ? 10
+                  : difficulty === "medium"
+                    ? 12
+                    : difficulty === "hard"
+                      ? 15
+                      : 20
+            );
+            generated = generateDivision({
+              count: problemCount,
+              minValue: Math.max(range.min, 2),
+              maxValue: divMax,
+              seed,
+              requireWholeNumbers: true,
+            });
+            break;
+        }
+        setProblems(generated);
+      } else if (subject === "language_arts") {
+        if (languageArtsType === "spelling") {
+          const words = generateSpellingWords({
+            count: problemCount,
+            difficulty:
+              difficulty === "very_easy" || difficulty === "very_hard" || difficulty === "custom"
+                ? "easy"
+                : difficulty,
+            seed,
+          });
+          setSpellingWords(words);
+        } else if (languageArtsType === "vocabulary") {
+          const words = generateVocabularyWords({
+            count: Math.min(problemCount, 10),
+            difficulty:
+              difficulty === "very_easy" ||
+              difficulty === "easy" ||
+              difficulty === "very_hard" ||
+              difficulty === "custom"
+                ? "medium"
+                : difficulty,
+            seed,
+          });
+          setVocabularyWords(words);
+        } else if (languageArtsType === "writing") {
+          const prompts = generateWritingPrompts({
+            count: Math.min(problemCount, 5),
+            type: writingType,
+            seed,
+          });
+          setWritingPrompts(prompts);
+        }
+      }
     } catch (error) {
       console.error("Generation error:", error);
-      alert("Failed to generate problems. Please try different settings.");
+      alert("Failed to generate content. Please try different settings.");
     } finally {
       setIsGenerating(false);
     }
@@ -156,8 +248,14 @@ export default function CreateWorksheet() {
   };
 
   const handleExport = async () => {
-    if (problems.length === 0) {
-      alert("Please generate problems first!");
+    const hasContent =
+      problems.length > 0 ||
+      spellingWords.length > 0 ||
+      vocabularyWords.length > 0 ||
+      writingPrompts.length > 0;
+
+    if (!hasContent) {
+      alert("Please generate content first!");
       return;
     }
 
@@ -220,8 +318,15 @@ export default function CreateWorksheet() {
           : selectedBg?.css || "";
 
       const printWindow = window.open("", "_blank");
+      const contentData =
+        subject === "math"
+          ? { problems }
+          : subject === "language_arts"
+            ? { spellingWords, vocabularyWords, writingPrompts }
+            : {};
+
       if (printWindow) {
-        printWindow.document.write(generatePrintHTML(result.data, bgStyle));
+        printWindow.document.write(generatePrintHTML(subject, result.data || contentData, bgStyle));
         printWindow.document.close();
         alert(
           "Worksheet created! Check the new window/tab to print.\n\n(Unlimited exports available)"
@@ -231,7 +336,7 @@ export default function CreateWorksheet() {
           "Popup blocked! Please allow popups for this site, then try again.\n\n" +
             "Or click OK and I'll show the worksheet on this page instead."
         );
-        document.body.innerHTML = generatePrintHTML(result.data, bgStyle);
+        document.body.innerHTML = generatePrintHTML(subject, result.data || contentData, bgStyle);
       }
     } catch (error) {
       console.error("Export error:", error);
@@ -290,6 +395,28 @@ export default function CreateWorksheet() {
               </CardHeader>
               <CardContent className="space-y-6 pt-6">
                 <div className="space-y-2">
+                  <label className="text-sm font-semibold">📚 Subject</label>
+                  <select
+                    className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-11 w-full rounded-md border-2 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
+                    value={subject}
+                    onChange={(e) => {
+                      setSubject(e.target.value as SubjectType);
+                      setTitle(
+                        e.target.value === "math"
+                          ? "Math Practice Worksheet"
+                          : e.target.value === "language_arts"
+                            ? "Language Arts Worksheet"
+                            : "Science Worksheet"
+                      );
+                    }}
+                  >
+                    <option value="math">📐 Math</option>
+                    <option value="language_arts">📖 Language Arts</option>
+                    <option value="science">🔬 Science (Coming Soon)</option>
+                  </select>
+                </div>
+
+                <div className="space-y-2">
                   <label className="text-sm font-semibold">📝 Title</label>
                   <Input
                     value={title}
@@ -299,23 +426,70 @@ export default function CreateWorksheet() {
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold">➕ Operation</label>
-                  <select
-                    className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-11 w-full rounded-md border-2 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
-                    value={operation}
-                    onChange={(e) =>
-                      setOperation(
-                        e.target.value as "addition" | "subtraction" | "multiplication" | "division"
-                      )
-                    }
-                  >
-                    <option value="addition">➕ Addition</option>
-                    <option value="subtraction">➖ Subtraction</option>
-                    <option value="multiplication">✖️ Multiplication</option>
-                    <option value="division">➗ Division</option>
-                  </select>
-                </div>
+                {subject === "math" && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold">➕ Operation</label>
+                    <select
+                      className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-11 w-full rounded-md border-2 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
+                      value={operation}
+                      onChange={(e) =>
+                        setOperation(
+                          e.target.value as
+                            | "addition"
+                            | "subtraction"
+                            | "multiplication"
+                            | "division"
+                        )
+                      }
+                    >
+                      <option value="addition">➕ Addition</option>
+                      <option value="subtraction">➖ Subtraction</option>
+                      <option value="multiplication">✖️ Multiplication</option>
+                      <option value="division">➗ Division</option>
+                    </select>
+                  </div>
+                )}
+
+                {subject === "language_arts" && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold">📖 Type</label>
+                    <select
+                      className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-11 w-full rounded-md border-2 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
+                      value={languageArtsType}
+                      onChange={(e) => setLanguageArtsType(e.target.value as LanguageArtsType)}
+                    >
+                      <option value="spelling">🔤 Spelling Words</option>
+                      <option value="vocabulary">📚 Vocabulary</option>
+                      <option value="writing">✍️ Writing Prompts</option>
+                    </select>
+                  </div>
+                )}
+
+                {subject === "language_arts" && languageArtsType === "writing" && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold">✍️ Writing Style</label>
+                    <select
+                      className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-11 w-full rounded-md border-2 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
+                      value={writingType}
+                      onChange={(e) =>
+                        setWritingType(
+                          e.target.value as
+                            | "narrative"
+                            | "expository"
+                            | "persuasive"
+                            | "descriptive"
+                            | "mixed"
+                        )
+                      }
+                    >
+                      <option value="narrative">📖 Narrative (Tell a Story)</option>
+                      <option value="expository">📝 Expository (Explain/Inform)</option>
+                      <option value="persuasive">💬 Persuasive (Convince)</option>
+                      <option value="descriptive">🎨 Descriptive (Paint a Picture)</option>
+                      <option value="mixed">🎲 Mixed (Random)</option>
+                    </select>
+                  </div>
+                )}
 
                 <div className="space-y-2">
                   <label className="text-sm font-semibold">🎯 Difficulty Level</label>
@@ -593,7 +767,20 @@ export default function CreateWorksheet() {
 }
 
 // Helper function to generate printable HTML
-function generatePrintHTML(
+function generatePrintHTML(subject: string, data: unknown, backgroundStyle: string): string {
+  if (subject === "math") {
+    return generateMathPrintHTML(
+      data as { title: string; subtitle?: string; problems: MathProblem[] },
+      backgroundStyle
+    );
+  }
+  return generateMathPrintHTML(
+    data as { title: string; subtitle?: string; problems: MathProblem[] },
+    backgroundStyle
+  );
+}
+
+function generateMathPrintHTML(
   data: {
     title: string;
     subtitle?: string;
