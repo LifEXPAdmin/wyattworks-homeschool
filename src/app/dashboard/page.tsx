@@ -30,29 +30,35 @@ export default async function Dashboard() {
             </MobileCard>
           </Link>
 
-          <MobileCard 
-            title="Browse Templates" 
-            description="Choose from pre-made templates"
-            className="cursor-pointer transition-shadow hover:shadow-md"
-          >
-            <MobileButton variant="outline" className="w-full">Browse</MobileButton>
-          </MobileCard>
+          <Link href="/dashboard/templates">
+            <MobileCard 
+              title="Browse Templates" 
+              description="Choose from pre-made templates"
+              className="cursor-pointer transition-shadow hover:shadow-md"
+            >
+              <MobileButton variant="outline" className="w-full">Browse</MobileButton>
+            </MobileCard>
+          </Link>
 
-          <MobileCard 
-            title="My Worksheets" 
-            description="View and manage your worksheets"
-            className="cursor-pointer transition-shadow hover:shadow-md"
-          >
-            <MobileButton variant="outline" className="w-full">View All</MobileButton>
-          </MobileCard>
+          <Link href="/dashboard/worksheets">
+            <MobileCard 
+              title="My Worksheets" 
+              description="View and manage your worksheets"
+              className="cursor-pointer transition-shadow hover:shadow-md"
+            >
+              <MobileButton variant="outline" className="w-full">View All</MobileButton>
+            </MobileCard>
+          </Link>
 
-          <MobileCard 
-            title="Progress Reports" 
-            description="Track learning progress"
-            className="cursor-pointer transition-shadow hover:shadow-md"
-          >
-            <MobileButton variant="outline" className="w-full">View Reports</MobileButton>
-          </MobileCard>
+          <Link href="/dashboard/progress">
+            <MobileCard 
+              title="Progress Reports" 
+              description="Track learning progress"
+              className="cursor-pointer transition-shadow hover:shadow-md"
+            >
+              <MobileButton variant="outline" className="w-full">View Reports</MobileButton>
+            </MobileCard>
+          </Link>
         </MobileGrid>
 
         {/* Progress Tracking Section */}

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -31,7 +32,7 @@ interface MobileLayoutProps {
 }
 
 export function MobileLayout({ children, className }: MobileLayoutProps) {
-  const [mobileConfig, setMobileConfig] = useState<MobileConfig>(mobileDetector.getConfig());
+  const [mobileConfig, setMobileConfig] = useState<MobileConfig>(() => mobileDetector.getConfig());
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -108,12 +109,12 @@ export function MobileLayout({ children, className }: MobileLayoutProps) {
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
             <div className="flex items-center">
-              <span className={`text-primary font-bold ${fontSizes['2xl']}`}>
-                <span className="flex items-center gap-2">
+              <Link href="/" className="text-primary font-bold hover:text-primary/80 transition-colors">
+                <span className={`flex items-center gap-2 ${fontSizes['2xl']}`}>
                   <span className="text-3xl">✨</span>
                   <span>Astra Academy</span>
                 </span>
-              </span>
+              </Link>
             </div>
 
             {/* Mobile Actions */}
@@ -181,18 +182,16 @@ export function MobileLayout({ children, className }: MobileLayoutProps) {
 
               <nav className="space-y-2">
                 {navigationItems.map((item) => (
-                  <Button
-                    key={item.label}
-                    variant="ghost"
-                    className={`w-full justify-start ${buttonSizes.md} touch-friendly`}
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      // In a real app, you'd navigate here
-                    }}
-                  >
-                    <item.icon className="mr-3 h-4 w-4" />
-                    {item.label}
-                  </Button>
+                  <Link key={item.label} href={item.href}>
+                    <Button
+                      variant="ghost"
+                      className={`w-full justify-start ${buttonSizes.md} touch-friendly`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <item.icon className="mr-3 h-4 w-4" />
+                      {item.label}
+                    </Button>
+                  </Link>
                 ))}
               </nav>
 
@@ -202,20 +201,26 @@ export function MobileLayout({ children, className }: MobileLayoutProps) {
                   Quick Actions
                 </h3>
                 <div className="space-y-2">
-                  <Button
-                    variant="outline"
-                    className={`w-full ${buttonSizes.sm} touch-friendly`}
-                  >
-                    <BookOpen className="mr-2 h-4 w-4" />
-                    New Math Worksheet
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className={`w-full ${buttonSizes.sm} touch-friendly`}
-                  >
-                    <BarChart3 className="mr-2 h-4 w-4" />
-                    View Progress
-                  </Button>
+                  <Link href="/dashboard/create">
+                    <Button
+                      variant="outline"
+                      className={`w-full ${buttonSizes.sm} touch-friendly`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <BookOpen className="mr-2 h-4 w-4" />
+                      New Math Worksheet
+                    </Button>
+                  </Link>
+                  <Link href="/dashboard/progress">
+                    <Button
+                      variant="outline"
+                      className={`w-full ${buttonSizes.sm} touch-friendly`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <BarChart3 className="mr-2 h-4 w-4" />
+                      View Progress
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -252,18 +257,16 @@ export function MobileLayout({ children, className }: MobileLayoutProps) {
         <nav className="fixed bottom-0 left-0 right-0 bg-background border-t z-40">
           <div className="flex items-center justify-around py-2">
             {navigationItems.slice(0, 4).map((item, index) => (
-              <Button
-                key={item.label}
-                variant="ghost"
-                size="sm"
-                className={`flex flex-col items-center ${spacing.sm} touch-friendly`}
-                onClick={() => {
-                  // In a real app, you'd navigate here
-                }}
-              >
-                <item.icon className="h-4 w-4 mb-1" />
-                <span className="text-xs">{item.label}</span>
-              </Button>
+              <Link key={item.label} href={item.href}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={`flex flex-col items-center ${spacing.sm} touch-friendly`}
+                >
+                  <item.icon className="h-4 w-4 mb-1" />
+                  <span className="text-xs">{item.label}</span>
+                </Button>
+              </Link>
             ))}
           </div>
         </nav>
@@ -306,7 +309,7 @@ interface MobileCardProps {
 }
 
 export function MobileCard({ title, description, children, className, onClick }: MobileCardProps) {
-  const [mobileConfig] = useState<MobileConfig>(mobileDetector.getConfig());
+  const [mobileConfig] = useState<MobileConfig>(() => mobileDetector.getConfig());
   const spacing = responsiveUtils.getSpacing(mobileConfig);
   const fontSizes = responsiveUtils.getFontSizes(mobileConfig);
 
@@ -346,7 +349,7 @@ export function MobileButton({
   onClick, 
   disabled 
 }: MobileButtonProps) {
-  const [mobileConfig] = useState<MobileConfig>(mobileDetector.getConfig());
+  const [mobileConfig] = useState<MobileConfig>(() => mobileDetector.getConfig());
   const buttonSizes = responsiveUtils.getButtonSizes(mobileConfig);
 
   return (
@@ -370,7 +373,7 @@ interface MobileGridProps {
 }
 
 export function MobileGrid({ children, columns = 2, gap = "md", className }: MobileGridProps) {
-  const [mobileConfig] = useState<MobileConfig>(mobileDetector.getConfig());
+  const [mobileConfig] = useState<MobileConfig>(() => mobileDetector.getConfig());
   const responsiveColumns = responsiveUtils.getGridColumns(mobileConfig, columns);
   
   const gapClasses = {

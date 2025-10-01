@@ -40,6 +40,10 @@ export class MobileDetector {
     return MobileDetector.instance;
   }
 
+  getConfig(): MobileConfig {
+    return this.config;
+  }
+
   private detectMobile(): MobileConfig {
     if (typeof window === 'undefined') {
       return {
