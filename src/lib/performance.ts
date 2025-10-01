@@ -156,7 +156,7 @@ export class WorksheetCache extends Cache {
   }
 
   getWorksheet(id: string): Record<string, unknown> | null {
-    return this.get(`worksheet:${id}`);
+    return this.get(`worksheet:${id}`) as Record<string, unknown> | null;
   }
 
   cacheGeneratedContent(subject: string, config: Record<string, unknown>, content: Record<string, unknown>): void {
@@ -166,7 +166,7 @@ export class WorksheetCache extends Cache {
 
   getGeneratedContent(subject: string, config: Record<string, unknown>): Record<string, unknown> | null {
     const key = `generated:${subject}:${JSON.stringify(config)}`;
-    return this.get(key);
+    return this.get(key) as Record<string, unknown> | null;
   }
 }
 
@@ -184,7 +184,7 @@ export class FontCache extends Cache {
   }
 
   getFont(fontFamily: string): string | null {
-    return this.get(`font:${fontFamily}`);
+    return this.get(`font:${fontFamily}`) as string | null;
   }
 }
 
@@ -202,7 +202,7 @@ export class ProgressCache extends Cache {
   }
 
   getProgress(userId: string): Record<string, unknown> | null {
-    return this.get(`progress:${userId}`);
+    return this.get(`progress:${userId}`) as Record<string, unknown> | null;
   }
 }
 
@@ -258,7 +258,9 @@ export class PerformanceMonitor {
   updateMemoryUsage(): void {
     if ('memory' in performance) {
       const memory = (performance as { memory?: { usedJSHeapSize: number } }).memory;
-      this.metrics.memoryUsage = memory.usedJSHeapSize / 1024 / 1024; // MB
+      if (memory) {
+        this.metrics.memoryUsage = memory.usedJSHeapSize / 1024 / 1024; // MB
+      }
     }
   }
 
@@ -433,7 +435,7 @@ export class BundleOptimizer {
       return importedModule.default;
     } catch (error) {
       console.error('Failed to lazy load component:', componentPath, error);
-      return null;
+      return null as React.ComponentType<unknown>;
     }
   }
 

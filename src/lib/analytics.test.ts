@@ -350,7 +350,7 @@ describe('Analytics System', () => {
       
       expect(report.studentId).toBe('student-1');
       expect(report.reportPeriod).toBe('weekly');
-      expect(report.summary.totalWorksheets).toBe(1);
+      expect(report.summary.worksheetsCompleted).toBe(1);
       expect(report.summary.problemsSolved).toBe(1);
       expect(report.summary.totalTimeSpent).toBe(30);
       expect(report.subjectBreakdown).toHaveLength(1);

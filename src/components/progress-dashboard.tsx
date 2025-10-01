@@ -449,7 +449,7 @@ export function SessionRecorder({
       incorrectCount,
       timeSpent: totalTimeSpent,
       completedAt: sessionEndTime,
-        problems: problemAttempts as ProblemAttempt[], // Type assertion for now
+        problems: problemAttempts as Array<{ problemId: string; correct: boolean; timeSpent: number; attempts: number }>,
     };
 
     progressTracker.recordSession(session);

@@ -39,7 +39,7 @@ describe('Design System', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Reset ThemeManager instance
-    (ThemeManager as any).instance = undefined;
+    (ThemeManager as unknown as { instance: undefined }).instance = undefined;
   });
 
   describe('THEMES', () => {
@@ -196,13 +196,13 @@ describe('Design System', () => {
       style: {
         setProperty: vi.fn(),
       },
-    } as HTMLElement;
+    } as unknown as HTMLElement;
     });
 
     it('should animate element with fade animation', async () => {
       const promise = AnimationManager.animate(mockElement, {
         type: 'fade',
-        direction: 'in',
+        direction: 'up',
         duration: 'normal',
       });
 
@@ -280,7 +280,7 @@ describe('Design System', () => {
         width: 200,
         height: 50,
       })),
-    } as HTMLElement;
+    } as unknown as HTMLElement;
     });
 
     it('should add hover effects', () => {
@@ -338,7 +338,7 @@ describe('Design System', () => {
         writable: true,
       });
 
-      const clickHandler = mockElement.addEventListener.mock.calls[0][1];
+      const clickHandler = (mockElement.addEventListener as unknown as { mock: { calls: unknown[][] } }).mock.calls[0][1];
       clickHandler({ target: mockElement });
 
       expect(mockBody.appendChild).toHaveBeenCalled();

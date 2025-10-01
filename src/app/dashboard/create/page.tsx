@@ -141,6 +141,10 @@ export default function CreateWorksheet() {
     return () => themeManager.removeListener(handleThemeChange);
   }, []);
 
+  const handleSessionComplete = (_completedSessionId: string) => {
+    alert("🎉 Session completed! Your progress has been tracked. Check your dashboard for insights!");
+  };
+
   const handleFontSelect = (font: FontInfo) => {
     setSelectedFont(font);
     
@@ -171,7 +175,10 @@ export default function CreateWorksheet() {
         subject,
         type: subject === "math" ? operation : subject === "language_arts" ? languageArtsType : scienceType,
         difficulty: subject === "math" ? difficulty : gradeLevel,
-        problemCount: subject === "math" ? problemCount : subject === "language_arts" ? (languageArtsType === "spelling" ? spellingCount : languageArtsType === "vocabulary" ? vocabularyCount : writingCount) : scienceCount,
+        problemCount: subject === "math" ? problemCount : 
+          subject === "language_arts" ? 
+            (languageArtsType === "spelling" ? 10 : languageArtsType === "vocabulary" ? 10 : 5) : 
+          10,
         seed,
       },
     });
@@ -196,13 +203,13 @@ export default function CreateWorksheet() {
       
       // Use cached content
       if (subject === "math") {
-        setProblems(cachedContent);
+        setProblems(cachedContent as MathProblem[]);
       } else if (subject === "language_arts") {
-        if (languageArtsType === "spelling") setSpellingWords(cachedContent);
-        else if (languageArtsType === "vocabulary") setVocabularyWords(cachedContent);
-        else if (languageArtsType === "writing") setWritingPrompts(cachedContent);
+        if (languageArtsType === "spelling") setSpellingWords(cachedContent as SpellingWord[]);
+        else if (languageArtsType === "vocabulary") setVocabularyWords(cachedContent as VocabularyItem[]);
+        else if (languageArtsType === "writing") setWritingPrompts(cachedContent as WritingPrompt[]);
       } else if (subject === "science") {
-        setScienceProblems(cachedContent);
+        setScienceProblems(cachedContent as ScienceProblem[]);
       }
       
       setIsGenerating(false);
@@ -352,7 +359,7 @@ export default function CreateWorksheet() {
         problemCount,
         seed,
         gradeLevel,
-      }, contentToCache);
+      }, contentToCache as Record<string, unknown>);
       
       performanceMonitor.endRender(startTime);
     }
@@ -382,7 +389,10 @@ export default function CreateWorksheet() {
         subject,
         type: subject === "math" ? operation : subject === "language_arts" ? languageArtsType : scienceType,
         difficulty: subject === "math" ? difficulty : gradeLevel,
-        problemCount: subject === "math" ? problemCount : subject === "language_arts" ? (languageArtsType === "spelling" ? spellingCount : languageArtsType === "vocabulary" ? vocabularyCount : writingCount) : scienceCount,
+        problemCount: subject === "math" ? problemCount : 
+          subject === "language_arts" ? 
+            (languageArtsType === "spelling" ? 10 : languageArtsType === "vocabulary" ? 10 : 5) : 
+          10,
         font: selectedFont.name,
         theme: currentTheme.id,
       },
@@ -1205,7 +1215,7 @@ export default function CreateWorksheet() {
 }
 
 // Helper function to generate printable HTML
-function generatePrintHTML(subject: string, data: unknown, backgroundStyle: string, font: FontInfo, theme: typeof currentTheme): string {
+function generatePrintHTML(subject: string, data: unknown, backgroundStyle: string, font: FontInfo, theme: { colors: Record<string, string> }): string {
   if (subject === "math") {
     return generateMathPrintHTML(
       data as { title: string; subtitle?: string; problems: MathProblem[] },
@@ -1237,7 +1247,7 @@ function generateMathPrintHTML(
   },
   backgroundStyle: string,
   font: FontInfo,
-  theme: typeof currentTheme
+  theme: { colors: Record<string, string> }
 ): string {
   const { title, subtitle, problems } = data;
 
