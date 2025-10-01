@@ -81,11 +81,13 @@ const BACKGROUND_TEMPLATES = [
 type SubjectType = "math" | "language_arts" | "science";
 type MathOperation = "addition" | "subtraction" | "multiplication" | "division";
 type LanguageArtsType = "spelling" | "vocabulary" | "writing";
+type GradeLevel = "K" | "1-2" | "3-4" | "5-6" | "7-8";
 
 export default function CreateWorksheet() {
   const [subject, setSubject] = useState<SubjectType>("math");
   const [title, setTitle] = useState("Math Practice Worksheet");
   const [difficulty, setDifficulty] = useState<DifficultyLevel>("medium");
+  const [gradeLevel, setGradeLevel] = useState<GradeLevel>("3-4");
   const [customMin, setCustomMin] = useState(1);
   const [customMax, setCustomMax] = useState(20);
   const [problemCount, setProblemCount] = useState(20);
@@ -198,23 +200,14 @@ export default function CreateWorksheet() {
         if (languageArtsType === "spelling") {
           const words = generateSpellingWords({
             count: problemCount,
-            difficulty:
-              difficulty === "very_easy" || difficulty === "very_hard" || difficulty === "custom"
-                ? "easy"
-                : difficulty,
+            grade: gradeLevel,
             seed,
           });
           setSpellingWords(words);
         } else if (languageArtsType === "vocabulary") {
           const words = generateVocabularyWords({
             count: Math.min(problemCount, 10),
-            difficulty:
-              difficulty === "very_easy" ||
-              difficulty === "easy" ||
-              difficulty === "very_hard" ||
-              difficulty === "custom"
-                ? "medium"
-                : difficulty,
+            grade: gradeLevel,
             seed,
           });
           setVocabularyWords(words);
@@ -491,23 +484,51 @@ export default function CreateWorksheet() {
                   </div>
                 )}
 
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold">🎯 Difficulty Level</label>
-                  <select
-                    className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-11 w-full rounded-md border-2 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
-                    value={difficulty}
-                    onChange={(e) => setDifficulty(e.target.value as DifficultyLevel)}
-                  >
-                    {Object.entries(DIFFICULTY_RANGES).map(([key, value]) => (
-                      <option key={key} value={key}>
-                        {value.label}
-                      </option>
-                    ))}
-                  </select>
-                  <p className="rounded bg-blue-50 px-3 py-2 text-xs text-blue-700">
-                    {DIFFICULTY_RANGES[difficulty].desc}
-                  </p>
-                </div>
+                {subject === "math" ? (
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold">🎯 Difficulty Level</label>
+                    <select
+                      className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-11 w-full rounded-md border-2 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
+                      value={difficulty}
+                      onChange={(e) => setDifficulty(e.target.value as DifficultyLevel)}
+                    >
+                      {Object.entries(DIFFICULTY_RANGES).map(([key, value]) => (
+                        <option key={key} value={key}>
+                          {value.label}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="rounded bg-blue-50 px-3 py-2 text-xs text-blue-700">
+                      {DIFFICULTY_RANGES[difficulty].desc}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold">🎓 Grade Level</label>
+                    <select
+                      className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-11 w-full rounded-md border-2 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
+                      value={gradeLevel}
+                      onChange={(e) => setGradeLevel(e.target.value as GradeLevel)}
+                    >
+                      <option value="K">Kindergarten</option>
+                      <option value="1-2">Grades 1-2</option>
+                      <option value="3-4">Grades 3-4</option>
+                      <option value="5-6">Grades 5-6</option>
+                      <option value="7-8">Grades 7-8</option>
+                    </select>
+                    <p className="rounded bg-green-50 px-3 py-2 text-xs text-green-700">
+                      {gradeLevel === "K"
+                        ? "Simple CVC words & basic sight words"
+                        : gradeLevel === "1-2"
+                          ? "Consonant blends, digraphs & common sight words"
+                          : gradeLevel === "3-4"
+                            ? "Multi-syllable words & common patterns"
+                            : gradeLevel === "5-6"
+                              ? "Complex words & Greek/Latin roots"
+                              : "Advanced vocabulary & challenging spellings"}
+                    </p>
+                  </div>
+                )}
 
                 {difficulty === "custom" && (
                   <div className="space-y-4 rounded-lg border-2 border-dashed border-purple-300 bg-purple-50/50 p-4">
@@ -538,16 +559,36 @@ export default function CreateWorksheet() {
                 )}
 
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold">🔢 Number of Problems</label>
+                  <label className="text-sm font-semibold">
+                    {subject === "math"
+                      ? "🔢 Number of Problems"
+                      : languageArtsType === "spelling"
+                        ? "📝 Number of Words"
+                        : languageArtsType === "vocabulary"
+                          ? "📚 Number of Vocabulary Words"
+                          : "✍️ Number of Prompts"}
+                  </label>
                   <Input
                     type="number"
                     min="5"
-                    max="100"
+                    max={
+                      subject === "language_arts" && languageArtsType === "vocabulary"
+                        ? "10"
+                        : "100"
+                    }
                     value={problemCount}
                     onChange={(e) => setProblemCount(parseInt(e.target.value) || 20)}
                     className="border-2"
                   />
-                  <p className="text-muted-foreground text-xs">Between 5 and 100 problems</p>
+                  <p className="text-muted-foreground text-xs">
+                    {subject === "math"
+                      ? "Between 5 and 100 problems"
+                      : languageArtsType === "vocabulary"
+                        ? "Between 5 and 10 vocabulary words"
+                        : languageArtsType === "writing"
+                          ? "Between 1 and 5 writing prompts"
+                          : "Between 5 and 100 words"}
+                  </p>
                 </div>
 
                 <Button
@@ -556,7 +597,15 @@ export default function CreateWorksheet() {
                   className="w-full text-lg shadow-md"
                   size="lg"
                 >
-                  {isGenerating ? "Generating..." : "🎲 Generate Problems"}
+                  {isGenerating
+                    ? "Generating..."
+                    : subject === "math"
+                      ? "🎲 Generate Problems"
+                      : languageArtsType === "spelling"
+                        ? "🔤 Generate Spelling Words"
+                        : languageArtsType === "vocabulary"
+                          ? "📚 Generate Vocabulary"
+                          : "✍️ Generate Writing Prompts"}
                 </Button>
               </CardContent>
             </Card>
