@@ -682,11 +682,20 @@ export default function CreateWorksheet() {
                 <CardDescription>
                   {problems.length > 0
                     ? `${problems.length} problems ready to print!`
-                    : "Configure settings and generate problems"}
+                    : spellingWords.length > 0
+                      ? `${spellingWords.length} spelling words ready to print!`
+                      : vocabularyWords.length > 0
+                        ? `${vocabularyWords.length} vocabulary words ready to print!`
+                        : writingPrompts.length > 0
+                          ? `${writingPrompts.length} writing prompts ready to print!`
+                          : "Configure settings and generate content"}
                 </CardDescription>
               </CardHeader>
               <CardContent className="pt-6">
-                {problems.length === 0 ? (
+                {problems.length === 0 &&
+                spellingWords.length === 0 &&
+                vocabularyWords.length === 0 &&
+                writingPrompts.length === 0 ? (
                   <div className="flex h-[600px] items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gradient-to-br from-blue-50/50 to-purple-50/50">
                     <div className="text-center">
                       <div className="mb-4 text-6xl">📋</div>
@@ -694,11 +703,11 @@ export default function CreateWorksheet() {
                         Ready to create magic? ✨
                       </p>
                       <p className="text-muted-foreground mt-2">
-                        Configure your settings on the left and click "Generate Problems"
+                        Configure your settings on the left and click "Generate"
                       </p>
                     </div>
                   </div>
-                ) : (
+                ) : subject === "math" && problems.length > 0 ? (
                   <div className="space-y-6">
                     {/* Worksheet Preview */}
                     <div
@@ -811,7 +820,82 @@ export default function CreateWorksheet() {
                       </div>
                     </div>
                   </div>
-                )}
+                ) : subject === "language_arts" && spellingWords.length > 0 ? (
+                  <div className="space-y-6">
+                    {/* Spelling Words Preview */}
+                    <div className="rounded-xl border-2 bg-gradient-to-br from-blue-50 to-purple-50 p-8">
+                      <h2 className="text-primary mb-6 text-center text-3xl font-bold">{title}</h2>
+                      <p className="text-muted-foreground mb-6 text-center text-lg">
+                        Grade {gradeLevel} Spelling Words
+                      </p>
+                      <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+                        {spellingWords.map((word, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center gap-3 rounded-lg border-2 bg-white p-4 shadow-sm"
+                          >
+                            <span className="bg-primary flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold text-white">
+                              {index + 1}
+                            </span>
+                            <span className="text-lg font-medium">{word.word}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : subject === "language_arts" && vocabularyWords.length > 0 ? (
+                  <div className="space-y-6">
+                    {/* Vocabulary Preview */}
+                    <div className="rounded-xl border-2 bg-gradient-to-br from-green-50 to-blue-50 p-8">
+                      <h2 className="text-primary mb-6 text-center text-3xl font-bold">{title}</h2>
+                      <p className="text-muted-foreground mb-6 text-center text-lg">
+                        Grade {gradeLevel} Vocabulary
+                      </p>
+                      <div className="space-y-4">
+                        {vocabularyWords.map((item, index) => (
+                          <div key={index} className="rounded-lg border-2 bg-white p-4 shadow-sm">
+                            <div className="flex items-start gap-3">
+                              <span className="bg-primary flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold text-white">
+                                {index + 1}
+                              </span>
+                              <div>
+                                <h3 className="text-lg font-bold text-purple-900">{item.word}</h3>
+                                <p className="text-muted-foreground mt-1">{item.definition}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : subject === "language_arts" && writingPrompts.length > 0 ? (
+                  <div className="space-y-6">
+                    {/* Writing Prompts Preview */}
+                    <div className="rounded-xl border-2 bg-gradient-to-br from-yellow-50 to-orange-50 p-8">
+                      <h2 className="text-primary mb-6 text-center text-3xl font-bold">{title}</h2>
+                      <p className="text-muted-foreground mb-6 text-center text-lg">
+                        Writing Prompts
+                      </p>
+                      <div className="space-y-6">
+                        {writingPrompts.map((prompt, index) => (
+                          <div key={index} className="rounded-lg border-2 bg-white p-6 shadow-sm">
+                            <div className="flex items-start gap-3">
+                              <span className="bg-primary flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold text-white">
+                                {index + 1}
+                              </span>
+                              <div>
+                                <span className="mb-2 inline-block rounded-full bg-purple-100 px-3 py-1 text-xs font-semibold text-purple-800">
+                                  {prompt.type.charAt(0).toUpperCase() + prompt.type.slice(1)}
+                                </span>
+                                <p className="text-lg font-medium">{prompt.prompt}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
               </CardContent>
             </Card>
           </div>
