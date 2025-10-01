@@ -193,8 +193,22 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="border-t px-4 py-8 sm:px-6 lg:px-8">
-        <div className="text-muted-foreground container mx-auto text-center">
-          <p>
+        <div className="text-muted-foreground container mx-auto">
+          <div className="mb-4 flex flex-wrap justify-center gap-6 text-sm">
+            <Link href="/privacy" className="hover:text-primary transition-colors">
+              Privacy Policy
+            </Link>
+            <Link href="/terms" className="hover:text-primary transition-colors">
+              Terms of Service
+            </Link>
+            <a
+              href="mailto:support@wyattworks.com"
+              className="hover:text-primary transition-colors"
+            >
+              Contact Us
+            </a>
+          </div>
+          <p className="text-center">
             &copy; {new Date().getFullYear()} Astra Academy. Made with ❤️ by{" "}
             <strong>Wyatt Works</strong>.
           </p>
