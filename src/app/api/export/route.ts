@@ -9,7 +9,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { z } from "zod";
 import { WorksheetConfigSchema, hashConfig } from "@/lib/config";
 import { checkQuota, findExistingExport } from "@/lib/quota";
-import { generateWorksheetPDF } from "@/lib/pdf-generator";
+// import { generateWorksheetPDF } from "@/lib/pdf-generator"; // Disabled for serverless - Puppeteer not supported
 import { generateAddition } from "@/lib/generators/math";
 import prisma from "@/lib/prisma";
 
@@ -86,15 +86,12 @@ export async function POST(request: NextRequest) {
     const existingExport = await findExistingExport(dbUser.id, configHash);
 
     if (existingExport) {
-      // Return existing URLs (no charge)
+      // Return existing data (no charge)
       const metadata = JSON.parse(existingExport.metadata || "{}");
       return NextResponse.json({
         success: true,
         cached: true,
-        urls: {
-          worksheet: metadata.worksheetUrl || `/tmp/worksheet-${existingExport.id}.pdf`,
-          answerKey: metadata.answerKeyUrl || `/tmp/answer-key-${existingExport.id}.pdf`,
-        },
+        data: metadata.worksheetData,
         exportId: existingExport.id,
         createdAt: existingExport.createdAt,
       });
@@ -151,41 +148,17 @@ export async function POST(request: NextRequest) {
         problems.push(...generateAddition({ count: 20, seed }));
     }
 
-    // 7. Generate PDFs
-    const pdfOptions: {
-      format: "letter" | "a4" | "legal";
-      orientation: "portrait" | "landscape";
-      margin?: { top: string; right: string; bottom: string; left: string };
-    } = {
-      format: config.layout?.pageSize || "letter",
-      orientation: config.layout?.orientation || "portrait",
+    // 7. For now, return problem data directly
+    // TODO: Implement PDF generation with a service like Puppeteer on a dedicated server
+    // or use client-side PDF generation with jsPDF/PDFKit
+    const worksheetData = {
+      title,
+      subtitle,
+      instructions: instructions || "Solve each problem. Show your work.",
+      studentName: config.options?.includeStudentName ?? true,
+      date: config.options?.includeDate ?? true,
+      problems,
     };
-
-    // Convert number margins to string margins if provided
-    if (config.layout?.margins) {
-      pdfOptions.margin = {
-        top: `${config.layout.margins.top}in`,
-        right: `${config.layout.margins.right}in`,
-        bottom: `${config.layout.margins.bottom}in`,
-        left: `${config.layout.margins.left}in`,
-      };
-    }
-
-    const pdfs = await generateWorksheetPDF(
-      {
-        title: title,
-        subtitle: subtitle,
-        instructions:
-          instructions || config.options?.showInstructions
-            ? "Solve each problem. Show your work."
-            : undefined,
-        studentName: config.options?.includeStudentName ?? true,
-        date: config.options?.includeDate ?? true,
-        problems,
-      },
-      "/tmp",
-      pdfOptions
-    );
 
     // 8. Create or get worksheet
     let finalWorksheetId = worksheetId;
@@ -210,30 +183,26 @@ export async function POST(request: NextRequest) {
       data: {
         userId: dbUser.id,
         worksheetId: finalWorksheetId,
-        format: "PDF",
+        format: "JSON", // Changed from PDF
         configHash,
         metadata: JSON.stringify({
-          worksheetUrl: pdfs.worksheetPath,
-          answerKeyUrl: pdfs.answerKeyPath,
+          worksheetData,
           config,
           problemCount: problems.length,
         }),
       },
     });
 
-    // 9. Return URLs
+    // 9. Return worksheet data (client will handle PDF generation)
     return NextResponse.json({
       success: true,
       cached: false,
-      urls: {
-        worksheet: pdfs.worksheetPath,
-        answerKey: pdfs.answerKeyPath,
-      },
+      data: worksheetData,
       exportId: exportLog.id,
       quota: {
-        used: quota.limit - quota.remaining + 1, // +1 for this export
+        used: quota.limit === Infinity ? Infinity : quota.limit - quota.remaining + 1,
         limit: quota.limit,
-        remaining: quota.remaining - 1,
+        remaining: quota.remaining === Infinity ? Infinity : quota.remaining - 1,
         plan: quota.plan,
         currentMonth: quota.currentMonth,
       },
