@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,14 @@ import type { SpellingWord, VocabularyItem, WritingPrompt } from "@/lib/generato
 import { generateScienceProblems } from "@/lib/generators/science";
 import type { ScienceProblem, ScienceSubject } from "@/lib/generators/science";
 import type { WorksheetConfig } from "@/lib/config";
+import { FontSelector } from "@/components/font-selector";
+import { BUILT_IN_FONTS, type FontInfo } from "@/lib/fonts";
+import { themeManager } from "@/lib/design-system";
+import { analyticsStorage } from "@/lib/analytics";
+import { SessionRecorder } from "@/components/progress-dashboard";
+import { UsageLimitWarning } from "@/components/subscription-dashboard";
+import { subscriptionManager } from "@/lib/subscription";
+import { worksheetCache, performanceMonitor, offlineManager } from "@/lib/performance";
 
 type DifficultyLevel = "very_easy" | "easy" | "medium" | "hard" | "very_hard" | "custom";
 
@@ -109,10 +117,100 @@ export default function CreateWorksheet() {
   const [scienceProblems, setScienceProblems] = useState<ScienceProblem[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [selectedFont, setSelectedFont] = useState<FontInfo>(BUILT_IN_FONTS[0]);
+  const [currentTheme, setCurrentTheme] = useState(themeManager.getCurrentTheme());
+
+  // Listen for theme changes
+  React.useEffect(() => {
+    const handleThemeChange = (theme: typeof currentTheme) => {
+      setCurrentTheme(theme);
+      
+      // Track theme change
+      analyticsStorage.trackEvent({
+        userId: "current-user",
+        studentId: "current-student",
+        eventType: "theme_changed",
+        data: {
+          themeId: theme.id,
+          themeName: theme.name,
+        },
+      });
+    };
+
+    themeManager.addListener(handleThemeChange);
+    return () => themeManager.removeListener(handleThemeChange);
+  }, []);
+
+  const handleFontSelect = (font: FontInfo) => {
+    setSelectedFont(font);
+    
+    // Track font change
+    analyticsStorage.trackEvent({
+      userId: "current-user",
+      studentId: "current-student",
+      eventType: "font_changed",
+      data: {
+        fontName: font.name,
+        fontFamily: font.family,
+        fontCategory: font.category,
+      },
+    });
+  };
 
   const handleGenerate = () => {
     setIsGenerating(true);
     const seed = Date.now();
+    const startTime = performanceMonitor.startRender();
+
+    // Track worksheet creation event
+    analyticsStorage.trackEvent({
+      userId: "current-user",
+      studentId: "current-student",
+      eventType: "worksheet_created",
+      data: {
+        subject,
+        type: subject === "math" ? operation : subject === "language_arts" ? languageArtsType : scienceType,
+        difficulty: subject === "math" ? difficulty : gradeLevel,
+        problemCount: subject === "math" ? problemCount : subject === "language_arts" ? (languageArtsType === "spelling" ? spellingCount : languageArtsType === "vocabulary" ? vocabularyCount : writingCount) : scienceCount,
+        seed,
+      },
+    });
+
+    // Determine the current type based on subject
+    const currentType = subject === "math" ? operation :
+      subject === "language_arts" ? languageArtsType :
+      subject === "science" ? scienceType : "unknown";
+
+    // Check cache first
+    const cachedContent = worksheetCache.getGeneratedContent(subject, {
+      type: currentType,
+      difficulty,
+      problemCount,
+      seed,
+      gradeLevel,
+    });
+
+    if (cachedContent) {
+      console.log('Using cached content');
+      performanceMonitor.recordCacheHit();
+      
+      // Use cached content
+      if (subject === "math") {
+        setProblems(cachedContent);
+      } else if (subject === "language_arts") {
+        if (languageArtsType === "spelling") setSpellingWords(cachedContent);
+        else if (languageArtsType === "vocabulary") setVocabularyWords(cachedContent);
+        else if (languageArtsType === "writing") setWritingPrompts(cachedContent);
+      } else if (subject === "science") {
+        setScienceProblems(cachedContent);
+      }
+      
+      setIsGenerating(false);
+      performanceMonitor.endRender(startTime);
+      return;
+    }
+
+    performanceMonitor.recordCacheMiss();
 
     // Reset all content
     setProblems([]);
@@ -239,6 +337,24 @@ export default function CreateWorksheet() {
       alert("Failed to generate content. Please try different settings.");
     } finally {
       setIsGenerating(false);
+      
+      // Cache the generated content
+      const contentToCache = subject === "math" ? problems :
+        subject === "language_arts" ? (
+          languageArtsType === "spelling" ? spellingWords :
+          languageArtsType === "vocabulary" ? vocabularyWords :
+          writingPrompts
+        ) : scienceProblems;
+      
+      worksheetCache.cacheGeneratedContent(subject, {
+        type: currentType,
+        difficulty,
+        problemCount,
+        seed,
+        gradeLevel,
+      }, contentToCache);
+      
+      performanceMonitor.endRender(startTime);
     }
   };
 
@@ -255,6 +371,62 @@ export default function CreateWorksheet() {
   };
 
   const handleExport = async () => {
+    const userId = "current-user"; // In a real app, this would come from auth
+    
+    // Track export attempt
+    analyticsStorage.trackEvent({
+      userId,
+      studentId: "current-student",
+      eventType: "worksheet_exported",
+      data: {
+        subject,
+        type: subject === "math" ? operation : subject === "language_arts" ? languageArtsType : scienceType,
+        difficulty: subject === "math" ? difficulty : gradeLevel,
+        problemCount: subject === "math" ? problemCount : subject === "language_arts" ? (languageArtsType === "spelling" ? spellingCount : languageArtsType === "vocabulary" ? vocabularyCount : writingCount) : scienceCount,
+        font: selectedFont.name,
+        theme: currentTheme.id,
+      },
+    });
+    
+    // Determine the current type based on subject
+    const currentType = subject === "math" ? operation :
+      subject === "language_arts" ? languageArtsType :
+      subject === "science" ? scienceType : "unknown";
+    
+    // Check if offline
+    if (offlineManager.canWorkOffline()) {
+      // Add to pending actions for later sync
+      offlineManager.addPendingAction({
+        type: 'export_worksheet',
+        data: {
+          subject,
+          type: currentType,
+          difficulty,
+          problemCount,
+          gradeLevel,
+          problems,
+          spellingWords,
+          vocabularyWords,
+          writingPrompts,
+          scienceProblems,
+        },
+      });
+      
+      alert('📡 You\'re offline! Your worksheet export has been queued and will sync when you\'re back online.');
+      return;
+    }
+    
+    // Check usage limits
+    if (!subscriptionManager.canPerformAction(userId, 'exportsPerMonth')) {
+      alert('You\'ve reached your monthly export limit. Please upgrade your plan to continue exporting worksheets.');
+      return;
+    }
+    
+    if (!subscriptionManager.canPerformAction(userId, 'worksheetsPerMonth')) {
+      alert('You\'ve reached your monthly worksheet limit. Please upgrade your plan to create more worksheets.');
+      return;
+    }
+
     const hasContent =
       problems.length > 0 ||
       spellingWords.length > 0 ||
@@ -347,16 +519,20 @@ export default function CreateWorksheet() {
       const printWindow = window.open("", "_blank");
 
       if (printWindow) {
-        printWindow.document.write(generatePrintHTML(subject, result.data || contentData, bgStyle));
+        printWindow.document.write(generatePrintHTML(subject, result.data || contentData, bgStyle, selectedFont, currentTheme));
         printWindow.document.close();
         alert(
-          "✅ Worksheet Ready!\n\nA new window has opened with your worksheet.\n\nClick the 'Print Worksheet' button and use your browser's print dialog to:\n• Save as PDF\n• Print directly\n\n(Unlimited exports available)"
+          "✅ Worksheet Ready!\n\nA new window has opened with your worksheet.\n\nClick the 'Print Worksheet' button and use your browser's print dialog to:\n• Save as PDF\n• Print directly"
         );
+        
+        // Track usage
+        subscriptionManager.incrementUsage(userId, 'exportsPerMonth');
+        subscriptionManager.incrementUsage(userId, 'worksheetsPerMonth');
       } else {
         alert(
           "Popup blocked! Please allow popups for this site, then try again.\n\nOr click OK and I'll show the worksheet on this page instead."
         );
-        document.body.innerHTML = generatePrintHTML(subject, result.data || contentData, bgStyle);
+        document.body.innerHTML = generatePrintHTML(subject, result.data || contentData, bgStyle, selectedFont, currentTheme);
       }
     } catch (error) {
       console.error("Export error:", error);
@@ -707,6 +883,17 @@ export default function CreateWorksheet() {
                   </div>
 
                   <div className="space-y-2">
+                    <label className="text-sm font-semibold">🔤 Font Style</label>
+                    <FontSelector
+                      selectedFont={selectedFont}
+                      onFontSelect={handleFontSelect}
+                    />
+                    <p className="text-xs text-gray-500">
+                      Choose a font that matches your teaching style. Upload custom fonts for handwriting practice.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
                     <label className="text-sm font-semibold">🖼️ Custom Background Image</label>
                     <Input
                       type="file"
@@ -728,6 +915,21 @@ export default function CreateWorksheet() {
                   >
                     {isExporting ? "Creating..." : "📄 Print Worksheet"}
                   </Button>
+
+                  {/* Usage Warning */}
+                  <UsageLimitWarning userId="current-user" action="exportsPerMonth" className="mt-4" />
+
+                  {/* Session Tracking */}
+                  <div className="mt-4">
+                    <SessionRecorder
+                      studentId="current-user" // In a real app, this would come from auth
+                      worksheetId={`worksheet-${Date.now()}`}
+                      subject={subject}
+                      gradeLevel={gradeLevel}
+                      difficulty={difficulty}
+                      onSessionComplete={handleSessionComplete}
+                    />
+                  </div>
                 </CardContent>
               </Card>
             )}
@@ -1003,21 +1205,27 @@ export default function CreateWorksheet() {
 }
 
 // Helper function to generate printable HTML
-function generatePrintHTML(subject: string, data: unknown, backgroundStyle: string): string {
+function generatePrintHTML(subject: string, data: unknown, backgroundStyle: string, font: FontInfo, theme: typeof currentTheme): string {
   if (subject === "math") {
     return generateMathPrintHTML(
       data as { title: string; subtitle?: string; problems: MathProblem[] },
-      backgroundStyle
+      backgroundStyle,
+      font,
+      theme
     );
   } else if (subject === "science") {
     return generateSciencePrintHTML(
       data as { title: string; subtitle?: string; problems: ScienceProblem[] },
-      backgroundStyle
+      backgroundStyle,
+      font,
+      theme
     );
   }
   return generateMathPrintHTML(
     data as { title: string; subtitle?: string; problems: MathProblem[] },
-    backgroundStyle
+    backgroundStyle,
+    font,
+    theme
   );
 }
 
@@ -1027,7 +1235,9 @@ function generateMathPrintHTML(
     subtitle?: string;
     problems: MathProblem[];
   },
-  backgroundStyle: string
+  backgroundStyle: string,
+  font: FontInfo,
+  theme: typeof currentTheme
 ): string {
   const { title, subtitle, problems } = data;
 
@@ -1073,13 +1283,15 @@ function generateMathPrintHTML(
         }
         
         body { 
-          font-family: 'Georgia', 'Times New Roman', serif; 
+          font-family: ${font.family}; 
           padding: 40px; 
           line-height: 1.6;
           ${backgroundStyle}
           -webkit-print-color-adjust: exact;
           print-color-adjust: exact;
           color-adjust: exact;
+          color: ${theme.colors.text};
+          background-color: ${theme.colors.background};
         }
         
         .controls { 
@@ -1349,7 +1561,8 @@ function generateSciencePrintHTML(
     subtitle?: string;
     problems: ScienceProblem[];
   },
-  backgroundStyle: string
+  backgroundStyle: string,
+  font: FontInfo
 ): string {
   const { title, subtitle, problems } = data;
 
@@ -1390,7 +1603,7 @@ function generateSciencePrintHTML(
         }
         
         body {
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          font-family: ${font.family};
           line-height: 1.6;
           color: #333;
           background: white;

@@ -1,41 +1,17 @@
 import Link from "next/link";
-import { UserButton } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ProgressDashboard } from "@/components/progress-dashboard";
+import { MobileLayout, MobileCard, MobileButton, MobileGrid } from "@/components/mobile-layout";
 
 export default async function Dashboard() {
   const user = await currentUser();
   return (
-    <div className="bg-background min-h-screen">
-      {/* Navbar */}
-      <nav className="bg-background/95 supports-[backdrop-filter]:bg-background/60 border-b backdrop-blur">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            <div className="flex items-center">
-              <Link href="/" className="text-primary text-2xl font-bold">
-                <span className="flex items-center gap-2">
-                  <span className="text-3xl">✨</span>
-                  <span>Astra Academy</span>
-                </span>
-              </Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <UserButton
-                appearance={{
-                  elements: {
-                    avatarBox: "w-10 h-10",
-                  },
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      </nav>
-
+    <MobileLayout>
       {/* Dashboard Content */}
-      <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-8">
+      <div className="space-y-8">
+        <div>
           <h1 className="text-foreground mb-2 text-3xl font-bold">Dashboard</h1>
           <p className="text-muted-foreground">
             Welcome back, {user?.firstName || "there"}! Let&apos;s build some worksheets.
@@ -43,54 +19,45 @@ export default async function Dashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <MobileGrid columns={4} gap="md">
           <Link href="/dashboard/create">
-            <Card className="cursor-pointer transition-shadow hover:shadow-md">
-              <CardHeader>
-                <CardTitle className="text-lg">Create New Worksheet</CardTitle>
-                <CardDescription>Start building a custom worksheet</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button className="w-full">Get Started</Button>
-              </CardContent>
-            </Card>
+            <MobileCard 
+              title="Create New Worksheet" 
+              description="Start building a custom worksheet"
+              className="cursor-pointer transition-shadow hover:shadow-md"
+            >
+              <MobileButton className="w-full">Get Started</MobileButton>
+            </MobileCard>
           </Link>
 
-          <Card className="cursor-pointer transition-shadow hover:shadow-md">
-            <CardHeader>
-              <CardTitle className="text-lg">Browse Templates</CardTitle>
-              <CardDescription>Choose from pre-made templates</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button variant="outline" className="w-full">
-                Browse
-              </Button>
-            </CardContent>
-          </Card>
+          <MobileCard 
+            title="Browse Templates" 
+            description="Choose from pre-made templates"
+            className="cursor-pointer transition-shadow hover:shadow-md"
+          >
+            <MobileButton variant="outline" className="w-full">Browse</MobileButton>
+          </MobileCard>
 
-          <Card className="cursor-pointer transition-shadow hover:shadow-md">
-            <CardHeader>
-              <CardTitle className="text-lg">My Worksheets</CardTitle>
-              <CardDescription>View and manage your worksheets</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button variant="outline" className="w-full">
-                View All
-              </Button>
-            </CardContent>
-          </Card>
+          <MobileCard 
+            title="My Worksheets" 
+            description="View and manage your worksheets"
+            className="cursor-pointer transition-shadow hover:shadow-md"
+          >
+            <MobileButton variant="outline" className="w-full">View All</MobileButton>
+          </MobileCard>
 
-          <Card className="cursor-pointer transition-shadow hover:shadow-md">
-            <CardHeader>
-              <CardTitle className="text-lg">Progress Reports</CardTitle>
-              <CardDescription>Track learning progress</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button variant="outline" className="w-full">
-                View Reports
-              </Button>
-            </CardContent>
-          </Card>
+          <MobileCard 
+            title="Progress Reports" 
+            description="Track learning progress"
+            className="cursor-pointer transition-shadow hover:shadow-md"
+          >
+            <MobileButton variant="outline" className="w-full">View Reports</MobileButton>
+          </MobileCard>
+        </MobileGrid>
+
+        {/* Progress Tracking Section */}
+        <div>
+          <ProgressDashboard studentId={user?.id || "default-student"} />
         </div>
 
         {/* Recent Activity */}
@@ -161,6 +128,6 @@ export default async function Dashboard() {
           </Card>
         </div>
       </div>
-    </div>
+    </MobileLayout>
   );
 }

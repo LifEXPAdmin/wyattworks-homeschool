@@ -20,13 +20,20 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:fast": "vitest run --reporter=basic",
+    "check:fast": "npm run typecheck && npm run lint",
+    "check:full": "npm run typecheck && npm run lint && npm run build:ci"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.33.1",
     "@prisma/client": "^6.16.3",
     "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-progress": "^1.1.7",
+    "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-tabs": "^1.1.13",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "html2canvas": "^1.4.1",
