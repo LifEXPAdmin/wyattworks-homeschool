@@ -203,13 +203,13 @@ export default function CreateWorksheet() {
       
       // Use cached content
       if (subject === "math") {
-        setProblems(cachedContent as MathProblem[]);
+        setProblems(cachedContent as unknown as MathProblem[]);
       } else if (subject === "language_arts") {
-        if (languageArtsType === "spelling") setSpellingWords(cachedContent as SpellingWord[]);
-        else if (languageArtsType === "vocabulary") setVocabularyWords(cachedContent as VocabularyItem[]);
-        else if (languageArtsType === "writing") setWritingPrompts(cachedContent as WritingPrompt[]);
+        if (languageArtsType === "spelling") setSpellingWords(cachedContent as unknown as SpellingWord[]);
+        else if (languageArtsType === "vocabulary") setVocabularyWords(cachedContent as unknown as VocabularyItem[]);
+        else if (languageArtsType === "writing") setWritingPrompts(cachedContent as unknown as WritingPrompt[]);
       } else if (subject === "science") {
-        setScienceProblems(cachedContent as ScienceProblem[]);
+        setScienceProblems(cachedContent as unknown as ScienceProblem[]);
       }
       
       setIsGenerating(false);
@@ -359,7 +359,7 @@ export default function CreateWorksheet() {
         problemCount,
         seed,
         gradeLevel,
-      }, contentToCache as Record<string, unknown>);
+      }, contentToCache as unknown as Record<string, unknown>);
       
       performanceMonitor.endRender(startTime);
     }
@@ -529,7 +529,7 @@ export default function CreateWorksheet() {
       const printWindow = window.open("", "_blank");
 
       if (printWindow) {
-        printWindow.document.write(generatePrintHTML(subject, result.data || contentData, bgStyle, selectedFont, currentTheme));
+        printWindow.document.write(generatePrintHTML(subject, result.data || contentData, bgStyle, selectedFont, currentTheme as unknown as { colors: Record<string, string> }));
         printWindow.document.close();
         alert(
           "✅ Worksheet Ready!\n\nA new window has opened with your worksheet.\n\nClick the 'Print Worksheet' button and use your browser's print dialog to:\n• Save as PDF\n• Print directly"
@@ -542,7 +542,7 @@ export default function CreateWorksheet() {
         alert(
           "Popup blocked! Please allow popups for this site, then try again.\n\nOr click OK and I'll show the worksheet on this page instead."
         );
-        document.body.innerHTML = generatePrintHTML(subject, result.data || contentData, bgStyle, selectedFont, currentTheme);
+        document.body.innerHTML = generatePrintHTML(subject, result.data || contentData, bgStyle, selectedFont, currentTheme as unknown as { colors: Record<string, string> });
       }
     } catch (error) {
       console.error("Export error:", error);
@@ -1572,7 +1572,8 @@ function generateSciencePrintHTML(
     problems: ScienceProblem[];
   },
   backgroundStyle: string,
-  font: FontInfo
+  font: FontInfo,
+  theme: { colors: Record<string, string> }
 ): string {
   const { title, subtitle, problems } = data;
 

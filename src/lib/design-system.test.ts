@@ -339,7 +339,7 @@ describe('Design System', () => {
       });
 
       const clickHandler = (mockElement.addEventListener as unknown as { mock: { calls: unknown[][] } }).mock.calls[0][1];
-      clickHandler({ target: mockElement });
+      (clickHandler as (event: { target: HTMLElement }) => void)({ target: mockElement });
 
       expect(mockBody.appendChild).toHaveBeenCalled();
     });

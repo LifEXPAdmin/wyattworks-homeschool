@@ -435,7 +435,7 @@ export class BundleOptimizer {
       return importedModule.default;
     } catch (error) {
       console.error('Failed to lazy load component:', componentPath, error);
-      return null as React.ComponentType<unknown>;
+      return null as unknown as React.ComponentType<unknown>;
     }
   }
 
