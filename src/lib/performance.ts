@@ -430,13 +430,18 @@ export class BundleOptimizer {
   }
 
   static async lazyLoadComponent(componentPath: string): Promise<React.ComponentType<unknown>> {
-    try {
-      const importedModule = await import(componentPath);
-      return importedModule.default;
-    } catch (error) {
-      console.error('Failed to lazy load component:', componentPath, error);
-      return null as unknown as React.ComponentType<unknown>;
-    }
+    // Disabled for production builds - Turbopack can't resolve dynamic imports
+    console.warn('Lazy loading disabled in production builds');
+    return null as unknown as React.ComponentType<unknown>;
+    
+    // Original implementation (commented out):
+    // try {
+    //   const importedModule = await import(componentPath);
+    //   return importedModule.default;
+    // } catch (error) {
+    //   console.error('Failed to lazy load component:', componentPath, error);
+    //   return null as unknown as React.ComponentType<unknown>;
+    // }
   }
 
   static optimizeImages(): void {
