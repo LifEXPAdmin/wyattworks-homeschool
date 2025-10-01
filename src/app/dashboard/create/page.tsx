@@ -18,13 +18,59 @@ import type { WorksheetConfig } from "@/lib/config";
 type DifficultyLevel = "very_easy" | "easy" | "medium" | "hard" | "very_hard" | "custom";
 
 const DIFFICULTY_RANGES = {
-  very_easy: { min: 0, max: 5, label: "Very Easy (0-5)" },
-  easy: { min: 1, max: 10, label: "Easy (1-10)" },
-  medium: { min: 1, max: 20, label: "Medium (1-20)" },
-  hard: { min: 10, max: 100, label: "Hard (10-100)" },
-  very_hard: { min: 50, max: 500, label: "Very Hard (50-500)" },
-  custom: { min: 0, max: 0, label: "Custom Range" },
+  very_easy: { min: 0, max: 5, label: "Very Easy (0-5)", desc: "Perfect for Pre-K & Kindergarten" },
+  easy: { min: 1, max: 10, label: "Easy (1-10)", desc: "Great for Grades K-2" },
+  medium: { min: 1, max: 20, label: "Medium (1-20)", desc: "Ideal for Grades 2-4" },
+  hard: { min: 10, max: 100, label: "Hard (10-100)", desc: "Challenging for Grades 4-6" },
+  very_hard: { min: 50, max: 500, label: "Very Hard (50-500)", desc: "Advanced Grades 6+" },
+  custom: { min: 0, max: 0, label: "Custom Range", desc: "Set your own numbers" },
 };
+
+const BACKGROUND_TEMPLATES = [
+  { id: "none", name: "Plain White", preview: "#ffffff", css: "background: white;" },
+  {
+    id: "subtle-grid",
+    name: "Subtle Grid",
+    preview: "linear-gradient(#f0f0f0, #f0f0f0)",
+    css: "background: white; background-image: linear-gradient(rgba(0,0,0,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,.03) 1px, transparent 1px); background-size: 20px 20px;",
+  },
+  {
+    id: "notebook",
+    name: "Notebook Lines",
+    preview: "linear-gradient(#e3f2fd, #e3f2fd)",
+    css: "background: #fef9e7; background-image: repeating-linear-gradient(transparent, transparent 29px, #e8b4b4 29px, #e8b4b4 31px);",
+  },
+  {
+    id: "dots",
+    name: "Polka Dots",
+    preview: "radial-gradient(circle, #ddd 10%, transparent 10%)",
+    css: "background-color: #fff; background-image: radial-gradient(circle, rgba(59, 130, 246, 0.08) 1px, transparent 1px); background-size: 20px 20px;",
+  },
+  {
+    id: "nature",
+    name: "Soft Nature",
+    preview: "linear-gradient(135deg, #e8f5e9, #fff3e0)",
+    css: "background: linear-gradient(135deg, #e8f5e9 0%, #fff8e1 50%, #fce4ec 100%);",
+  },
+  {
+    id: "sky",
+    name: "Sky Blue",
+    preview: "linear-gradient(180deg, #e3f2fd, #ffffff)",
+    css: "background: linear-gradient(180deg, #e3f2fd 0%, #ffffff 40%);",
+  },
+  {
+    id: "warm",
+    name: "Warm Sunset",
+    preview: "linear-gradient(135deg, #fff9c4, #ffecb3)",
+    css: "background: linear-gradient(135deg, #fff9c4 0%, #ffecb3 50%, #ffe0b2 100%);",
+  },
+  {
+    id: "pastel",
+    name: "Pastel Rainbow",
+    preview: "linear-gradient(90deg, #fce4ec, #e1f5fe)",
+    css: "background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 25%, #e1f5fe 50%, #e8f5e9 75%, #fff9c4 100%);",
+  },
+];
 
 export default function CreateWorksheet() {
   const [title, setTitle] = useState("Math Practice Worksheet");
@@ -35,6 +81,8 @@ export default function CreateWorksheet() {
   const [operation, setOperation] = useState<
     "addition" | "subtraction" | "multiplication" | "division"
   >("addition");
+  const [background, setBackground] = useState("none");
+  const [customImage, setCustomImage] = useState<string | null>(null);
   const [problems, setProblems] = useState<MathProblem[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -95,6 +143,18 @@ export default function CreateWorksheet() {
     }
   };
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setCustomImage(event.target?.result as string);
+        setBackground("custom");
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleExport = async () => {
     if (problems.length === 0) {
       alert("Please generate problems first!");
@@ -103,7 +163,6 @@ export default function CreateWorksheet() {
 
     setIsExporting(true);
 
-    // Map our difficulty to config difficulty
     const configDifficulty =
       difficulty === "very_easy" || difficulty === "very_hard" || difficulty === "custom"
         ? "medium"
@@ -154,23 +213,25 @@ export default function CreateWorksheet() {
         return;
       }
 
-      // Client-side: Create a printable version
+      const selectedBg = BACKGROUND_TEMPLATES.find((t) => t.id === background);
+      const bgStyle =
+        background === "custom" && customImage
+          ? `background-image: url('${customImage}'); background-size: cover; background-position: center; background-repeat: no-repeat;`
+          : selectedBg?.css || "";
+
       const printWindow = window.open("", "_blank");
       if (printWindow) {
-        printWindow.document.write(generatePrintHTML(result.data));
+        printWindow.document.write(generatePrintHTML(result.data, bgStyle));
         printWindow.document.close();
         alert(
-          result.cached
-            ? "Using cached worksheet (no quota used)! Check the new window/tab."
-            : `Worksheet created! Check the new window/tab to print. (Unlimited exports available)`
+          "Worksheet created! Check the new window/tab to print.\n\n(Unlimited exports available)"
         );
       } else {
         alert(
           "Popup blocked! Please allow popups for this site, then try again.\n\n" +
             "Or click OK and I'll show the worksheet on this page instead."
         );
-        // Fallback: Replace current page
-        document.body.innerHTML = generatePrintHTML(result.data);
+        document.body.innerHTML = generatePrintHTML(result.data, bgStyle);
       }
     } catch (error) {
       console.error("Export error:", error);
@@ -180,20 +241,23 @@ export default function CreateWorksheet() {
     }
   };
 
+  const selectedBg = BACKGROUND_TEMPLATES.find((t) => t.id === background);
+
   return (
-    <div className="bg-background min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
       {/* Navbar */}
-      <nav className="bg-background/95 supports-[backdrop-filter]:bg-background/60 border-b backdrop-blur">
+      <nav className="border-b bg-white/80 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/60">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
-            <div className="flex items-center">
+            <div className="flex items-center gap-2">
+              <span className="text-3xl">📚</span>
               <Link href="/" className="text-primary text-2xl font-bold">
                 Wyatt Works
               </Link>
             </div>
             <div className="flex items-center space-x-4">
               <Link href="/dashboard">
-                <Button variant="ghost">← Back to Dashboard</Button>
+                <Button variant="ghost">← Dashboard</Button>
               </Link>
               <UserButton
                 appearance={{
@@ -208,37 +272,37 @@ export default function CreateWorksheet() {
       </nav>
 
       <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-foreground mb-2 text-3xl font-bold">Create Worksheet</h1>
-          <p className="text-muted-foreground">
-            Customize your worksheet settings and generate practice problems
+        <div className="mb-8 text-center">
+          <h1 className="text-foreground mb-2 text-4xl font-bold">Create Your Worksheet</h1>
+          <p className="text-muted-foreground text-lg">
+            Customize, generate, and print beautiful math worksheets in seconds ✨
           </p>
         </div>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Configuration Panel */}
-          <div className="lg:col-span-1">
-            <Card>
-              <CardHeader>
-                <CardTitle>Worksheet Settings</CardTitle>
-                <CardDescription>Configure your worksheet options</CardDescription>
+          <div className="space-y-6 lg:col-span-1">
+            {/* Basic Settings */}
+            <Card className="shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50">
+                <CardTitle className="flex items-center gap-2">⚙️ Basic Settings</CardTitle>
+                <CardDescription>Configure your worksheet</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Title */}
+              <CardContent className="space-y-6 pt-6">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Title</label>
+                  <label className="text-sm font-semibold">📝 Title</label>
                   <Input
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="Enter worksheet title"
+                    className="border-2"
                   />
                 </div>
 
-                {/* Operation */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Operation</label>
+                  <label className="text-sm font-semibold">➕ Operation</label>
                   <select
-                    className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
+                    className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-11 w-full rounded-md border-2 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
                     value={operation}
                     onChange={(e) =>
                       setOperation(
@@ -246,202 +310,266 @@ export default function CreateWorksheet() {
                       )
                     }
                   >
-                    <option value="addition">Addition (+)</option>
-                    <option value="subtraction">Subtraction (−)</option>
-                    <option value="multiplication">Multiplication (×)</option>
-                    <option value="division">Division (÷)</option>
+                    <option value="addition">➕ Addition</option>
+                    <option value="subtraction">➖ Subtraction</option>
+                    <option value="multiplication">✖️ Multiplication</option>
+                    <option value="division">➗ Division</option>
                   </select>
                 </div>
 
-                {/* Difficulty */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Difficulty Level</label>
+                  <label className="text-sm font-semibold">🎯 Difficulty Level</label>
                   <select
-                    className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
+                    className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-11 w-full rounded-md border-2 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
                     value={difficulty}
                     onChange={(e) => setDifficulty(e.target.value as DifficultyLevel)}
                   >
-                    <option value="very_easy">{DIFFICULTY_RANGES.very_easy.label}</option>
-                    <option value="easy">{DIFFICULTY_RANGES.easy.label}</option>
-                    <option value="medium">{DIFFICULTY_RANGES.medium.label}</option>
-                    <option value="hard">{DIFFICULTY_RANGES.hard.label}</option>
-                    <option value="very_hard">{DIFFICULTY_RANGES.very_hard.label}</option>
-                    <option value="custom">Custom Range</option>
+                    {Object.entries(DIFFICULTY_RANGES).map(([key, value]) => (
+                      <option key={key} value={key}>
+                        {value.label}
+                      </option>
+                    ))}
                   </select>
-                  <p className="text-muted-foreground text-xs">
-                    {difficulty === "custom"
-                      ? "Set your own min and max values below"
-                      : `Numbers will range from ${DIFFICULTY_RANGES[difficulty].min} to ${DIFFICULTY_RANGES[difficulty].max}`}
+                  <p className="rounded bg-blue-50 px-3 py-2 text-xs text-blue-700">
+                    {DIFFICULTY_RANGES[difficulty].desc}
                   </p>
                 </div>
 
-                {/* Custom Range Inputs */}
                 {difficulty === "custom" && (
-                  <div className="bg-muted/50 space-y-4 rounded-lg border p-4">
-                    <h4 className="text-sm font-semibold">Custom Range</h4>
+                  <div className="space-y-4 rounded-lg border-2 border-dashed border-purple-300 bg-purple-50/50 p-4">
+                    <h4 className="text-sm font-semibold text-purple-900">🎨 Custom Range</h4>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="text-xs font-medium">Min Value</label>
+                        <label className="text-xs font-medium">Minimum</label>
                         <Input
                           type="number"
                           value={customMin}
                           onChange={(e) => setCustomMin(parseInt(e.target.value) || 0)}
                           min="0"
+                          className="border-2"
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-xs font-medium">Max Value</label>
+                        <label className="text-xs font-medium">Maximum</label>
                         <Input
                           type="number"
                           value={customMax}
                           onChange={(e) => setCustomMax(parseInt(e.target.value) || 100)}
                           min={customMin}
+                          className="border-2"
                         />
                       </div>
                     </div>
                   </div>
                 )}
 
-                {/* Problem Count */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Number of Problems</label>
+                  <label className="text-sm font-semibold">🔢 Number of Problems</label>
                   <Input
                     type="number"
                     min="5"
                     max="100"
                     value={problemCount}
                     onChange={(e) => setProblemCount(parseInt(e.target.value) || 20)}
+                    className="border-2"
                   />
                   <p className="text-muted-foreground text-xs">Between 5 and 100 problems</p>
                 </div>
 
-                {/* Generate Button */}
                 <Button
                   onClick={handleGenerate}
                   disabled={isGenerating}
-                  className="w-full"
+                  className="w-full text-lg shadow-md"
                   size="lg"
                 >
                   {isGenerating ? "Generating..." : "🎲 Generate Problems"}
                 </Button>
+              </CardContent>
+            </Card>
 
-                {/* Export Button */}
-                {problems.length > 0 && (
+            {/* Styling Options */}
+            {problems.length > 0 && (
+              <Card className="shadow-lg">
+                <CardHeader className="bg-gradient-to-r from-pink-50 to-orange-50">
+                  <CardTitle className="flex items-center gap-2">🎨 Styling Options</CardTitle>
+                  <CardDescription>Make your worksheet beautiful</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6 pt-6">
+                  <div className="space-y-3">
+                    <label className="text-sm font-semibold">Background Theme</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {BACKGROUND_TEMPLATES.map((template) => (
+                        <button
+                          key={template.id}
+                          onClick={() => setBackground(template.id)}
+                          className={`rounded-lg border-2 p-3 text-left transition-all hover:shadow-md ${
+                            background === template.id
+                              ? "border-primary bg-primary/10 ring-primary ring-2"
+                              : "border-gray-200"
+                          }`}
+                        >
+                          <div
+                            className="mb-2 h-8 w-full rounded"
+                            style={{ background: template.preview }}
+                          />
+                          <div className="text-xs font-medium">{template.name}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold">🖼️ Custom Background Image</label>
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="cursor-pointer border-2"
+                    />
+                    <p className="text-muted-foreground text-xs">
+                      Upload your own image (will be subtle/transparent)
+                    </p>
+                  </div>
+
                   <Button
                     onClick={handleExport}
                     disabled={isExporting}
-                    className="w-full"
-                    variant="default"
+                    className="w-full text-lg shadow-md"
                     size="lg"
+                    variant="default"
                   >
-                    {isExporting ? "Exporting..." : "📄 Export Worksheet"}
+                    {isExporting ? "Creating..." : "📄 Print Worksheet"}
                   </Button>
-                )}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Preview Panel */}
           <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Preview</CardTitle>
+            <Card className="shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-green-50 to-teal-50">
+                <CardTitle className="flex items-center gap-2">👀 Live Preview</CardTitle>
                 <CardDescription>
                   {problems.length > 0
-                    ? `${problems.length} problems generated`
-                    : "Generate problems to see preview"}
+                    ? `${problems.length} problems ready to print!`
+                    : "Configure settings and generate problems"}
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-6">
                 {problems.length === 0 ? (
-                  <div className="flex h-96 items-center justify-center rounded-lg border-2 border-dashed">
+                  <div className="flex h-[600px] items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gradient-to-br from-blue-50/50 to-purple-50/50">
                     <div className="text-center">
-                      <p className="text-muted-foreground text-lg">
-                        👈 Configure your settings and click "Generate Problems"
+                      <div className="mb-4 text-6xl">📋</div>
+                      <p className="text-foreground text-xl font-medium">
+                        Ready to create magic? ✨
                       </p>
-                      <p className="text-muted-foreground mt-2 text-sm">
-                        You'll see a preview of your worksheet here
+                      <p className="text-muted-foreground mt-2">
+                        Configure your settings on the left and click "Generate Problems"
                       </p>
                     </div>
                   </div>
                 ) : (
                   <div className="space-y-6">
                     {/* Worksheet Preview */}
-                    <div className="bg-card rounded-lg border p-8">
-                      <h2 className="mb-2 text-center text-3xl font-bold">{title}</h2>
-                      <p className="text-muted-foreground mb-6 text-center text-lg">
-                        {operation.charAt(0).toUpperCase() + operation.slice(1)} -{" "}
-                        {DIFFICULTY_RANGES[difficulty].label}
-                      </p>
-
-                      <div className="bg-muted mb-6 grid grid-cols-2 gap-4 rounded-lg p-4">
-                        <div className="text-sm">
-                          <strong>Name:</strong> ___________________
-                        </div>
-                        <div className="text-sm">
-                          <strong>Date:</strong> ___________________
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        {problems.slice(0, 12).map((problem, index) => (
-                          <div key={index} className="flex items-center gap-3 rounded border p-3">
-                            <span className="text-primary min-w-[30px] font-bold">
-                              {index + 1}.
-                            </span>
-                            <span className="flex-1 text-lg font-medium">{problem.problem} =</span>
-                            <span className="border-foreground min-w-[60px] border-b-2 px-2">
-                              &nbsp;
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-
-                      {problems.length > 12 && (
-                        <p className="text-muted-foreground mt-6 text-center text-sm">
-                          + {problems.length - 12} more problems (shown when exported)
+                    <div
+                      className="rounded-xl border-2 p-8 shadow-inner"
+                      style={
+                        background === "custom" && customImage
+                          ? {
+                              backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)), url('${customImage}')`,
+                              backgroundSize: "cover",
+                              backgroundPosition: "center",
+                            }
+                          : {
+                              background:
+                                selectedBg?.css.split("background:")[1]?.split(";")[0] || "white",
+                            }
+                      }
+                    >
+                      <div className="rounded-lg bg-white/90 p-6 shadow-sm">
+                        <h2 className="text-primary mb-2 text-center text-3xl font-bold">
+                          {title}
+                        </h2>
+                        <p className="text-muted-foreground mb-6 text-center text-lg font-medium">
+                          {operation.charAt(0).toUpperCase() + operation.slice(1)} -{" "}
+                          {DIFFICULTY_RANGES[difficulty].label}
                         </p>
-                      )}
+
+                        <div className="mb-6 grid grid-cols-2 gap-4 rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 p-4">
+                          <div className="text-sm font-medium">
+                            <strong>Name:</strong> ___________________
+                          </div>
+                          <div className="text-sm font-medium">
+                            <strong>Date:</strong> ___________________
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                          {problems.slice(0, 12).map((problem, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center gap-3 rounded-lg border bg-white p-3 shadow-sm"
+                            >
+                              <span className="bg-primary flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold text-white">
+                                {index + 1}
+                              </span>
+                              <span className="flex-1 text-lg font-medium">
+                                {problem.problem} =
+                              </span>
+                              <span className="border-primary min-w-[60px] border-b-2 px-2 font-medium">
+                                &nbsp;
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+
+                        {problems.length > 12 && (
+                          <p className="text-muted-foreground mt-6 text-center text-sm font-medium">
+                            + {problems.length - 12} more problems will appear when you print
+                          </p>
+                        )}
+                      </div>
                     </div>
 
                     {/* Answer Key Preview */}
-                    <div className="rounded-lg border bg-yellow-50 p-6 dark:bg-yellow-950/30">
-                      <h3 className="mb-4 text-center text-xl font-semibold text-yellow-900 dark:text-yellow-100">
+                    <div className="rounded-xl border-2 border-yellow-300 bg-gradient-to-br from-yellow-50 to-orange-50 p-6 shadow-lg">
+                      <h3 className="mb-4 text-center text-xl font-bold text-yellow-900">
                         📝 Answer Key Preview
                       </h3>
-                      <div className="grid grid-cols-4 gap-3 text-sm md:grid-cols-6">
+                      <div className="grid grid-cols-4 gap-3 md:grid-cols-6">
                         {problems.slice(0, 12).map((problem, index) => (
                           <div
                             key={index}
-                            className="rounded bg-yellow-100 p-2 text-center font-medium text-yellow-900 dark:bg-yellow-900/30 dark:text-yellow-100"
+                            className="rounded-lg bg-white p-2 text-center font-bold text-yellow-900 shadow-sm"
                           >
                             {index + 1}. {problem.answer}
                           </div>
                         ))}
                       </div>
                       {problems.length > 12 && (
-                        <p className="mt-4 text-center text-xs text-yellow-700 dark:text-yellow-300">
+                        <p className="mt-4 text-center text-xs text-yellow-800">
                           + {problems.length - 12} more answers
                         </p>
                       )}
                     </div>
 
                     {/* Quick Stats */}
-                    <div className="bg-muted/50 grid grid-cols-3 gap-4 rounded-lg border p-4">
-                      <div className="text-center">
-                        <div className="text-primary text-2xl font-bold">{problems.length}</div>
-                        <div className="text-muted-foreground text-xs">Problems</div>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="rounded-xl bg-white p-4 text-center shadow-md">
+                        <div className="text-3xl font-bold text-blue-600">{problems.length}</div>
+                        <div className="text-muted-foreground text-xs font-medium">Problems</div>
                       </div>
-                      <div className="text-center">
-                        <div className="text-primary text-2xl font-bold">
+                      <div className="rounded-xl bg-white p-4 text-center shadow-md">
+                        <div className="text-3xl font-bold text-purple-600">
                           {difficulty === "custom"
                             ? `${customMin}-${customMax}`
                             : `${DIFFICULTY_RANGES[difficulty].min}-${DIFFICULTY_RANGES[difficulty].max}`}
                         </div>
-                        <div className="text-muted-foreground text-xs">Number Range</div>
+                        <div className="text-muted-foreground text-xs font-medium">Range</div>
                       </div>
-                      <div className="text-center">
-                        <div className="text-primary text-2xl font-bold">
+                      <div className="rounded-xl bg-white p-4 text-center shadow-md">
+                        <div className="text-3xl font-bold text-pink-600">
                           {operation === "addition"
                             ? "+"
                             : operation === "subtraction"
@@ -450,7 +578,7 @@ export default function CreateWorksheet() {
                                 ? "×"
                                 : "÷"}
                         </div>
-                        <div className="text-muted-foreground text-xs">Operation</div>
+                        <div className="text-muted-foreground text-xs font-medium">Operation</div>
                       </div>
                     </div>
                   </div>
@@ -465,18 +593,21 @@ export default function CreateWorksheet() {
 }
 
 // Helper function to generate printable HTML
-function generatePrintHTML(data: {
-  title: string;
-  subtitle?: string;
-  problems: MathProblem[];
-}): string {
+function generatePrintHTML(
+  data: {
+    title: string;
+    subtitle?: string;
+    problems: MathProblem[];
+  },
+  backgroundStyle: string
+): string {
   const { title, subtitle, problems } = data;
 
   const worksheetProblems = problems
     .map(
       (p: MathProblem, i: number) => `
     <div class="problem">
-      <span class="number">${i + 1}.</span>
+      <span class="number">${i + 1}</span>
       <span class="text">${p.problem} =</span>
       <span class="answer-space">_______</span>
     </div>
@@ -497,44 +628,185 @@ function generatePrintHTML(data: {
         @media print {
           .no-print { display: none; }
           .page-break { page-break-before: always; }
+          body { ${backgroundStyle} }
         }
-        body { font-family: Arial, sans-serif; padding: 40px; line-height: 1.6; }
-        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 15px; }
-        h1 { font-size: 28pt; margin-bottom: 8px; }
-        h2 { font-size: 16pt; color: #666; font-weight: normal; }
-        .meta { display: flex; justify-content: space-between; margin: 20px 0; padding: 15px; background: #f5f5f5; border-radius: 8px; }
-        .problems { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 30px; }
-        .problem { display: flex; align-items: center; gap: 10px; padding: 12px; border-bottom: 1px solid #e0e0e0; }
-        .number { font-weight: bold; min-width: 30px; }
-        .text { font-size: 18pt; flex: 1; }
-        .answer-space { border-bottom: 2px solid #333; min-width: 80px; display: inline-block; }
-        .answer-key { margin-top: 40px; padding: 20px; background: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; }
-        .answer-key h3 { text-align: center; color: #856404; margin-bottom: 20px; }
-        .answers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .answer-item { padding: 8px; background: #fff; border-radius: 4px; text-align: center; }
-        .controls { margin: 20px 0; text-align: center; }
-        button { padding: 12px 24px; font-size: 16px; background: #333; color: white; border: none; border-radius: 6px; cursor: pointer; margin: 0 8px; }
-        button:hover { background: #555; }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+          font-family: 'Georgia', 'Times New Roman', serif; 
+          padding: 40px; 
+          line-height: 1.6;
+          ${backgroundStyle}
+        }
+        
+        .controls { 
+          margin: 20px 0; 
+          text-align: center; 
+          padding: 20px;
+          background: white;
+          border-radius: 12px;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        button { 
+          padding: 14px 32px; 
+          font-size: 16px; 
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+          color: white; 
+          border: none; 
+          border-radius: 8px; 
+          cursor: pointer; 
+          margin: 0 8px;
+          font-weight: 600;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+          transition: all 0.2s;
+        }
+        
+        button:hover { 
+          transform: translateY(-2px);
+          box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        
+        .worksheet-container {
+          background: rgba(255, 255, 255, 0.95);
+          padding: 40px;
+          border-radius: 16px;
+          box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+          margin-bottom: 30px;
+        }
+        
+        .header { 
+          text-align: center; 
+          margin-bottom: 30px; 
+          border-bottom: 3px solid #667eea; 
+          padding-bottom: 20px; 
+        }
+        
+        h1 { 
+          font-size: 32pt; 
+          margin-bottom: 8px; 
+          color: #667eea;
+          font-weight: bold;
+        }
+        
+        h2 { 
+          font-size: 18pt; 
+          color: #764ba2; 
+          font-weight: normal; 
+        }
+        
+        .meta { 
+          display: flex; 
+          justify-content: space-between; 
+          margin: 25px 0; 
+          padding: 20px; 
+          background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+          border-radius: 10px;
+          font-size: 14pt;
+        }
+        
+        .meta strong { 
+          color: #667eea; 
+          margin-right: 8px; 
+        }
+        
+        .problems { 
+          display: grid; 
+          grid-template-columns: repeat(2, 1fr); 
+          gap: 20px; 
+          margin-top: 30px; 
+        }
+        
+        .problem { 
+          display: flex; 
+          align-items: center; 
+          gap: 12px; 
+          padding: 14px; 
+          background: rgba(255, 255, 255, 0.9);
+          border-radius: 8px;
+          border: 2px solid #e0e0e0;
+        }
+        
+        .number { 
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 32px;
+          height: 32px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          border-radius: 50%;
+          font-weight: bold;
+          font-size: 14pt;
+        }
+        
+        .text { 
+          font-size: 20pt; 
+          flex: 1;
+          font-weight: 500;
+        }
+        
+        .answer-space { 
+          border-bottom: 3px solid #667eea; 
+          min-width: 90px; 
+          display: inline-block; 
+          height: 24px;
+        }
+        
+        .answer-key { 
+          background: linear-gradient(135deg, #fff9c4 0%, #ffe0b2 100%);
+          padding: 30px; 
+          border: 3px solid #ffa726; 
+          border-radius: 16px; 
+          box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+        
+        .answer-key h3 { 
+          text-align: center; 
+          color: #e65100; 
+          margin-bottom: 25px; 
+          font-size: 24pt;
+          font-weight: bold;
+        }
+        
+        .answers { 
+          display: grid; 
+          grid-template-columns: repeat(5, 1fr); 
+          gap: 12px; 
+        }
+        
+        .answer-item { 
+          padding: 12px; 
+          background: white; 
+          border-radius: 8px; 
+          text-align: center;
+          font-weight: bold;
+          border: 2px solid #ffb74d;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
       </style>
     </head>
     <body>
       <div class="controls no-print">
         <button onclick="window.print()">🖨️ Print Worksheet</button>
-        <button onclick="window.close()">Close</button>
+        <button onclick="window.close()">Close Window</button>
       </div>
       
-      <div class="header">
-        <h1>${title}</h1>
-        <h2>${subtitle || ""}</h2>
-      </div>
-      
-      <div class="meta">
-        <div><strong>Name:</strong> ___________________</div>
-        <div><strong>Date:</strong> ___________________</div>
-      </div>
-      
-      <div class="problems">
-        ${worksheetProblems}
+      <div class="worksheet-container">
+        <div class="header">
+          <h1>${title}</h1>
+          ${subtitle ? `<h2>${subtitle}</h2>` : ""}
+        </div>
+        
+        <div class="meta">
+          <div><strong>Name:</strong> ______________________________</div>
+          <div><strong>Date:</strong> ______________________________</div>
+        </div>
+        
+        <div class="problems">
+          ${worksheetProblems}
+        </div>
       </div>
       
       <div class="page-break"></div>
