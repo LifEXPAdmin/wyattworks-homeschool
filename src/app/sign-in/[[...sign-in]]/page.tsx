@@ -6,7 +6,7 @@ export default function SignInPage() {
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <h1 className="text-foreground text-3xl font-bold">Welcome Back</h1>
-          <p className="text-muted-foreground mt-2">Sign in to your Wyatt Works account</p>
+          <p className="text-muted-foreground mt-2">Sign in to your Astra Academy account</p>
         </div>
         <SignIn
           appearance={{

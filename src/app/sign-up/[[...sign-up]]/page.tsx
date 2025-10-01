@@ -7,7 +7,7 @@ export default function SignUpPage() {
         <div className="mb-8 text-center">
           <h1 className="text-foreground text-3xl font-bold">Get Started</h1>
           <p className="text-muted-foreground mt-2">
-            Create your Wyatt Works account and start building worksheets
+            Create your Astra Academy account and start building worksheets
           </p>
         </div>
         <SignUp

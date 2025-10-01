@@ -14,9 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Wyatt Works - Homeschool Worksheet Builder",
+  title: "Astra Academy - Homeschool Worksheet Builder",
   description:
-    "Create custom worksheets, track progress, and make learning fun with our intuitive worksheet builder designed specifically for homeschooling parents.",
+    "Create custom worksheets, track progress, and make learning fun with our intuitive worksheet builder designed specifically for homeschooling parents. By Wyatt Works.",
 };
 
 export default function RootLayout({

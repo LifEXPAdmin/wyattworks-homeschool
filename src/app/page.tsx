@@ -11,8 +11,9 @@ export default function Home() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center">
-              <Link href="/" className="text-primary text-2xl font-bold">
-                Wyatt Works
+              <Link href="/" className="flex items-center gap-2">
+                <span className="text-3xl">✨</span>
+                <span className="text-primary text-2xl font-bold">Astra Academy</span>
               </Link>
             </div>
             <div className="flex items-center space-x-4">
@@ -193,7 +194,9 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t px-4 py-8 sm:px-6 lg:px-8">
         <div className="text-muted-foreground container mx-auto text-center">
-          <p>&copy; 2024 Wyatt Works. All rights reserved.</p>
+          <p>
+            &copy; 2024 Astra Academy. Made with ❤️ by <strong>Wyatt Works</strong>.
+          </p>
         </div>
       </footer>
     </div>

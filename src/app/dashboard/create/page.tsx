@@ -356,7 +356,10 @@ export default function CreateWorksheet() {
             <div className="flex items-center gap-2">
               <span className="text-3xl">📚</span>
               <Link href="/" className="text-primary text-2xl font-bold">
-                Wyatt Works
+                <span className="flex items-center gap-2">
+                  <span className="text-3xl">✨</span>
+                  <span>Astra Academy</span>
+                </span>
               </Link>
             </div>
             <div className="flex items-center space-x-4">
