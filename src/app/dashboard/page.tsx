@@ -41,15 +41,17 @@ export default async function Dashboard() {
 
         {/* Quick Actions */}
         <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="cursor-pointer transition-shadow hover:shadow-md">
-            <CardHeader>
-              <CardTitle className="text-lg">Create New Worksheet</CardTitle>
-              <CardDescription>Start building a custom worksheet</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button className="w-full">Get Started</Button>
-            </CardContent>
-          </Card>
+          <Link href="/dashboard/create">
+            <Card className="cursor-pointer transition-shadow hover:shadow-md">
+              <CardHeader>
+                <CardTitle className="text-lg">Create New Worksheet</CardTitle>
+                <CardDescription>Start building a custom worksheet</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button className="w-full">Get Started</Button>
+              </CardContent>
+            </Card>
+          </Link>
 
           <Card className="cursor-pointer transition-shadow hover:shadow-md">
             <CardHeader>
