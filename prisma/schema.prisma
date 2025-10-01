@@ -27,9 +27,51 @@ model User {
   subscription Subscription?
   creditLedger CreditLedger[]
   reports      Report[]
+  profile      UserProfile?
+  students     Student[] // Students managed by this user
 
   @@index([clerkId])
   @@index([email])
+}
+
+// User profile model - extended user information
+model UserProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  bio         String?
+  avatar      String? // URL to avatar image
+  timezone    String   @default("UTC")
+  language    String   @default("en")
+  preferences Json? // User preferences as JSON
+  settings    Json? // User settings as JSON
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// Student model - students managed by users
+model Student {
+  id          String   @id @default(cuid())
+  userId      String   // Parent/teacher who manages this student
+  firstName   String
+  lastName    String?
+  gradeLevel  String   @default("K")
+  birthDate   DateTime?
+  avatar      String? // URL to avatar image
+  preferences Json? // Student-specific preferences
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([gradeLevel])
 }
 
 // Worksheet model - represents a created worksheet

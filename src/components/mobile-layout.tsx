@@ -15,7 +15,8 @@ import {
   BarChart3,
   ArrowLeft,
   Palette,
-  PieChart
+  PieChart,
+  UserCircle
 } from "lucide-react";
 import { 
   MobileDetector, 
@@ -116,6 +117,7 @@ export function MobileLayout({ children, className }: MobileLayoutProps) {
     { icon: BarChart3, label: "Progress", href: "/dashboard/progress" },
     { icon: PieChart, label: "Analytics", href: "/dashboard/analytics" },
     { icon: Palette, label: "Design", href: "/dashboard/design" },
+    { icon: UserCircle, label: "Profile", href: "/dashboard/profile" },
     { icon: Settings, label: "Settings", href: "/dashboard/settings" },
   ];
 
