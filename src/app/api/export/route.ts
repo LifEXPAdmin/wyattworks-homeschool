@@ -8,10 +8,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
 import { z } from "zod";
 import { WorksheetConfigSchema, hashConfig } from "@/lib/config";
-import { checkQuota, findExistingExport } from "@/lib/quota";
-// import { generateWorksheetPDF } from "@/lib/pdf-generator"; // Disabled for serverless - Puppeteer not supported
+// Temporarily disabled for Vercel serverless (SQLite not supported)
+// import { checkQuota, findExistingExport } from "@/lib/quota";
+// import { generateWorksheetPDF } from "@/lib/pdf-generator";
+// import prisma from "@/lib/prisma";
 import { generateAddition } from "@/lib/generators/math";
-import prisma from "@/lib/prisma";
 
 /**
  * Export request schema
@@ -64,63 +65,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { config, worksheetId, title, subtitle, instructions } = validation.data;
+    const { config, title, subtitle, instructions } = validation.data;
 
     // 3. Compute configHash
     const configHash = hashConfig(config);
 
-    // Ensure user exists in database
-    let dbUser = await prisma.user.findUnique({
-      where: { clerkId: user.id },
-    });
+    // For now, skip database operations on Vercel (SQLite not supported in serverless)
+    // TODO: Add PostgreSQL for production
 
-    if (!dbUser) {
-      // Create user if doesn't exist
-      dbUser = await prisma.user.create({
-        data: {
-          clerkId: user.id,
-          email: user.emailAddresses[0]?.emailAddress || "",
-          firstName: user.firstName,
-          lastName: user.lastName,
-          imageUrl: user.imageUrl,
-        },
-      });
-    }
-
-    // 4. Check for existing export
-    const existingExport = await findExistingExport(dbUser.id, configHash);
-
-    if (existingExport) {
-      // Return existing data (no charge)
-      const metadata = JSON.parse(existingExport.metadata || "{}");
-      return NextResponse.json({
-        success: true,
-        cached: true,
-        data: metadata.worksheetData,
-        exportId: existingExport.id,
-        createdAt: existingExport.createdAt,
-      });
-    }
-
-    // 5. Check quota
-    const quota = await checkQuota(dbUser.id);
-
-    if (!quota.allowed) {
-      return NextResponse.json(
-        {
-          error: "Quota exceeded",
-          paywall: quota.paywall,
-          quota: {
-            used: quota.limit - quota.remaining,
-            limit: quota.limit,
-            remaining: quota.remaining,
-            plan: quota.plan,
-            currentMonth: quota.currentMonth,
-          },
-        },
-        { status: 403 }
-      );
-    }
+    // 4. Skip database checks for now (will add later with PostgreSQL)
+    // For MVP: Allow all exports without quota tracking
+    const quota = {
+      allowed: true,
+      remaining: Infinity,
+      limit: Infinity,
+      plan: "free" as const,
+      currentMonth: new Date().toISOString().slice(0, 7),
+      paywall: false,
+    };
 
     // 6. Generate math problems based on config
     const seed = config.seed || Date.now();
@@ -165,49 +127,16 @@ export async function POST(request: NextRequest) {
       problems,
     };
 
-    // 8. Create or get worksheet
-    let finalWorksheetId = worksheetId;
-    if (!finalWorksheetId) {
-      // Create a temporary worksheet for the export
-      const worksheet = await prisma.worksheet.create({
-        data: {
-          userId: dbUser.id,
-          title: title,
-          description: subtitle,
-          content: JSON.stringify(problems),
-          subject: config.subject,
-          status: "draft",
-          isPublic: false,
-        },
-      });
-      finalWorksheetId = worksheet.id;
-    }
-
-    // 9. Create ExportLog entry
-    const exportLog = await prisma.exportLog.create({
-      data: {
-        userId: dbUser.id,
-        worksheetId: finalWorksheetId,
-        format: "JSON", // Changed from PDF
-        configHash,
-        metadata: JSON.stringify({
-          worksheetData,
-          config,
-          problemCount: problems.length,
-        }),
-      },
-    });
-
-    // 9. Return worksheet data (client will handle PDF generation)
+    // 8. Return worksheet data (skip database for now - will add PostgreSQL later)
     return NextResponse.json({
       success: true,
       cached: false,
       data: worksheetData,
-      exportId: exportLog.id,
+      exportId: `temp-${configHash.slice(0, 8)}`,
       quota: {
-        used: quota.limit === Infinity ? Infinity : quota.limit - quota.remaining + 1,
-        limit: quota.limit,
-        remaining: quota.remaining === Infinity ? Infinity : quota.remaining - 1,
+        used: 0,
+        limit: Infinity,
+        remaining: Infinity,
         plan: quota.plan,
         currentMonth: quota.currentMonth,
       },
@@ -236,26 +165,14 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const dbUser = await prisma.user.findUnique({
-      where: { clerkId: user.id },
-    });
-
-    if (!dbUser) {
-      return NextResponse.json(
-        { quota: { used: 0, limit: 15, remaining: 15, plan: "free" } },
-        { status: 200 }
-      );
-    }
-
-    const quota = await checkQuota(dbUser.id);
-
+    // Skip database for now - return unlimited quota
     return NextResponse.json({
       quota: {
-        used: quota.limit === Infinity ? "unlimited" : quota.limit - quota.remaining,
-        limit: quota.limit === Infinity ? "unlimited" : quota.limit,
-        remaining: quota.remaining === Infinity ? "unlimited" : quota.remaining,
-        plan: quota.plan,
-        currentMonth: quota.currentMonth,
+        used: 0,
+        limit: "unlimited",
+        remaining: "unlimited",
+        plan: "free",
+        currentMonth: new Date().toISOString().slice(0, 7),
       },
     });
   } catch (error) {
