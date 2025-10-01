@@ -1184,6 +1184,14 @@ async function generateAndDownloadPDF(
     const html = generatePrintHTML(subject, data, backgroundStyle);
     container.innerHTML = html;
 
+    // Force styles to be computed (helps html2canvas)
+    const allElements = container.querySelectorAll("*");
+    allElements.forEach((el) => {
+      if (el instanceof HTMLElement) {
+        window.getComputedStyle(el);
+      }
+    });
+
     // Wait for fonts and images to load
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -1198,6 +1206,11 @@ async function generateAndDownloadPDF(
       useCORS: true,
       allowTaint: true,
       backgroundColor: "#ffffff",
+      logging: false,
+      removeContainer: false,
+      ignoreElements: (element) => {
+        return element.tagName === "SCRIPT" || element.tagName === "STYLE";
+      },
     });
 
     // Capture the answer key (page 2)
@@ -1211,6 +1224,11 @@ async function generateAndDownloadPDF(
       useCORS: true,
       allowTaint: true,
       backgroundColor: "#ffffff",
+      logging: false,
+      removeContainer: false,
+      ignoreElements: (element) => {
+        return element.tagName === "SCRIPT" || element.tagName === "STYLE";
+      },
     });
 
     // Create PDF
