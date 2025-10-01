@@ -159,7 +159,18 @@ export class SubscriptionManager {
   // Get user's current subscription
   getUserSubscription(userId: string): UserSubscription | null {
     const subscriptions = this.getAllSubscriptions();
-    return subscriptions.find(sub => sub.userId === userId) || null;
+    const subscription = subscriptions.find(sub => sub.userId === userId);
+    
+    if (subscription) {
+      // Convert string dates back to Date objects
+      return {
+        ...subscription,
+        lastPaymentDate: new Date(subscription.lastPaymentDate),
+        nextPaymentDate: new Date(subscription.nextPaymentDate),
+      };
+    }
+    
+    return null;
   }
 
   // Create or update subscription

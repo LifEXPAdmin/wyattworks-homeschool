@@ -105,7 +105,12 @@ export class ProgressTracker {
     const existing = allProgress.find(p => p.studentId === studentId);
     
     if (existing) {
-      return existing;
+      // Convert string dates back to Date objects
+      return {
+        ...existing,
+        lastActivity: new Date(existing.lastActivity),
+        updatedAt: new Date(existing.updatedAt),
+      };
     }
 
     // Create new progress record
@@ -132,7 +137,10 @@ export class ProgressTracker {
   // Get all sessions for a student
   getStudentSessions(studentId: string): WorksheetSession[] {
     const sessions = this.getAllSessions();
-    return sessions.filter(s => s.studentId === studentId);
+    return sessions.filter(s => s.studentId === studentId).map(session => ({
+      ...session,
+      completedAt: new Date(session.completedAt),
+    }));
   }
 
   // Generate learning insights
