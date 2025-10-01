@@ -111,15 +111,19 @@ export async function PUT(request: NextRequest) {
       where: { userId: dbUser.id },
       update: {
         ...validation.data,
-        preferences: validation.data.preferences as Record<string, unknown>,
-        settings: validation.data.settings as Record<string, unknown>,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        preferences: validation.data.preferences as any,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        settings: validation.data.settings as any,
         updatedAt: new Date(),
       },
       create: {
         userId: dbUser.id,
         ...validation.data,
-        preferences: validation.data.preferences as Record<string, unknown>,
-        settings: validation.data.settings as Record<string, unknown>,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        preferences: validation.data.preferences as any,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        settings: validation.data.settings as any,
       },
     });
 

@@ -37,10 +37,6 @@ export function SubscriptionDashboard({ userId, className }: SubscriptionDashboa
   const [isYearly, setIsYearly] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadSubscriptionData();
-  }, [userId, loadSubscriptionData]);
-
   const loadSubscriptionData = useCallback(() => {
     const subscription = subscriptionManager.getUserSubscription(userId);
     const usage = subscriptionManager.getUserUsageSummary(userId);
@@ -49,6 +45,10 @@ export function SubscriptionDashboard({ userId, className }: SubscriptionDashboa
     setUsageSummary(usage);
     setLoading(false);
   }, [userId]);
+
+  useEffect(() => {
+    loadSubscriptionData();
+  }, [userId, loadSubscriptionData]);
 
   const handleUpgrade = async (tierId: string, yearly: boolean) => {
     setIsProcessingPayment(true);

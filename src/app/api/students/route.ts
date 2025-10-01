@@ -83,7 +83,8 @@ export async function POST(request: NextRequest) {
         userId: dbUser.id,
         ...validation.data,
         birthDate: validation.data.birthDate ? new Date(validation.data.birthDate) : null,
-        preferences: validation.data.preferences as Record<string, unknown>,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        preferences: validation.data.preferences as any,
       },
     });
 

@@ -19,7 +19,7 @@ const UpdateStudentSchema = z.object({
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await currentUser();
@@ -27,6 +27,7 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { id } = await params;
     const dbUser = await prisma.user.findUnique({
       where: { clerkId: user.id },
     });
@@ -37,7 +38,7 @@ export async function GET(
 
     const student = await prisma.student.findFirst({
       where: {
-        id: params.id,
+        id,
         userId: dbUser.id,
       },
     });
@@ -62,7 +63,7 @@ export async function GET(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await currentUser();
@@ -70,6 +71,7 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { id } = await params;
     const body = await request.json();
     const validation = UpdateStudentSchema.safeParse(body);
 
@@ -94,7 +96,7 @@ export async function PUT(
     // Check if student exists and belongs to user
     const existingStudent = await prisma.student.findFirst({
       where: {
-        id: params.id,
+        id,
         userId: dbUser.id,
       },
     });
@@ -104,11 +106,12 @@ export async function PUT(
     }
 
     const student = await prisma.student.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...validation.data,
         birthDate: validation.data.birthDate ? new Date(validation.data.birthDate) : undefined,
-        preferences: validation.data.preferences as Record<string, unknown>,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        preferences: validation.data.preferences as any,
         updatedAt: new Date(),
       },
     });
@@ -129,7 +132,7 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await currentUser();
@@ -137,6 +140,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const { id } = await params;
     const dbUser = await prisma.user.findUnique({
       where: { clerkId: user.id },
     });
@@ -148,7 +152,7 @@ export async function DELETE(
     // Check if student exists and belongs to user
     const existingStudent = await prisma.student.findFirst({
       where: {
-        id: params.id,
+        id,
         userId: dbUser.id,
       },
     });
@@ -159,7 +163,7 @@ export async function DELETE(
 
     // Soft delete by setting isActive to false
     await prisma.student.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         isActive: false,
         updatedAt: new Date(),

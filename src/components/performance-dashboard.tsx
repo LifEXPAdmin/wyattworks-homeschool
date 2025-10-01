@@ -13,12 +13,10 @@ import {
   WifiOff, 
   Clock, 
   MemoryStick, 
-  BarChart3, 
   RefreshCw,
   CheckCircle,
   AlertCircle,
   TrendingUp,
-  TrendingDown,
   Activity
 } from "lucide-react";
 import { 
@@ -391,7 +389,7 @@ export function PerformanceDashboard({ className }: PerformanceDashboardProps) {
                 {offlineCapabilities.pendingActions.length > 0 && (
                   <div className="space-y-2">
                     <h4 className="font-semibold">Pending Actions:</h4>
-                    {offlineCapabilities.pendingActions.map((action, index) => (
+                    {offlineCapabilities.pendingActions.map((action) => (
                       <div key={action.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
                         <span className="text-sm">{action.type.replace('_', ' ')}</span>
                         <span className="text-xs text-gray-500">

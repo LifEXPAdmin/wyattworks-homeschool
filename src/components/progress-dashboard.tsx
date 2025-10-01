@@ -404,31 +404,31 @@ export function SessionRecorder({
     setIsRecording(true);
   };
 
-  const recordProblemAttempt = (
-    problemId: string, 
-    problemText: string, 
-    correctAnswer: string | number, 
-    studentAnswer: string | number, 
-    isCorrect: boolean, 
-    timeSpent: number, 
-    attempts: number = 1, 
-    hintsUsed: number = 0
-  ) => {
-    if (!isRecording) return;
-
-    const attempt = {
-      problemId,
-      problemText,
-      correctAnswer,
-      studentAnswer,
-      isCorrect,
-      timeSpent,
-      attempts,
-      hintsUsed,
-    };
-
-    setProblemAttempts(prev => [...prev, attempt]);
-  };
+  // const recordProblemAttempt = (
+  //   problemId: string, 
+  //   problemText: string, 
+  //   correctAnswer: string | number, 
+  //   studentAnswer: string | number, 
+  //   isCorrect: boolean, 
+  //   timeSpent: number, 
+  //   attempts: number = 1, 
+  //   hintsUsed: number = 0
+  // ) => {
+  //   if (!isRecording) return;
+  //
+  //   const attempt = {
+  //     problemId,
+  //     problemText,
+  //     correctAnswer,
+  //     studentAnswer,
+  //     isCorrect,
+  //     timeSpent,
+  //     attempts,
+  //     hintsUsed,
+  //   };
+  //
+  //   setProblemAttempts(prev => [...prev, attempt]);
+  // };
 
   const completeSession = () => {
     if (!sessionStartTime || problemAttempts.length === 0) return;
