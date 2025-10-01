@@ -32,7 +32,24 @@ interface MobileLayoutProps {
 }
 
 export function MobileLayout({ children, className }: MobileLayoutProps) {
-  const [mobileConfig, setMobileConfig] = useState<MobileConfig>(() => MobileDetector.getInstance().getConfig());
+  const [mobileConfig, setMobileConfig] = useState<MobileConfig>(() => {
+    try {
+      return MobileDetector.getInstance().getConfig();
+    } catch (error) {
+      console.error('Error initializing mobile config:', error);
+      // Fallback config
+      return {
+        isMobile: false,
+        isTablet: false,
+        isDesktop: true,
+        screenWidth: 1920,
+        screenHeight: 1080,
+        orientation: 'landscape',
+        touchSupport: false,
+        devicePixelRatio: 1,
+      };
+    }
+  });
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -40,30 +57,34 @@ export function MobileLayout({ children, className }: MobileLayoutProps) {
   const gestureDetectorRef = useRef<TouchGestureDetector | null>(null);
 
   useEffect(() => {
-    // Add mobile optimizations
-    mobileOptimizations.preventZoomOnFocus();
-    mobileOptimizations.addTouchStyles();
+    try {
+      // Add mobile optimizations
+      mobileOptimizations.preventZoomOnFocus();
+      mobileOptimizations.addTouchStyles();
 
-    // Listen for mobile config changes
-    const handleConfigChange = (config: MobileConfig) => {
-      setMobileConfig(config);
-    };
+      // Listen for mobile config changes
+      const handleConfigChange = (config: MobileConfig) => {
+        setMobileConfig(config);
+      };
 
-    MobileDetector.getInstance().addListener(handleConfigChange);
+      MobileDetector.getInstance().addListener(handleConfigChange);
 
-    // Setup gesture detection
-    if (layoutRef.current && mobileConfig.touchSupport) {
-      gestureDetectorRef.current = new TouchGestureDetector(layoutRef.current);
-      
-      gestureDetectorRef.current.addListener(handleGesture);
-    }
-
-    return () => {
-      MobileDetector.getInstance().removeListener(handleConfigChange);
-      if (gestureDetectorRef.current) {
-        gestureDetectorRef.current.destroy();
+      // Setup gesture detection
+      if (layoutRef.current && mobileConfig.touchSupport) {
+        gestureDetectorRef.current = new TouchGestureDetector(layoutRef.current);
+        
+        gestureDetectorRef.current.addListener(handleGesture);
       }
-    };
+
+      return () => {
+        MobileDetector.getInstance().removeListener(handleConfigChange);
+        if (gestureDetectorRef.current) {
+          gestureDetectorRef.current.destroy();
+        }
+      };
+    } catch (error) {
+      console.error('Error in MobileLayout useEffect:', error);
+    }
   }, [mobileConfig.touchSupport]);
 
   const handleGesture = React.useCallback((gesture: TouchGesture) => {
@@ -309,7 +330,23 @@ interface MobileCardProps {
 }
 
 export function MobileCard({ title, description, children, className, onClick }: MobileCardProps) {
-  const [mobileConfig] = useState<MobileConfig>(() => MobileDetector.getInstance().getConfig());
+  const [mobileConfig] = useState<MobileConfig>(() => {
+    try {
+      return MobileDetector.getInstance().getConfig();
+    } catch (error) {
+      console.error('Error initializing mobile config in MobileCard:', error);
+      return {
+        isMobile: false,
+        isTablet: false,
+        isDesktop: true,
+        screenWidth: 1920,
+        screenHeight: 1080,
+        orientation: 'landscape',
+        touchSupport: false,
+        devicePixelRatio: 1,
+      };
+    }
+  });
   const spacing = responsiveUtils.getSpacing(mobileConfig);
   const fontSizes = responsiveUtils.getFontSizes(mobileConfig);
 
@@ -349,7 +386,23 @@ export function MobileButton({
   onClick, 
   disabled 
 }: MobileButtonProps) {
-  const [mobileConfig] = useState<MobileConfig>(() => MobileDetector.getInstance().getConfig());
+  const [mobileConfig] = useState<MobileConfig>(() => {
+    try {
+      return MobileDetector.getInstance().getConfig();
+    } catch (error) {
+      console.error('Error initializing mobile config in MobileButton:', error);
+      return {
+        isMobile: false,
+        isTablet: false,
+        isDesktop: true,
+        screenWidth: 1920,
+        screenHeight: 1080,
+        orientation: 'landscape',
+        touchSupport: false,
+        devicePixelRatio: 1,
+      };
+    }
+  });
   const buttonSizes = responsiveUtils.getButtonSizes(mobileConfig);
 
   return (
@@ -373,7 +426,23 @@ interface MobileGridProps {
 }
 
 export function MobileGrid({ children, columns = 2, gap = "md", className }: MobileGridProps) {
-  const [mobileConfig] = useState<MobileConfig>(() => MobileDetector.getInstance().getConfig());
+  const [mobileConfig] = useState<MobileConfig>(() => {
+    try {
+      return MobileDetector.getInstance().getConfig();
+    } catch (error) {
+      console.error('Error initializing mobile config in MobileGrid:', error);
+      return {
+        isMobile: false,
+        isTablet: false,
+        isDesktop: true,
+        screenWidth: 1920,
+        screenHeight: 1080,
+        orientation: 'landscape',
+        touchSupport: false,
+        devicePixelRatio: 1,
+      };
+    }
+  });
   const responsiveColumns = responsiveUtils.getGridColumns(mobileConfig, columns);
   
   const gapClasses = {
