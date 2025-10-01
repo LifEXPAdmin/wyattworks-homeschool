@@ -795,8 +795,8 @@ function generateMathPrintHTML(
       (p: MathProblem, i: number) => `
     <div class="problem">
       <span class="number">${i + 1}</span>
-      <span class="text">${p.problem} =</span>
-      <span class="answer-space">_______</span>
+      <span class="text">${p.problem} = </span>
+      <span class="answer-space"></span>
     </div>
   `
     )
@@ -815,7 +815,7 @@ function generateMathPrintHTML(
         @media print {
           .no-print { display: none; }
           .page-break { page-break-before: always; }
-          body { ${backgroundStyle} }
+          body { ${backgroundStyle} -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -935,10 +935,10 @@ function generateMathPrintHTML(
         }
         
         .answer-space { 
-          border-bottom: 3px solid #667eea; 
-          min-width: 90px; 
+          border-bottom: 2px solid #667eea; 
+          min-width: 100px; 
           display: inline-block; 
-          height: 24px;
+          margin-left: 8px;
         }
         
         .answer-key { 
@@ -972,6 +972,48 @@ function generateMathPrintHTML(
           border: 2px solid #ffb74d;
           box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
+        
+        .footer {
+          margin-top: 40px;
+          padding: 20px;
+          text-align: center;
+          color: #999;
+          font-size: 10pt;
+          border-top: 1px solid #e0e0e0;
+        }
+        
+        .footer .brand {
+          color: #667eea;
+          font-weight: bold;
+        }
+        
+        .footer .copyright {
+          font-size: 9pt;
+          margin-top: 5px;
+          color: #bbb;
+        }
+        
+        .encouragement {
+          margin-top: 50px;
+          padding: 30px;
+          text-align: center;
+          background: rgba(255, 255, 255, 0.9);
+          border-radius: 16px;
+          border: 3px dashed #ffa726;
+        }
+        
+        .encourage-text {
+          font-size: 24pt;
+          font-weight: bold;
+          color: #667eea;
+          margin-bottom: 10px;
+        }
+        
+        .tips {
+          font-size: 14pt;
+          color: #764ba2;
+          font-style: italic;
+        }
       </style>
     </head>
     <body>
@@ -1003,6 +1045,22 @@ function generateMathPrintHTML(
         <div class="answers">
           ${answerKey}
         </div>
+        
+        ${
+          problems.length < 30
+            ? `
+        <div class="encouragement">
+          <p class="encourage-text">🌟 Great job! 🌟</p>
+          <p class="tips">Keep practicing to improve your math skills!</p>
+        </div>
+        `
+            : ""
+        }
+      </div>
+      
+      <div class="footer">
+        <p>Created with <span class="brand">Wyatt Works™</span></p>
+        <p class="copyright">© ${new Date().getFullYear()} Wyatt Works. All rights reserved.</p>
       </div>
     </body>
     </html>
