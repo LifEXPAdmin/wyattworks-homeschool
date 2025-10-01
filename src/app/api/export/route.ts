@@ -8,10 +8,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
 import { z } from "zod";
 import { WorksheetConfigSchema, hashConfig } from "@/lib/config";
-// Temporarily disabled for Vercel serverless (SQLite not supported)
-// import { checkQuota, findExistingExport } from "@/lib/quota";
-// import { generateWorksheetPDF } from "@/lib/pdf-generator";
-// import prisma from "@/lib/prisma";
+import { checkQuota, findExistingExport } from "@/lib/quota";
+import { generateWorksheetPDF } from "@/lib/pdf-generator";
+import prisma from "@/lib/prisma";
 import { generateAddition } from "@/lib/generators/math";
 
 /**
@@ -70,19 +69,44 @@ export async function POST(request: NextRequest) {
     // 3. Compute configHash
     const configHash = hashConfig(config);
 
-    // For now, skip database operations on Vercel (SQLite not supported in serverless)
-    // TODO: Add PostgreSQL for production
+    // 4. Check for existing export (userId, configHash)
+    const existingExport = await findExistingExport(user.id, configHash);
+    
+    if (existingExport) {
+      // Return existing URLs (no charge)
+      // For now, we'll regenerate since we don't store URLs
+      // In the future, we could store URLs in the metadata field
+      const metadata = existingExport.metadata ? JSON.parse(existingExport.metadata) : {};
+      
+      return NextResponse.json({
+        success: true,
+        urls: {
+          worksheet: metadata.worksheetUrl || "regenerate",
+          answerKey: metadata.answerKeyUrl || "regenerate",
+        },
+        cached: true,
+        quota: {
+          allowed: true,
+          remaining: Infinity,
+          limit: Infinity,
+          plan: "free" as const,
+          currentMonth: new Date().toISOString().slice(0, 7),
+          paywall: false,
+        },
+      });
+    }
 
-    // 4. Skip database checks for now (will add later with PostgreSQL)
-    // For MVP: Allow all exports without quota tracking
-    const quota = {
-      allowed: true,
-      remaining: Infinity,
-      limit: Infinity,
-      plan: "free" as const,
-      currentMonth: new Date().toISOString().slice(0, 7),
-      paywall: false,
-    };
+    // 5. Check quota
+    const quota = await checkQuota(user.id);
+    
+    if (!quota.allowed) {
+      return NextResponse.json({
+        success: false,
+        paywall: true,
+        quota,
+        message: "Export limit reached. Please upgrade your plan.",
+      }, { status: 402 });
+    }
 
     // 6. Generate math problems based on config
     const seed = config.seed || Date.now();
@@ -127,16 +151,46 @@ export async function POST(request: NextRequest) {
       problems,
     };
 
-    // 8. Return worksheet data (skip database for now - will add PostgreSQL later)
+    // 7. Create Worksheet entry
+    const worksheet = await prisma.worksheet.create({
+      data: {
+        userId: user.id,
+        title: title || `${config.subject} Worksheet`,
+        description: subtitle || `Generated ${config.subject} worksheet`,
+        content: JSON.stringify(worksheetData),
+        subject: config.subject,
+        gradeLevel: "K",
+        status: "published",
+      },
+    });
+
+    // 8. Create ExportLog entry
+    const exportLog = await prisma.exportLog.create({
+      data: {
+        userId: user.id,
+        worksheetId: worksheet.id,
+        format: "pdf",
+        configHash,
+        metadata: JSON.stringify({
+          title,
+          subtitle,
+          instructions,
+          config,
+          problemCount: problems.length,
+        }),
+      },
+    });
+
+    // 9. Return worksheet data
     return NextResponse.json({
       success: true,
       cached: false,
       data: worksheetData,
-      exportId: `temp-${configHash.slice(0, 8)}`,
+      exportId: exportLog.id,
       quota: {
-        used: 0,
-        limit: Infinity,
-        remaining: Infinity,
+        used: quota.limit - quota.remaining + 1,
+        limit: quota.limit,
+        remaining: quota.remaining - 1,
         plan: quota.plan,
         currentMonth: quota.currentMonth,
       },

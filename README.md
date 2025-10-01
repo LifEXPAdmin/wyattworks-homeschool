@@ -49,20 +49,50 @@ A modern worksheet builder for homeschooling parents. Create custom worksheets, 
    - Create a new application
    - Copy your API keys
 
-4. **Configure environment variables**
+4. **Set up Database**
 
+   **For Development (SQLite):**
    ```bash
-   cp .env.example .env.local
+   # Create .env.local file
+   echo 'DATABASE_URL="file:./dev.db"' > .env.local
    ```
+
+   **For Production (PostgreSQL):**
+   - Sign up for [Supabase](https://supabase.com) (free tier available)
+   - Create a new project
+   - Copy the database URL from Settings > Database
+   - Add to `.env.local`:
+   ```env
+   DATABASE_URL="postgresql://postgres:[password]@[host]:5432/postgres"
+   ```
+
+5. **Configure environment variables**
 
    Edit `.env.local` and add your Clerk keys:
 
    ```env
+   # Clerk Authentication (Required)
    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_your_key_here
    CLERK_SECRET_KEY=sk_test_your_key_here
+   
+   # Database (Required)
+   DATABASE_URL="postgresql://username:password@localhost:5432/astra_academy"
    ```
 
-5. **Run the development server**
+6. **Initialize the database**
+
+   ```bash
+   # Generate Prisma client
+   npm run db:generate
+   
+   # Push schema to database
+   npm run db:push
+   
+   # Seed the database (optional)
+   npm run db:seed
+   ```
+
+7. **Run the development server**
 
    ```bash
    npm run dev
@@ -84,6 +114,11 @@ NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
 NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
 NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
+
+# Database (Required)
+# For development: DATABASE_URL="file:./dev.db"
+# For production: DATABASE_URL="postgresql://username:password@host:5432/database"
+DATABASE_URL="postgresql://postgres:[password]@[host]:5432/postgres"
 ```
 
 See `.env.example` for a template.
