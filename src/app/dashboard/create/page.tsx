@@ -19,6 +19,8 @@ import {
   generateWritingPrompts,
 } from "@/lib/generators/language-arts";
 import type { SpellingWord, VocabularyItem, WritingPrompt } from "@/lib/generators/language-arts";
+import { generateScienceProblems } from "@/lib/generators/science";
+import type { ScienceProblem, ScienceSubject } from "@/lib/generators/science";
 import type { WorksheetConfig } from "@/lib/config";
 
 type DifficultyLevel = "very_easy" | "easy" | "medium" | "hard" | "very_hard" | "custom";
@@ -81,7 +83,8 @@ const BACKGROUND_TEMPLATES = [
 type SubjectType = "math" | "language_arts" | "science";
 type MathOperation = "addition" | "subtraction" | "multiplication" | "division";
 type LanguageArtsType = "spelling" | "vocabulary" | "writing";
-type GradeLevel = "K" | "1-2" | "3-4" | "5-6" | "7-8";
+type ScienceType = "biology" | "chemistry" | "physics" | "earth-science";
+type GradeLevel = "K" | "1-2" | "3-4" | "5-6" | "7-8" | "9-12";
 
 export default function CreateWorksheet() {
   const [subject, setSubject] = useState<SubjectType>("math");
@@ -93,6 +96,7 @@ export default function CreateWorksheet() {
   const [problemCount, setProblemCount] = useState(20);
   const [operation, setOperation] = useState<MathOperation>("addition");
   const [languageArtsType, setLanguageArtsType] = useState<LanguageArtsType>("spelling");
+  const [scienceType, setScienceType] = useState<ScienceType>("biology");
   const [writingType, setWritingType] = useState<
     "narrative" | "expository" | "persuasive" | "descriptive" | "mixed"
   >("mixed");
@@ -102,6 +106,7 @@ export default function CreateWorksheet() {
   const [spellingWords, setSpellingWords] = useState<SpellingWord[]>([]);
   const [vocabularyWords, setVocabularyWords] = useState<VocabularyItem[]>([]);
   const [writingPrompts, setWritingPrompts] = useState<WritingPrompt[]>([]);
+  const [scienceProblems, setScienceProblems] = useState<ScienceProblem[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
 
@@ -114,6 +119,7 @@ export default function CreateWorksheet() {
     setSpellingWords([]);
     setVocabularyWords([]);
     setWritingPrompts([]);
+    setScienceProblems([]);
 
     try {
       if (subject === "math") {
@@ -196,6 +202,14 @@ export default function CreateWorksheet() {
             break;
         }
         setProblems(generated);
+      } else if (subject === "science") {
+        const problems = generateScienceProblems(
+          scienceType as ScienceSubject,
+          problemCount,
+          gradeLevel,
+          seed
+        );
+        setScienceProblems(problems);
       } else if (subject === "language_arts") {
         if (languageArtsType === "spelling") {
           const words = generateSpellingWords({
@@ -245,7 +259,8 @@ export default function CreateWorksheet() {
       problems.length > 0 ||
       spellingWords.length > 0 ||
       vocabularyWords.length > 0 ||
-      writingPrompts.length > 0;
+      writingPrompts.length > 0 ||
+      scienceProblems.length > 0;
 
     if (!hasContent) {
       alert("Please generate content first!");
@@ -318,9 +333,15 @@ export default function CreateWorksheet() {
               title,
               subtitle: `${operation.charAt(0).toUpperCase() + operation.slice(1)} - ${DIFFICULTY_RANGES[difficulty].label}`,
             }
-          : subject === "language_arts"
-            ? { spellingWords, vocabularyWords, writingPrompts, title }
-            : {};
+          : subject === "science"
+            ? {
+                problems: scienceProblems,
+                title,
+                subtitle: `${scienceType.charAt(0).toUpperCase() + scienceType.slice(1)} - Grade ${gradeLevel}`,
+              }
+            : subject === "language_arts"
+              ? { spellingWords, vocabularyWords, writingPrompts, title }
+              : {};
 
       // Open print window instead of generating PDF client-side
       const printWindow = window.open("", "_blank");
@@ -414,7 +435,7 @@ export default function CreateWorksheet() {
                   >
                     <option value="math">📐 Math</option>
                     <option value="language_arts">📖 Language Arts</option>
-                    <option value="science">🔬 Science (Coming Soon)</option>
+                    <option value="science">🔬 Science</option>
                   </select>
                 </div>
 
@@ -463,6 +484,22 @@ export default function CreateWorksheet() {
                       <option value="spelling">🔤 Spelling Words</option>
                       <option value="vocabulary">📚 Vocabulary</option>
                       <option value="writing">✍️ Writing Prompts</option>
+                    </select>
+                  </div>
+                )}
+
+                {subject === "science" && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold">🔬 Science Type</label>
+                    <select
+                      className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-11 w-full rounded-md border-2 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
+                      value={scienceType}
+                      onChange={(e) => setScienceType(e.target.value as ScienceType)}
+                    >
+                      <option value="biology">🧬 Biology</option>
+                      <option value="chemistry">⚗️ Chemistry</option>
+                      <option value="physics">⚡ Physics</option>
+                      <option value="earth-science">🌍 Earth Science</option>
                     </select>
                   </div>
                 )}
@@ -524,17 +561,30 @@ export default function CreateWorksheet() {
                       <option value="3-4">Grades 3-4</option>
                       <option value="5-6">Grades 5-6</option>
                       <option value="7-8">Grades 7-8</option>
+                      <option value="9-12">Grades 9-12</option>
                     </select>
                     <p className="rounded bg-green-50 px-3 py-2 text-xs text-green-700">
-                      {gradeLevel === "K"
-                        ? "Simple CVC words & basic sight words"
-                        : gradeLevel === "1-2"
-                          ? "Consonant blends, digraphs & common sight words"
-                          : gradeLevel === "3-4"
-                            ? "Multi-syllable words & common patterns"
-                            : gradeLevel === "5-6"
-                              ? "Complex words & Greek/Latin roots"
-                              : "Advanced vocabulary & challenging spellings"}
+                      {subject === "science"
+                        ? gradeLevel === "K"
+                          ? "Basic science concepts & observations"
+                          : gradeLevel === "1-2"
+                            ? "Simple experiments & nature study"
+                            : gradeLevel === "3-4"
+                              ? "Scientific method & basic processes"
+                              : gradeLevel === "5-6"
+                                ? "Advanced concepts & lab skills"
+                                : gradeLevel === "7-8"
+                                  ? "Complex theories & analysis"
+                                  : "Advanced science & research methods"
+                        : gradeLevel === "K"
+                          ? "Simple CVC words & basic sight words"
+                          : gradeLevel === "1-2"
+                            ? "Consonant blends, digraphs & common sight words"
+                            : gradeLevel === "3-4"
+                              ? "Multi-syllable words & common patterns"
+                              : gradeLevel === "5-6"
+                                ? "Complex words & Greek/Latin roots"
+                                : "Advanced vocabulary & challenging spellings"}
                     </p>
                   </div>
                 )}
@@ -571,11 +621,13 @@ export default function CreateWorksheet() {
                   <label className="text-sm font-semibold">
                     {subject === "math"
                       ? "🔢 Number of Problems"
-                      : languageArtsType === "spelling"
-                        ? "📝 Number of Words"
-                        : languageArtsType === "vocabulary"
-                          ? "📚 Number of Vocabulary Words"
-                          : "✍️ Number of Prompts"}
+                      : subject === "science"
+                        ? "🔬 Number of Questions"
+                        : languageArtsType === "spelling"
+                          ? "📝 Number of Words"
+                          : languageArtsType === "vocabulary"
+                            ? "📚 Number of Vocabulary Words"
+                            : "✍️ Number of Prompts"}
                   </label>
                   <Input
                     type="number"
@@ -592,11 +644,13 @@ export default function CreateWorksheet() {
                   <p className="text-muted-foreground text-xs">
                     {subject === "math"
                       ? "Between 5 and 100 problems"
-                      : languageArtsType === "vocabulary"
-                        ? "Between 5 and 10 vocabulary words"
-                        : languageArtsType === "writing"
-                          ? "Between 1 and 5 writing prompts"
-                          : "Between 5 and 100 words"}
+                      : subject === "science"
+                        ? "Between 5 and 50 questions"
+                        : languageArtsType === "vocabulary"
+                          ? "Between 5 and 10 vocabulary words"
+                          : languageArtsType === "writing"
+                            ? "Between 1 and 5 writing prompts"
+                            : "Between 5 and 100 words"}
                   </p>
                 </div>
 
@@ -610,11 +664,13 @@ export default function CreateWorksheet() {
                     ? "Generating..."
                     : subject === "math"
                       ? "🎲 Generate Problems"
-                      : languageArtsType === "spelling"
-                        ? "🔤 Generate Spelling Words"
-                        : languageArtsType === "vocabulary"
-                          ? "📚 Generate Vocabulary"
-                          : "✍️ Generate Writing Prompts"}
+                      : subject === "science"
+                        ? "🔬 Generate Science Questions"
+                        : languageArtsType === "spelling"
+                          ? "🔤 Generate Spelling Words"
+                          : languageArtsType === "vocabulary"
+                            ? "📚 Generate Vocabulary"
+                            : "✍️ Generate Writing Prompts"}
                 </Button>
               </CardContent>
             </Card>
@@ -898,6 +954,44 @@ export default function CreateWorksheet() {
                       </div>
                     </div>
                   </div>
+                ) : subject === "science" && scienceProblems.length > 0 ? (
+                  <div className="space-y-6">
+                    {/* Science Questions Preview */}
+                    <div className="rounded-xl border-2 bg-gradient-to-br from-green-50 to-teal-50 p-8">
+                      <h2 className="text-primary mb-6 text-center text-3xl font-bold">{title}</h2>
+                      <p className="text-muted-foreground mb-6 text-center text-lg">
+                        Grade {gradeLevel}{" "}
+                        {scienceType.charAt(0).toUpperCase() + scienceType.slice(1)} Questions
+                      </p>
+                      <div className="space-y-4">
+                        {scienceProblems.map((problem, index) => (
+                          <div key={index} className="rounded-lg border-2 bg-white p-6 shadow-sm">
+                            <div className="flex items-start gap-3">
+                              <span className="bg-primary flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold text-white">
+                                {index + 1}
+                              </span>
+                              <div className="flex-1">
+                                <span className="mb-2 inline-block rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-800">
+                                  {problem.type.charAt(0).toUpperCase() + problem.type.slice(1)}
+                                </span>
+                                <p className="mb-2 text-lg font-medium">{problem.question}</p>
+                                <div className="rounded bg-gray-50 p-3">
+                                  <p className="text-sm text-gray-600">
+                                    <strong>Answer:</strong> {problem.answer}
+                                  </p>
+                                  {problem.explanation && (
+                                    <p className="mt-1 text-sm text-gray-500">
+                                      <strong>Explanation:</strong> {problem.explanation}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 ) : null}
               </CardContent>
             </Card>
@@ -913,6 +1007,11 @@ function generatePrintHTML(subject: string, data: unknown, backgroundStyle: stri
   if (subject === "math") {
     return generateMathPrintHTML(
       data as { title: string; subtitle?: string; problems: MathProblem[] },
+      backgroundStyle
+    );
+  } else if (subject === "science") {
+    return generateSciencePrintHTML(
+      data as { title: string; subtitle?: string; problems: ScienceProblem[] },
       backgroundStyle
     );
   }
@@ -1229,6 +1328,281 @@ function generateMathPrintHTML(
         <div class="encouragement">
           <p class="encourage-text">🌟 Great job! 🌟</p>
           <p class="tips">Keep practicing to improve your math skills!</p>
+        </div>
+        `
+            : ""
+        }
+      </div>
+      
+      <div class="footer">
+        <p>Created with <span class="brand">Wyatt Works™</span></p>
+        <p class="copyright">© ${new Date().getFullYear()} Wyatt Works. All rights reserved.</p>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+function generateSciencePrintHTML(
+  data: {
+    title: string;
+    subtitle?: string;
+    problems: ScienceProblem[];
+  },
+  backgroundStyle: string
+): string {
+  const { title, subtitle, problems } = data;
+
+  const worksheetProblems = problems
+    .map(
+      (p: ScienceProblem, i: number) => `
+    <div class="problem">
+      <span class="number">${i + 1}</span>
+      <span class="text">${p.question}</span>
+      <div class="answer-space"></div>
+    </div>
+  `
+    )
+    .join("");
+
+  const answerKey = problems
+    .map(
+      (p: ScienceProblem, i: number) => `
+      <div class="answer-item">
+        <strong>${i + 1}.</strong> ${p.answer}
+        ${p.explanation ? `<br><em>Explanation:</em> ${p.explanation}` : ""}
+      </div>
+    `
+    )
+    .join("");
+
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>${title}</title>
+      <style>
+        * { 
+          margin: 0; 
+          padding: 0; 
+          box-sizing: border-box;
+          print-color-adjust: exact !important;
+        }
+        
+        body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          line-height: 1.6;
+          color: #333;
+          background: white;
+          print-color-adjust: exact !important;
+        }
+        
+        .worksheet {
+          max-width: 8.5in;
+          margin: 0 auto;
+          padding: 0.5in;
+          ${backgroundStyle}
+        }
+        
+        .header {
+          text-align: center;
+          margin-bottom: 30px;
+          border-bottom: 3px solid #3b82f6;
+          padding-bottom: 20px;
+        }
+        
+        .header h1 {
+          font-size: 2.5em;
+          color: #1e40af;
+          margin-bottom: 10px;
+        }
+        
+        .header h2 {
+          font-size: 1.2em;
+          color: #64748b;
+          font-weight: normal;
+        }
+        
+        .meta {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 30px;
+          font-size: 1.1em;
+        }
+        
+        .meta .line {
+          display: inline-block;
+          width: 200px;
+          border-bottom: 2px solid #3b82f6;
+          margin-left: 10px;
+        }
+        
+        .problems {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 20px;
+          margin-bottom: 30px;
+        }
+        
+        .problem {
+          display: flex;
+          align-items: flex-start;
+          gap: 10px;
+          padding: 15px;
+          border: 2px solid #e5e7eb;
+          border-radius: 8px;
+          background: white;
+          min-height: 80px;
+        }
+        
+        .problem .number {
+          background: #3b82f6;
+          color: white;
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: bold;
+          flex-shrink: 0;
+        }
+        
+        .problem .text {
+          flex: 1;
+          font-size: 1.1em;
+          line-height: 1.4;
+        }
+        
+        .answer-space {
+          height: 30px;
+          border-bottom: 2px solid #3b82f6;
+          width: 100px;
+          margin-top: 10px;
+        }
+        
+        .page-break {
+          page-break-before: always;
+        }
+        
+        .answer-key {
+          background: #f8fafc;
+          padding: 30px;
+          border-radius: 12px;
+          border: 2px solid #e2e8f0;
+          print-color-adjust: exact !important;
+        }
+        
+        .answer-key h3 {
+          color: #1e40af;
+          font-size: 1.8em;
+          margin-bottom: 20px;
+          text-align: center;
+        }
+        
+        .answers {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 15px;
+        }
+        
+        .answer-item {
+          padding: 12px;
+          background: white;
+          border-radius: 6px;
+          border: 1px solid #d1d5db;
+          font-size: 0.95em;
+          line-height: 1.4;
+        }
+        
+        .encouragement {
+          margin-top: 30px;
+          text-align: center;
+          padding: 20px;
+          background: linear-gradient(135deg, #dbeafe, #e0e7ff);
+          border-radius: 12px;
+          border: 2px solid #3b82f6;
+          print-color-adjust: exact !important;
+        }
+        
+        .encourage-text {
+          font-size: 1.5em;
+          color: #1e40af;
+          font-weight: bold;
+          margin-bottom: 10px;
+        }
+        
+        .tips {
+          color: #475569;
+          font-size: 1.1em;
+        }
+        
+        .footer {
+          margin-top: 40px;
+          text-align: center;
+          font-size: 0.9em;
+          color: #64748b;
+          border-top: 1px solid #e5e7eb;
+          padding-top: 20px;
+        }
+        
+        .brand {
+          color: #3b82f6;
+          font-weight: bold;
+        }
+        
+        .copyright {
+          margin-top: 5px;
+          font-size: 0.8em;
+        }
+        
+        @media print {
+          .worksheet {
+            margin: 0;
+            padding: 0.3in;
+          }
+          
+          .problems {
+            grid-template-columns: 1fr 1fr;
+          }
+          
+          .answers {
+            grid-template-columns: 1fr 1fr;
+          }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="worksheet">
+        <div class="header">
+          <h1>${title}</h1>
+          ${subtitle ? `<h2>${subtitle}</h2>` : ""}
+        </div>
+        
+        <div class="meta">
+          <div><strong>Name:</strong> <span class="line"></span></div>
+          <div><strong>Date:</strong> <span class="line"></span></div>
+        </div>
+        
+        <div class="problems">
+          ${worksheetProblems}
+        </div>
+      </div>
+      
+      <div class="page-break"></div>
+      
+      <div class="answer-key">
+        <h3>🔬 Answer Key</h3>
+        <div class="answers">
+          ${answerKey}
+        </div>
+        
+        ${
+          problems.length < 20
+            ? `
+        <div class="encouragement">
+          <p class="encourage-text">🌟 Great job! 🌟</p>
+          <p class="tips">Keep exploring science to discover amazing things!</p>
         </div>
         `
             : ""

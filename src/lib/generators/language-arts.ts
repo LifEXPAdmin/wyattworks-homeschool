@@ -504,13 +504,13 @@ const VOCABULARY_LISTS = {
  */
 export function generateSpellingWords(options: {
   count?: number;
-  grade?: "K" | "1-2" | "3-4" | "5-6" | "7-8";
+  grade?: "K" | "1-2" | "3-4" | "5-6" | "7-8" | "9-12";
   seed?: number;
 }): SpellingWord[] {
   const { count = 10, grade = "1-2", seed = Date.now() } = options;
   const rng = new SeededRandom(seed);
 
-  const wordList = SPELLING_LISTS[grade] || SPELLING_LISTS["1-2"];
+  const wordList = SPELLING_LISTS[grade as keyof typeof SPELLING_LISTS] || SPELLING_LISTS["1-2"];
   const selected: SpellingWord[] = [];
   const used = new Set<string>();
 
@@ -535,13 +535,14 @@ export function generateSpellingWords(options: {
  */
 export function generateVocabularyWords(options: {
   count?: number;
-  grade?: "K" | "1-2" | "3-4" | "5-6" | "7-8";
+  grade?: "K" | "1-2" | "3-4" | "5-6" | "7-8" | "9-12";
   seed?: number;
 }): VocabularyItem[] {
   const { count = 5, grade = "3-4", seed = Date.now() } = options;
   const rng = new SeededRandom(seed);
 
-  const vocabList = VOCABULARY_LISTS[grade] || VOCABULARY_LISTS["3-4"];
+  const vocabList =
+    VOCABULARY_LISTS[grade as keyof typeof VOCABULARY_LISTS] || VOCABULARY_LISTS["3-4"];
   const selected: VocabularyItem[] = [];
   const used = new Set<string>();
 
