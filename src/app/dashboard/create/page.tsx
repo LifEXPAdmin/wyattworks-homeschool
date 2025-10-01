@@ -13,7 +13,7 @@ import {
   generateDivision,
 } from "@/lib/generators/math";
 import type { MathProblem } from "@/lib/generators/math";
-import { exportWorksheet } from "@/lib/api-client";
+import { exportWorksheet, type ExportResponse, type ExportError } from "@/lib/api-client";
 import type { WorksheetConfig } from "@/lib/config";
 
 export default function CreateWorksheet() {
@@ -26,14 +26,7 @@ export default function CreateWorksheet() {
   const [problems, setProblems] = useState<MathProblem[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
-  const [exportResult, setExportResult] = useState<{
-    success: boolean;
-    cached?: boolean;
-    urls?: { worksheet: string; answerKey: string };
-    quota?: { remaining?: number; used?: number; limit?: number };
-    paywall?: boolean;
-    error?: string;
-  } | null>(null);
+  const [exportResult, setExportResult] = useState<ExportResponse | ExportError | null>(null);
 
   const handleGenerate = () => {
     setIsGenerating(true);
@@ -119,17 +112,17 @@ export default function CreateWorksheet() {
 
       setExportResult(result);
 
-      if (result.success) {
+      if ("success" in result && result.success) {
         alert(
           result.cached
             ? "Using cached worksheet (no quota used)!"
             : `Worksheet created! ${result.quota?.remaining} exports remaining this month.`
         );
-      } else if (result.paywall) {
+      } else if ("paywall" in result && result.paywall) {
         alert(
           `Quota exceeded! You've used ${result.quota?.used}/${result.quota?.limit} exports this month. Please upgrade to continue.`
         );
-      } else {
+      } else if ("error" in result) {
         alert(`Error: ${result.error}`);
       }
     } catch (error) {
@@ -257,7 +250,7 @@ export default function CreateWorksheet() {
                 )}
 
                 {/* Export Result */}
-                {exportResult && exportResult.success && (
+                {exportResult && "success" in exportResult && exportResult.success && (
                   <div className="space-y-2 rounded-lg border bg-green-50 p-4 dark:bg-green-950">
                     <p className="text-sm font-semibold text-green-900 dark:text-green-100">
                       ✅ Export Successful!
@@ -270,7 +263,7 @@ export default function CreateWorksheet() {
                     <div className="flex gap-2">
                       <Button size="sm" variant="outline" asChild>
                         <a
-                          href={exportResult.urls.worksheet}
+                          href={exportResult.urls?.worksheet || "#"}
                           target="_blank"
                           rel="noopener noreferrer"
                         >
@@ -279,7 +272,7 @@ export default function CreateWorksheet() {
                       </Button>
                       <Button size="sm" variant="outline" asChild>
                         <a
-                          href={exportResult.urls.answerKey}
+                          href={exportResult.urls?.answerKey || "#"}
                           target="_blank"
                           rel="noopener noreferrer"
                         >
