@@ -53,8 +53,13 @@ export async function POST(request: NextRequest) {
     const validation = ExportRequestSchema.safeParse(body);
 
     if (!validation.success) {
+      console.error("Validation error:", validation.error);
       return NextResponse.json(
-        { error: "Invalid request", details: validation.error.issues },
+        {
+          error: "Invalid request",
+          details: validation.error.issues,
+          message: validation.error.message,
+        },
         { status: 400 }
       );
     }

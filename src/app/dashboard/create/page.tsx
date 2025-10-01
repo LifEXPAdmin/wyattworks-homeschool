@@ -103,12 +103,18 @@ export default function CreateWorksheet() {
 
     setIsExporting(true);
 
+    // Map our difficulty to config difficulty
+    const configDifficulty =
+      difficulty === "very_easy" || difficulty === "very_hard" || difficulty === "custom"
+        ? "medium"
+        : difficulty;
+
     const config: WorksheetConfig = {
       subject: "math",
       type: "practice",
       options: {
         problemCount,
-        difficulty: difficulty as "easy" | "medium" | "hard",
+        difficulty: configDifficulty,
         showAnswerKey: false,
       },
       layout: {
@@ -133,12 +139,17 @@ export default function CreateWorksheet() {
       const result = await response.json();
 
       if (!response.ok) {
+        console.error("Export failed:", result);
         if (result.paywall) {
           alert(
             `Quota exceeded! You've used ${result.quota?.used}/${result.quota?.limit} exports this month. Please upgrade to continue.`
           );
         } else {
-          alert(`Error: ${result.error || "Failed to export"}`);
+          const errorMsg = result.message || result.error || "Failed to export";
+          const details = result.details
+            ? `\n\nDetails: ${JSON.stringify(result.details, null, 2)}`
+            : "";
+          alert(`Error: ${errorMsg}${details}`);
         }
         return;
       }
