@@ -12,13 +12,16 @@ export interface DragDropElement extends InteractiveElement {
   type: "drag-drop";
   content: {
     question: string;
-    options: string[];
-    correctAnswers: string[];
+    draggableItems: Array<{
+      id: string;
+      text: string;
+      correctDropZoneId?: string;
+    }>;
     dropZones: Array<{
       id: string;
       label: string;
-      position: { x: number; y: number };
-      accepts: string[];
+      position?: { x: number; y: number };
+      accepts?: string[];
     }>;
   };
 }
