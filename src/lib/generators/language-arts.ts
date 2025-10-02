@@ -513,8 +513,11 @@ export function generateSpellingWords(options: {
   const wordList = SPELLING_LISTS[grade as keyof typeof SPELLING_LISTS] || SPELLING_LISTS["1-2"];
   const selected: SpellingWord[] = [];
   const used = new Set<string>();
+  const maxAttempts = Math.min(count * 3, wordList.length * 2); // Prevent infinite loops
+  let attempts = 0;
 
-  while (selected.length < Math.min(count, wordList.length)) {
+  while (selected.length < Math.min(count, wordList.length) && attempts < maxAttempts) {
+    attempts++;
     const index = rng.nextInt(0, wordList.length - 1);
     const word = wordList[index];
 
@@ -525,6 +528,15 @@ export function generateSpellingWords(options: {
         difficulty: grade,
       });
     }
+  }
+
+  // If we couldn't get enough unique words, fill with duplicates
+  while (selected.length < count && wordList.length > 0) {
+    const index = rng.nextInt(0, wordList.length - 1);
+    selected.push({
+      word: wordList[index],
+      difficulty: grade,
+    });
   }
 
   return selected;
@@ -545,8 +557,11 @@ export function generateVocabularyWords(options: {
     VOCABULARY_LISTS[grade as keyof typeof VOCABULARY_LISTS] || VOCABULARY_LISTS["3-4"];
   const selected: VocabularyItem[] = [];
   const used = new Set<string>();
+  const maxAttempts = Math.min(count * 3, vocabList.length * 2);
+  let attempts = 0;
 
-  while (selected.length < Math.min(count, vocabList.length)) {
+  while (selected.length < Math.min(count, vocabList.length) && attempts < maxAttempts) {
+    attempts++;
     const index = rng.nextInt(0, vocabList.length - 1);
     const item = vocabList[index];
 
@@ -554,6 +569,12 @@ export function generateVocabularyWords(options: {
       used.add(item.word);
       selected.push(item);
     }
+  }
+
+  // If we couldn't get enough unique words, fill with duplicates
+  while (selected.length < count && vocabList.length > 0) {
+    const index = rng.nextInt(0, vocabList.length - 1);
+    selected.push(vocabList[index]);
   }
 
   return selected;
@@ -594,8 +615,11 @@ export function generateWritingPrompts(options: {
 
   const selected: WritingPrompt[] = [];
   const used = new Set<string>();
+  const maxAttempts = Math.min(count * 3, allPrompts.length * 2);
+  let attempts = 0;
 
-  while (selected.length < Math.min(count, allPrompts.length)) {
+  while (selected.length < Math.min(count, allPrompts.length) && attempts < maxAttempts) {
+    attempts++;
     const index = rng.nextInt(0, allPrompts.length - 1);
     const item = allPrompts[index];
 
@@ -603,6 +627,12 @@ export function generateWritingPrompts(options: {
       used.add(item.prompt);
       selected.push(item);
     }
+  }
+
+  // If we couldn't get enough unique prompts, fill with duplicates
+  while (selected.length < count && allPrompts.length > 0) {
+    const index = rng.nextInt(0, allPrompts.length - 1);
+    selected.push(allPrompts[index]);
   }
 
   return selected;

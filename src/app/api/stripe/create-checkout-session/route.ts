@@ -11,13 +11,27 @@ export async function POST(request: NextRequest) {
   try {
     const user = await currentUser();
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        {
+          error: "STRIPE_AUTH_001",
+          message: "User not authenticated",
+          details: "Please sign in to continue with subscription",
+        },
+        { status: 401 }
+      );
     }
 
     const { planKey, isYearly } = await request.json();
 
     if (!planKey || planKey === "free") {
-      return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: "STRIPE_PLAN_002",
+          message: "Invalid subscription plan selected",
+          details: "Please select a valid paid plan (homeschool or school)",
+        },
+        { status: 400 }
+      );
     }
 
     // Check if Stripe is properly configured
@@ -29,7 +43,8 @@ export async function POST(request: NextRequest) {
     ) {
       return NextResponse.json(
         {
-          error: "Stripe not configured. Please contact support to set up billing.",
+          error: "STRIPE_CONFIG_003",
+          message: "Payment system not configured",
           details:
             "The subscription system is not yet configured. Please contact support for assistance.",
         },
@@ -39,93 +54,179 @@ export async function POST(request: NextRequest) {
 
     const plan = STRIPE_CONFIG.plans[planKey as keyof typeof STRIPE_CONFIG.plans];
     if (!plan) {
-      return NextResponse.json({ error: "Plan not found" }, { status: 404 });
+      return NextResponse.json(
+        {
+          error: "STRIPE_PLAN_004",
+          message: "Subscription plan not found",
+          details: `The plan '${planKey}' does not exist. Available plans: homeschool, school`,
+        },
+        { status: 404 }
+      );
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const priceId = isYearly ? (plan as any).yearlyPriceId : plan.priceId;
     if (!priceId) {
-      return NextResponse.json({ error: "Price ID not found" }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: "STRIPE_PRICE_005",
+          message: "Pricing not configured for this plan",
+          details: `No price ID found for plan '${planKey}' ${isYearly ? "yearly" : "monthly"} billing`,
+        },
+        { status: 400 }
+      );
     }
 
     // Get or create Stripe customer
     let customerId: string;
 
-    // Check if user already has a Stripe customer ID
-    const dbUser = await prisma.user.findUnique({
-      where: { clerkId: user.id },
-      include: { subscription: true },
-    });
-
-    if (dbUser?.subscription?.stripeCustomerId) {
-      customerId = dbUser.subscription.stripeCustomerId;
-    } else {
-      // Create new Stripe customer
-      const customer = await stripe.customers.create({
-        email: user.emailAddresses[0]?.emailAddress,
-        name: `${user.firstName} ${user.lastName}`.trim(),
-        metadata: {
-          clerkUserId: user.id,
-        },
-      });
-      customerId = customer.id;
-
-      // Update user with Stripe customer ID
-      await prisma.user.upsert({
+    try {
+      // Check if user already has a Stripe customer ID
+      const dbUser = await prisma.user.findUnique({
         where: { clerkId: user.id },
-        update: {},
-        create: {
-          clerkId: user.id,
-          email: user.emailAddresses[0]?.emailAddress || "",
-          firstName: user.firstName,
-          lastName: user.lastName,
-          imageUrl: user.imageUrl,
-        },
+        include: { subscription: true },
       });
 
-      await prisma.subscription.upsert({
-        where: { userId: dbUser?.id || "" },
-        update: { stripeCustomerId: customerId },
-        create: {
-          userId: dbUser?.id || "",
-          stripeCustomerId: customerId,
-          plan: "free",
-          status: "active",
+      if (dbUser?.subscription?.stripeCustomerId) {
+        customerId = dbUser.subscription.stripeCustomerId;
+      } else {
+        // Create new Stripe customer
+        const customer = await stripe.customers.create({
+          email: user.emailAddresses[0]?.emailAddress,
+          name: `${user.firstName} ${user.lastName}`.trim(),
+          metadata: {
+            clerkUserId: user.id,
+          },
+        });
+        customerId = customer.id;
+
+        // Update user with Stripe customer ID
+        await prisma.user.upsert({
+          where: { clerkId: user.id },
+          update: {},
+          create: {
+            clerkId: user.id,
+            email: user.emailAddresses[0]?.emailAddress || "",
+            firstName: user.firstName,
+            lastName: user.lastName,
+            imageUrl: user.imageUrl,
+          },
+        });
+
+        await prisma.subscription.upsert({
+          where: { userId: dbUser?.id || "" },
+          update: { stripeCustomerId: customerId },
+          create: {
+            userId: dbUser?.id || "",
+            stripeCustomerId: customerId,
+            plan: "free",
+            status: "active",
+          },
+        });
+      }
+    } catch (dbError) {
+      console.error("Database error:", dbError);
+      return NextResponse.json(
+        {
+          error: "STRIPE_DB_006",
+          message: "Database connection error",
+          details: "Unable to process subscription request. Please try again.",
         },
-      });
+        { status: 500 }
+      );
     }
 
     // Create checkout session with trial period
-    const session = await stripe.checkout.sessions.create({
-      customer: customerId,
-      payment_method_types: ["card"],
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
+    try {
+      const session = await stripe.checkout.sessions.create({
+        customer: customerId,
+        payment_method_types: ["card"],
+        line_items: [
+          {
+            price: priceId,
+            quantity: 1,
+          },
+        ],
+        mode: "subscription",
+        subscription_data: {
+          trial_period_days: plan.trialDays || 14, // Default to 14 days if not specified
+          metadata: {
+            clerkUserId: user.id,
+            planKey,
+            isYearly: isYearly.toString(),
+          },
         },
-      ],
-      mode: "subscription",
-      subscription_data: {
-        trial_period_days: plan.trialDays || 14, // Default to 14 days if not specified
+        success_url: STRIPE_CONFIG.successUrl,
+        cancel_url: STRIPE_CONFIG.cancelUrl,
         metadata: {
           clerkUserId: user.id,
           planKey,
           isYearly: isYearly.toString(),
         },
-      },
-      success_url: STRIPE_CONFIG.successUrl,
-      cancel_url: STRIPE_CONFIG.cancelUrl,
-      metadata: {
-        clerkUserId: user.id,
-        planKey,
-        isYearly: isYearly.toString(),
-      },
-    });
+      });
 
-    return NextResponse.json({ sessionId: session.id, url: session.url });
+      return NextResponse.json({ sessionId: session.id, url: session.url });
+    } catch (stripeError: unknown) {
+      console.error("Stripe API error:", stripeError);
+
+      // Handle specific Stripe errors
+      const error = stripeError as { type?: string; message?: string };
+      if (error.type === "StripeInvalidRequestError") {
+        return NextResponse.json(
+          {
+            error: "STRIPE_API_007",
+            message: "Invalid payment request",
+            details: error.message || "The payment request contains invalid data",
+          },
+          { status: 400 }
+        );
+      } else if (error.type === "StripeCardError") {
+        return NextResponse.json(
+          {
+            error: "STRIPE_CARD_008",
+            message: "Payment method error",
+            details: error.message || "There was an issue with the payment method",
+          },
+          { status: 400 }
+        );
+      } else if (error.type === "StripeRateLimitError") {
+        return NextResponse.json(
+          {
+            error: "STRIPE_RATE_009",
+            message: "Too many requests",
+            details: "Please wait a moment and try again",
+          },
+          { status: 429 }
+        );
+      } else if (error.type === "StripeAPIError") {
+        return NextResponse.json(
+          {
+            error: "STRIPE_API_010",
+            message: "Payment service error",
+            details: "The payment service is temporarily unavailable. Please try again.",
+          },
+          { status: 503 }
+        );
+      } else {
+        return NextResponse.json(
+          {
+            error: "STRIPE_UNKNOWN_011",
+            message: "Payment processing error",
+            details: "An unexpected error occurred. Please try again or contact support.",
+          },
+          { status: 500 }
+        );
+      }
+    }
   } catch (error) {
-    console.error("Stripe checkout error:", error);
-    return NextResponse.json({ error: "Failed to create checkout session" }, { status: 500 });
+    console.error("General checkout error:", error);
+    return NextResponse.json(
+      {
+        error: "STRIPE_GENERAL_012",
+        message: "Failed to create checkout session",
+        details: "An unexpected error occurred. Please try again or contact support.",
+      },
+      { status: 500 }
+    );
   }
 }

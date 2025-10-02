@@ -61,13 +61,53 @@ export function SubscriptionDashboard({ userId, className }: SubscriptionDashboa
 
       if (!response.ok) {
         const errorData = await response.json();
-        if (response.status === 503) {
-          // Stripe not configured - show a more user-friendly message
-          const message = `🚧 Subscription System Coming Soon!\n\n${errorData.details}\n\nFor now, you can use the free plan with 15 exports per month. We're working on enabling payments soon!`;
-          alert(message);
-        } else {
-          throw new Error(errorData.error || "Failed to create checkout session");
+
+        // Handle specific error codes with user-friendly messages
+        let userMessage = "Payment failed. Please try again.";
+
+        switch (errorData.error) {
+          case "STRIPE_AUTH_001":
+            userMessage = "Please sign in to continue with your subscription.";
+            break;
+          case "STRIPE_PLAN_002":
+            userMessage = "Please select a valid subscription plan.";
+            break;
+          case "STRIPE_CONFIG_003":
+            userMessage =
+              "🚧 Subscription System Coming Soon!\n\nFor now, you can use the free plan with 15 exports per month. We're working on enabling payments soon!";
+            break;
+          case "STRIPE_PLAN_004":
+            userMessage = "The selected plan is not available. Please choose a different plan.";
+            break;
+          case "STRIPE_PRICE_005":
+            userMessage = "Pricing is not configured for this plan. Please contact support.";
+            break;
+          case "STRIPE_DB_006":
+            userMessage = "Unable to process your request. Please try again in a moment.";
+            break;
+          case "STRIPE_API_007":
+            userMessage =
+              "There was an issue with your payment request. Please check your information and try again.";
+            break;
+          case "STRIPE_CARD_008":
+            userMessage =
+              "There was an issue with your payment method. Please try a different card.";
+            break;
+          case "STRIPE_RATE_009":
+            userMessage = "Too many requests. Please wait a moment and try again.";
+            break;
+          case "STRIPE_API_010":
+            userMessage = "Payment service is temporarily unavailable. Please try again later.";
+            break;
+          case "STRIPE_UNKNOWN_011":
+          case "STRIPE_GENERAL_012":
+          default:
+            userMessage =
+              errorData.details || errorData.message || "Payment failed. Please try again.";
+            break;
         }
+
+        alert(`❌ ${userMessage}\n\nError Code: ${errorData.error || "UNKNOWN"}`);
         return;
       }
 

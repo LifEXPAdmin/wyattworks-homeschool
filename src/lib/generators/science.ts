@@ -1318,7 +1318,31 @@ export function generateBiologyProblems(
   const problems: BiologyProblem[] = [];
   const gradeContent = BIOLOGY_CONTENT[grade];
 
-  for (let i = 0; i < count; i++) {
+  if (!gradeContent) {
+    console.warn(`No biology content found for grade ${grade}, using K grade content`);
+    const fallbackContent = BIOLOGY_CONTENT.K;
+    for (let i = 0; i < count; i++) {
+      const type = types[random.nextInt(0, types.length - 1)];
+      const typeContent = fallbackContent[type as keyof typeof fallbackContent];
+
+      if (typeContent && typeContent.length > 0) {
+        const problem = typeContent[random.nextInt(0, typeContent.length - 1)];
+        problems.push({
+          type,
+          question: problem.question,
+          answer: problem.answer,
+          explanation: (problem as { explanation?: string }).explanation,
+        });
+      }
+    }
+    return problems;
+  }
+
+  const maxAttempts = count * 3;
+  let attempts = 0;
+
+  while (problems.length < count && attempts < maxAttempts) {
+    attempts++;
     const type = types[random.nextInt(0, types.length - 1)];
     const typeContent = gradeContent[type as keyof typeof gradeContent];
 
@@ -1330,6 +1354,24 @@ export function generateBiologyProblems(
         answer: problem.answer,
         explanation: (problem as { explanation?: string }).explanation,
       });
+    }
+  }
+
+  // If we need more problems, fill with any available content
+  while (problems.length < count) {
+    const type = types[random.nextInt(0, types.length - 1)];
+    const typeContent = gradeContent[type as keyof typeof gradeContent];
+
+    if (typeContent && typeContent.length > 0) {
+      const problem = typeContent[random.nextInt(0, typeContent.length - 1)];
+      problems.push({
+        type,
+        question: problem.question,
+        answer: problem.answer,
+        explanation: (problem as { explanation?: string }).explanation,
+      });
+    } else {
+      break; // No more content available
     }
   }
 

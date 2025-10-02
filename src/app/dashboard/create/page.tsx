@@ -230,6 +230,14 @@ export default function CreateWorksheet() {
     const seed = Date.now();
     const startTime = performance.now();
 
+    // Set a timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      setIsGenerating(false);
+      alert(
+        "⏱️ Generation is taking longer than expected. Please try:\n\n• Reducing the number of problems\n• Choosing a different subject or difficulty\n• Refreshing the page and trying again\n\nIf the issue persists, please contact support."
+      );
+    }, 15000); // 15 second timeout
+
     // Track worksheet creation event
     AnalyticsManager.trackEvent("current-user", "worksheet_created", {
       subject,
@@ -419,8 +427,27 @@ export default function CreateWorksheet() {
       }
     } catch (error) {
       console.error("Generation error:", error);
-      alert("Failed to generate content. Please try different settings.");
+
+      // Provide specific error messages based on the error type
+      let errorMessage = "Failed to generate content. Please try different settings.";
+
+      if (error instanceof Error) {
+        if (error.message.includes("language_arts")) {
+          errorMessage =
+            "Language Arts generation failed. Please try:\n\n• Reducing the number of problems\n• Choosing a different grade level\n• Switching to spelling or vocabulary";
+        } else if (error.message.includes("science")) {
+          errorMessage =
+            "Science generation failed. Please try:\n\n• Choosing a different science subject\n• Adjusting the grade level\n• Reducing the number of problems";
+        } else if (error.message.includes("timeout")) {
+          errorMessage =
+            "Generation timed out. Please try:\n\n• Reducing the number of problems\n• Choosing simpler settings\n• Refreshing the page";
+        }
+      }
+
+      alert(`❌ ${errorMessage}\n\nIf the issue persists, please contact support.`);
     } finally {
+      // Clear the timeout
+      clearTimeout(timeoutId);
       setIsGenerating(false);
 
       // Cache the generated content
