@@ -271,12 +271,14 @@ export default function CreateWorksheet() {
   };
 
   const handleGenerate = () => {
+    console.log("🚀 Starting generation with:", { subject, operation, difficulty, problemCount });
     setIsGenerating(true);
     const seed = Date.now();
     const startTime = performance.now();
 
     // Set a timeout to prevent infinite loading
     const timeoutId = setTimeout(() => {
+      console.log("⏰ Generation timeout triggered");
       setIsGenerating(false);
       alert(
         "⏱️ Generation is taking longer than expected. Please try:\n\n• Reducing the number of problems\n• Choosing a different subject or difficulty\n• Refreshing the page and trying again\n\nIf the issue persists, please contact support."
@@ -284,27 +286,32 @@ export default function CreateWorksheet() {
     }, 8000); // 8 second timeout
 
     // Track worksheet creation event
-    AnalyticsManager.trackEvent("current-user", "worksheet_created", {
-      subject,
-      type:
-        subject === "math"
-          ? operation
-          : subject === "language_arts"
-            ? languageArtsType
-            : scienceType,
-      difficulty: subject === "math" ? difficulty : gradeLevel,
-      problemCount:
-        subject === "math"
-          ? problemCount
-          : subject === "language_arts"
-            ? languageArtsType === "spelling"
-              ? 10
-              : languageArtsType === "vocabulary"
+    try {
+      AnalyticsManager.trackEvent("current-user", "worksheet_created", {
+        subject,
+        type:
+          subject === "math"
+            ? operation
+            : subject === "language_arts"
+              ? languageArtsType
+              : scienceType,
+        difficulty: subject === "math" ? difficulty : gradeLevel,
+        problemCount:
+          subject === "math"
+            ? problemCount
+            : subject === "language_arts"
+              ? languageArtsType === "spelling"
                 ? 10
-                : 5
-            : 10,
-      seed,
-    });
+                : languageArtsType === "vocabulary"
+                  ? 10
+                  : 5
+              : 10,
+        seed,
+      });
+      console.log("✅ Analytics tracked successfully");
+    } catch (error) {
+      console.error("❌ Analytics error:", error);
+    }
 
     // Determine the current type based on subject
     const currentType =
@@ -373,12 +380,18 @@ export default function CreateWorksheet() {
         switch (operation) {
           case "addition":
             console.log("Generating addition problems...");
-            generated = generateAddition({
-              count: problemCount,
-              minValue: range.min,
-              maxValue: range.max,
-              seed,
-            });
+            try {
+              generated = generateAddition({
+                count: problemCount,
+                minValue: range.min,
+                maxValue: range.max,
+                seed,
+              });
+              console.log("✅ Addition generation successful:", generated.length, "problems");
+            } catch (error) {
+              console.error("❌ Addition generation failed:", error);
+              throw error;
+            }
             break;
           case "subtraction":
             console.log("Generating subtraction problems...");
@@ -502,9 +515,11 @@ export default function CreateWorksheet() {
 
       alert(`❌ ${errorMessage}\n\nIf the issue persists, please contact support.`);
     } finally {
+      console.log("🏁 Generation finally block executing");
       // Clear the timeout
       clearTimeout(timeoutId);
       setIsGenerating(false);
+      console.log("✅ setIsGenerating(false) called");
 
       // Cache the generated content
       const contentToCache =
@@ -517,6 +532,8 @@ export default function CreateWorksheet() {
                 ? vocabularyWords
                 : writingPrompts
             : scienceProblems;
+
+      console.log("📦 Content cached:", contentToCache);
 
       // worksheetCache.cacheGeneratedContent(
       //   subject,
@@ -880,8 +897,9 @@ export default function CreateWorksheet() {
         <div className="flex h-screen flex-col">
           {/* Toolbar - Always visible at top */}
           <div className="border-b bg-white p-4 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
+            <div className="space-y-3">
+              {/* First Row */}
+              <div className="flex flex-wrap items-center gap-4">
                 {/* Document Type - PDF Only */}
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium">Type:</span>
@@ -971,36 +989,16 @@ export default function CreateWorksheet() {
                     className="w-20"
                   />
                 </div>
-
-                {/* Answer Key Toggle */}
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium">Answer Key:</span>
-                  <Button
-                    variant={includeAnswerKey ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setIncludeAnswerKey(!includeAnswerKey)}
-                    className="h-8 px-3"
-                  >
-                    {includeAnswerKey ? "✓ On" : "✗ Off"}
-                  </Button>
-                </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex items-center gap-2">
+              {/* Second Row - Action Buttons */}
+              <div className="flex flex-wrap items-center gap-2">
                 <Button
                   onClick={handleGenerate}
                   disabled={isGenerating}
                   className="homeschool-button"
                 >
                   {isGenerating ? "Generating..." : "🎲 Generate"}
-                </Button>
-                <Button
-                  onClick={() => setShowCustomizeModal(true)}
-                  variant="outline"
-                  className="homeschool-button-secondary"
-                >
-                  🎨 Customize PDF
                 </Button>
                 <Button
                   onClick={handleExport}
@@ -1134,6 +1132,35 @@ export default function CreateWorksheet() {
                         onChange={(e) => setTitle(e.target.value)}
                         className="mt-1"
                       />
+                    </div>
+
+                    {/* Answer Key Toggle - Moved from toolbar */}
+                    <div>
+                      <label className="text-sm font-medium">Answer Key</label>
+                      <div className="mt-1">
+                        <Button
+                          variant={includeAnswerKey ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setIncludeAnswerKey(!includeAnswerKey)}
+                          className="w-full"
+                        >
+                          {includeAnswerKey ? "✓ Answer Key On" : "✗ Answer Key Off"}
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Customize PDF Button - Moved from toolbar */}
+                    <div>
+                      <label className="text-sm font-medium">PDF Styling</label>
+                      <div className="mt-1">
+                        <Button
+                          onClick={() => setShowCustomizeModal(true)}
+                          variant="outline"
+                          className="homeschool-button-secondary w-full"
+                        >
+                          🎨 Customize PDF
+                        </Button>
+                      </div>
                     </div>
 
                     {subject === "math" && (
