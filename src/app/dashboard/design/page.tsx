@@ -1,10 +1,15 @@
-import { DesignSystemDashboard } from '@/components/design-system-dashboard';
-import { MobileLayout } from '@/components/mobile-layout';
+import { MobileLayout } from "@/components/mobile-layout";
 
 export default function DesignSystemPage() {
   return (
     <MobileLayout>
-      <DesignSystemDashboard />
+      <div className="p-6">
+        <h1 className="mb-4 text-2xl font-bold">Design System</h1>
+        <p className="text-muted-foreground">
+          Design system dashboard is temporarily unavailable while we implement the new
+          homeschool-focused theme.
+        </p>
+      </div>
     </MobileLayout>
   );
 }

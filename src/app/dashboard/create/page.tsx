@@ -169,8 +169,8 @@ export default function CreateWorksheet() {
         studentId: "current-student",
         eventType: "theme_changed",
         data: {
-          themeId: theme.id,
-          themeName: theme.name,
+          themeId: theme,
+          themeName: theme,
         },
       });
     };
@@ -548,7 +548,7 @@ export default function CreateWorksheet() {
                   : 5
               : 10,
         font: selectedFont.name,
-        theme: currentTheme.id,
+        theme: currentTheme,
       },
     });
 
