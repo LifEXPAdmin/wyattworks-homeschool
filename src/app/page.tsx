@@ -21,7 +21,7 @@ export default function Home() {
                 <Link href="/sign-in">
                   <Button variant="ghost">Sign In</Button>
                 </Link>
-                <Link href="/dashboard">
+                <Link href="/dashboard/build">
                   <Button>Start Building</Button>
                 </Link>
               </SignedOut>
@@ -69,7 +69,7 @@ export default function Home() {
             worksheet builder designed specifically for homeschooling parents.
           </p>
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
-            <Link href="/dashboard">
+            <Link href="/dashboard/build">
               <Button size="lg" className="homeschool-button px-8 py-6 text-lg">
                 Start Building
               </Button>
@@ -357,7 +357,7 @@ export default function Home() {
             Join thousands of homeschooling parents who are already creating amazing worksheets with
             Wyatt Works.
           </p>
-          <Link href="/dashboard">
+          <Link href="/dashboard/build">
             <Button size="lg" className="px-8 py-6 text-lg">
               Start Building Today
             </Button>
