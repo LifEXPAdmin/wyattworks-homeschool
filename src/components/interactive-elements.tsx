@@ -69,7 +69,7 @@ export function DragDropElement({
     // Check if correct
     const zone = dragElement.content.dropZones.find((z) => z.id === zoneId);
     const isAnswerCorrect =
-      zone?.accepts.includes("correct-answer") && draggedItem === "correct-answer";
+      zone?.accepts?.includes("correct-answer") && draggedItem === "correct-answer";
 
     if (isAnswerCorrect) {
       setIsCorrect(true);
@@ -99,16 +99,16 @@ export function DragDropElement({
 
         {/* Drag Items */}
         <div className="flex flex-wrap gap-2">
-          {dragElement.content.options.map((option) => (
+          {dragElement.content.draggableItems.map((item) => (
             <div
-              key={option}
+              key={item.id}
               draggable={!disabled}
-              onDragStart={(e) => handleDragStart(e, option)}
+              onDragStart={(e) => handleDragStart(e, item.text)}
               className={`cursor-move rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 px-3 py-2 text-sm transition-all hover:bg-gray-100 ${
                 disabled ? "cursor-not-allowed opacity-50" : ""
               }`}
             >
-              {option}
+              {item.text}
             </div>
           ))}
         </div>
