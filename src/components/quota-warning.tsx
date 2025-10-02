@@ -37,7 +37,10 @@ export function QuotaWarning({ userId, className, showUpgradePrompt = true }: Qu
 
     try {
       const quota = await checkQuota(userId);
-      setQuotaInfo(quota);
+      setQuotaInfo({
+        ...quota,
+        used: quota.limit - quota.remaining,
+      });
     } catch (error) {
       console.error("Failed to load quota info:", error);
     } finally {
@@ -199,7 +202,10 @@ export function UpgradePrompt({ userId, className, variant = "card" }: UpgradePr
 
     try {
       const quota = await checkQuota(userId);
-      setQuotaInfo(quota);
+      setQuotaInfo({
+        ...quota,
+        used: quota.limit - quota.remaining,
+      });
     } catch (error) {
       console.error("Failed to load quota info:", error);
     } finally {
@@ -329,7 +335,10 @@ export function QuotaDisplay({ userId, className, showProgress = true }: QuotaDi
 
     try {
       const quota = await checkQuota(userId);
-      setQuotaInfo(quota);
+      setQuotaInfo({
+        ...quota,
+        used: quota.limit - quota.remaining,
+      });
     } catch (error) {
       console.error("Failed to load quota info:", error);
     } finally {
