@@ -126,15 +126,20 @@ export default function QuizPage() {
     }
   };
 
-  const handleQuizComplete = (results: { score: number; totalPoints: number }) => {
-    const timeSpent = Math.floor(Math.random() * 600); // Mock time spent
+  const handleQuizComplete = (results: {
+    score: number;
+    totalElements: number;
+    correctAnswers: number;
+    totalTime: number;
+  }) => {
+    const timeSpent = Math.floor(results.totalTime / 1000); // Convert to seconds
 
     const finalResults = {
       score: results.score,
-      totalPoints: results.totalPoints,
+      totalPoints: results.totalElements,
       timeSpent,
-      correctAnswers: Math.round((results.score / 100) * results.totalPoints),
-      totalQuestions: results.totalPoints,
+      correctAnswers: results.correctAnswers,
+      totalQuestions: results.totalElements,
     };
 
     setQuizResults(finalResults);
