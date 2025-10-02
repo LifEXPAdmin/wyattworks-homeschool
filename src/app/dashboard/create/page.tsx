@@ -23,6 +23,13 @@ import { generateScienceProblems } from "@/lib/generators/science";
 import type { ScienceProblem, ScienceSubject } from "@/lib/generators/science";
 import type { WorksheetConfig } from "@/lib/config";
 import { FontSelector } from "@/components/font-selector";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { QuotaDisplay, UpgradePrompt } from "@/components/quota-warning";
 import { BUILT_IN_FONTS, type FontInfo } from "@/lib/fonts";
 import { themeManager } from "@/lib/design-system";
@@ -671,24 +678,28 @@ export default function CreateWorksheet() {
               <CardContent className="space-y-6 pt-6">
                 <div className="space-y-2">
                   <label className="text-sm font-semibold">📚 Subject</label>
-                  <select
-                    className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-11 w-full rounded-md border-2 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
+                  <Select
                     value={subject}
-                    onChange={(e) => {
-                      setSubject(e.target.value as SubjectType);
+                    onValueChange={(value) => {
+                      setSubject(value as SubjectType);
                       setTitle(
-                        e.target.value === "math"
+                        value === "math"
                           ? "Math Practice Worksheet"
-                          : e.target.value === "language_arts"
+                          : value === "language_arts"
                             ? "Language Arts Worksheet"
                             : "Science Worksheet"
                       );
                     }}
                   >
-                    <option value="math">📐 Math</option>
-                    <option value="language_arts">📖 Language Arts</option>
-                    <option value="science">🔬 Science</option>
-                  </select>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select subject" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="math">📐 Math</SelectItem>
+                      <SelectItem value="language_arts">📖 Language Arts</SelectItem>
+                      <SelectItem value="science">🔬 Science</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="space-y-2">
@@ -704,67 +715,74 @@ export default function CreateWorksheet() {
                 {subject === "math" && (
                   <div className="space-y-2">
                     <label className="text-sm font-semibold">➕ Operation</label>
-                    <select
-                      className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-11 w-full rounded-md border-2 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
+                    <Select
                       value={operation}
-                      onChange={(e) =>
+                      onValueChange={(value) =>
                         setOperation(
-                          e.target.value as
-                            | "addition"
-                            | "subtraction"
-                            | "multiplication"
-                            | "division"
+                          value as "addition" | "subtraction" | "multiplication" | "division"
                         )
                       }
                     >
-                      <option value="addition">➕ Addition</option>
-                      <option value="subtraction">➖ Subtraction</option>
-                      <option value="multiplication">✖️ Multiplication</option>
-                      <option value="division">➗ Division</option>
-                    </select>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select operation" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="addition">➕ Addition</SelectItem>
+                        <SelectItem value="subtraction">➖ Subtraction</SelectItem>
+                        <SelectItem value="multiplication">✖️ Multiplication</SelectItem>
+                        <SelectItem value="division">➗ Division</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 )}
 
                 {subject === "language_arts" && (
                   <div className="space-y-2">
                     <label className="text-sm font-semibold">📖 Type</label>
-                    <select
-                      className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-11 w-full rounded-md border-2 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
+                    <Select
                       value={languageArtsType}
-                      onChange={(e) => setLanguageArtsType(e.target.value as LanguageArtsType)}
+                      onValueChange={(value) => setLanguageArtsType(value as LanguageArtsType)}
                     >
-                      <option value="spelling">🔤 Spelling Words</option>
-                      <option value="vocabulary">📚 Vocabulary</option>
-                      <option value="writing">✍️ Writing Prompts</option>
-                    </select>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="spelling">🔤 Spelling Words</SelectItem>
+                        <SelectItem value="vocabulary">📚 Vocabulary</SelectItem>
+                        <SelectItem value="writing">✍️ Writing Prompts</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 )}
 
                 {subject === "science" && (
                   <div className="space-y-2">
                     <label className="text-sm font-semibold">🔬 Science Type</label>
-                    <select
-                      className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-11 w-full rounded-md border-2 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
+                    <Select
                       value={scienceType}
-                      onChange={(e) => setScienceType(e.target.value as ScienceType)}
+                      onValueChange={(value) => setScienceType(value as ScienceType)}
                     >
-                      <option value="biology">🧬 Biology</option>
-                      <option value="chemistry">⚗️ Chemistry</option>
-                      <option value="physics">⚡ Physics</option>
-                      <option value="earth-science">🌍 Earth Science</option>
-                    </select>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select science type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="biology">🧬 Biology</SelectItem>
+                        <SelectItem value="chemistry">⚗️ Chemistry</SelectItem>
+                        <SelectItem value="physics">⚡ Physics</SelectItem>
+                        <SelectItem value="earth-science">🌍 Earth Science</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 )}
 
                 {subject === "language_arts" && languageArtsType === "writing" && (
                   <div className="space-y-2">
                     <label className="text-sm font-semibold">✍️ Writing Style</label>
-                    <select
-                      className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-11 w-full rounded-md border-2 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
+                    <Select
                       value={writingType}
-                      onChange={(e) =>
+                      onValueChange={(value) =>
                         setWritingType(
-                          e.target.value as
+                          value as
                             | "narrative"
                             | "expository"
                             | "persuasive"
@@ -773,29 +791,40 @@ export default function CreateWorksheet() {
                         )
                       }
                     >
-                      <option value="narrative">📖 Narrative (Tell a Story)</option>
-                      <option value="expository">📝 Expository (Explain/Inform)</option>
-                      <option value="persuasive">💬 Persuasive (Convince)</option>
-                      <option value="descriptive">🎨 Descriptive (Paint a Picture)</option>
-                      <option value="mixed">🎲 Mixed (Random)</option>
-                    </select>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select writing style" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="narrative">📖 Narrative (Tell a Story)</SelectItem>
+                        <SelectItem value="expository">📝 Expository (Explain/Inform)</SelectItem>
+                        <SelectItem value="persuasive">💬 Persuasive (Convince)</SelectItem>
+                        <SelectItem value="descriptive">
+                          🎨 Descriptive (Paint a Picture)
+                        </SelectItem>
+                        <SelectItem value="mixed">🎲 Mixed (Random)</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 )}
 
                 {subject === "math" ? (
                   <div className="space-y-2">
                     <label className="text-sm font-semibold">🎯 Difficulty Level</label>
-                    <select
-                      className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-11 w-full rounded-md border-2 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
+                    <Select
                       value={difficulty}
-                      onChange={(e) => setDifficulty(e.target.value as DifficultyLevel)}
+                      onValueChange={(value) => setDifficulty(value as DifficultyLevel)}
                     >
-                      {Object.entries(DIFFICULTY_RANGES).map(([key, value]) => (
-                        <option key={key} value={key}>
-                          {value.label}
-                        </option>
-                      ))}
-                    </select>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select difficulty" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(DIFFICULTY_RANGES).map(([key, value]) => (
+                          <SelectItem key={key} value={key}>
+                            {value.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <p className="rounded bg-blue-50 px-3 py-2 text-xs text-blue-700">
                       {DIFFICULTY_RANGES[difficulty].desc}
                     </p>
@@ -803,18 +832,22 @@ export default function CreateWorksheet() {
                 ) : (
                   <div className="space-y-2">
                     <label className="text-sm font-semibold">🎓 Grade Level</label>
-                    <select
-                      className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-11 w-full rounded-md border-2 px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none"
+                    <Select
                       value={gradeLevel}
-                      onChange={(e) => setGradeLevel(e.target.value as GradeLevel)}
+                      onValueChange={(value) => setGradeLevel(value as GradeLevel)}
                     >
-                      <option value="K">Kindergarten</option>
-                      <option value="1-2">Grades 1-2</option>
-                      <option value="3-4">Grades 3-4</option>
-                      <option value="5-6">Grades 5-6</option>
-                      <option value="7-8">Grades 7-8</option>
-                      <option value="9-12">Grades 9-12</option>
-                    </select>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select grade level" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="K">Kindergarten</SelectItem>
+                        <SelectItem value="1-2">Grades 1-2</SelectItem>
+                        <SelectItem value="3-4">Grades 3-4</SelectItem>
+                        <SelectItem value="5-6">Grades 5-6</SelectItem>
+                        <SelectItem value="7-8">Grades 7-8</SelectItem>
+                        <SelectItem value="9-12">Grades 9-12</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <p className="rounded bg-green-50 px-3 py-2 text-xs text-green-700">
                       {subject === "science"
                         ? gradeLevel === "K"
