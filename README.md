@@ -326,7 +326,7 @@ STRIPE_SCHOOL_PRICE_ID=price_...
 STRIPE_SCHOOL_YEARLY_PRICE_ID=price_...
 
 # App URL for redirects
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_APP_URL=https://wyatt-works.education
 ```
 
 ### Setting Up Stripe

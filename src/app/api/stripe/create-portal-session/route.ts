@@ -26,7 +26,7 @@ export async function POST() {
     // Create portal session
     const session = await stripe.billingPortal.sessions.create({
       customer: dbUser.subscription.stripeCustomerId,
-      return_url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/dashboard/subscription`,
+      return_url: `${process.env.NEXT_PUBLIC_APP_URL || "https://wyatt-works.education"}/dashboard/subscription`,
     });
 
     return NextResponse.json({ url: session.url });

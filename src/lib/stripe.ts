@@ -75,8 +75,8 @@ export const STRIPE_CONFIG = {
   webhookSecret: process.env.STRIPE_WEBHOOK_SECRET || "",
 
   // Success/cancel URLs
-  successUrl: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/dashboard/subscription?success=true`,
-  cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/dashboard/subscription?canceled=true`,
+  successUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://wyatt-works.education"}/dashboard/subscription?success=true`,
+  cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://wyatt-works.education"}/dashboard/subscription?canceled=true`,
 };
 
 // Helper function to get plan by price ID
