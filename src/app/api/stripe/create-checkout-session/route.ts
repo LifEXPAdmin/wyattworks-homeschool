@@ -21,7 +21,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if Stripe is properly configured
-    if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY === "sk_test_placeholder") {
+    if (
+      !process.env.STRIPE_SECRET_KEY ||
+      process.env.STRIPE_SECRET_KEY === "sk_test_placeholder" ||
+      process.env.STRIPE_SECRET_KEY === "sk_test_your_stripe_secret_key_here" ||
+      process.env.STRIPE_SECRET_KEY.startsWith("sk_test_your_")
+    ) {
       return NextResponse.json(
         {
           error: "Stripe not configured. Please contact support to set up billing.",

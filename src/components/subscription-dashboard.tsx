@@ -62,10 +62,9 @@ export function SubscriptionDashboard({ userId, className }: SubscriptionDashboa
       if (!response.ok) {
         const errorData = await response.json();
         if (response.status === 503) {
-          // Stripe not configured
-          alert(
-            `🚧 Subscription System Coming Soon!\n\n${errorData.details}\n\nFor now, you can use the free plan with 15 exports per month.`
-          );
+          // Stripe not configured - show a more user-friendly message
+          const message = `🚧 Subscription System Coming Soon!\n\n${errorData.details}\n\nFor now, you can use the free plan with 15 exports per month. We're working on enabling payments soon!`;
+          alert(message);
         } else {
           throw new Error(errorData.error || "Failed to create checkout session");
         }
@@ -78,7 +77,8 @@ export function SubscriptionDashboard({ userId, className }: SubscriptionDashboa
       window.location.href = url;
     } catch (error) {
       console.error("Payment error:", error);
-      alert(error instanceof Error ? error.message : "Payment failed");
+      const errorMessage = error instanceof Error ? error.message : "Payment failed";
+      alert(`❌ ${errorMessage}\n\nPlease try again or contact support if the issue persists.`);
     } finally {
       setIsProcessingPayment(false);
     }
