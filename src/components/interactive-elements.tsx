@@ -904,6 +904,6 @@ export function InteractiveElementRenderer({
         />
       );
     default:
-      return <div>Unsupported element type: {element.type}</div>;
+      return <div>Unsupported element type: {(element as AllInteractiveElements).type}</div>;
   }
 }
