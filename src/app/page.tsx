@@ -235,7 +235,7 @@ export default function Home() {
                 <CardTitle className="text-2xl">Pro</CardTitle>
                 <CardDescription>For active homeschooling families</CardDescription>
                 <div className="mt-4">
-                  <div className="text-4xl font-bold">$9</div>
+                  <div className="text-4xl font-bold">$9.99</div>
                   <div className="text-muted-foreground text-sm">per month</div>
                 </div>
               </CardHeader>
@@ -274,7 +274,7 @@ export default function Home() {
                 <CardTitle className="text-2xl">Premium</CardTitle>
                 <CardDescription>For educators and co-ops</CardDescription>
                 <div className="mt-4">
-                  <div className="text-4xl font-bold">$19</div>
+                  <div className="text-4xl font-bold">$29.99</div>
                   <div className="text-muted-foreground text-sm">per month</div>
                 </div>
               </CardHeader>
