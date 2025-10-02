@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/select";
 import { QuotaDisplay, UpgradePrompt } from "@/components/quota-warning";
 import { BUILT_IN_FONTS, type FontInfo } from "@/lib/fonts";
-import { themeManager } from "@/lib/design-system";
+// import { themeManager } from "@/lib/design-system";
 import { analyticsStorage } from "@/lib/analytics";
 import { SessionRecorder } from "@/components/progress-dashboard";
 import { UsageLimitWarning } from "@/components/subscription-dashboard";
