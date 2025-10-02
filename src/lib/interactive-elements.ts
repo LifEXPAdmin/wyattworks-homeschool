@@ -194,7 +194,8 @@ export class InteractiveElementGenerator {
           dropZones: [
             {
               id: "answer-box",
-              text: "Drop your answer here",
+              label: "Drop your answer here",
+              position: { x: 0, y: 0 },
               accepts: ["correct-answer"],
             },
           ],
