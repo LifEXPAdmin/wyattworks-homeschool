@@ -24,6 +24,7 @@ import type { ScienceProblem, ScienceSubject } from "@/lib/generators/science";
 import type { WorksheetConfig } from "@/lib/config";
 import { FontSelector } from "@/components/font-selector";
 import { TemplateSelector } from "@/components/template-selector";
+import { InteractiveWorksheetViewer } from "@/components/interactive-worksheet-viewer";
 import {
   Select,
   SelectContent,
@@ -40,6 +41,7 @@ import { UsageLimitWarning } from "@/components/subscription-dashboard";
 import { subscriptionManager } from "@/lib/subscription";
 import { worksheetCache, performanceMonitor, offlineManager } from "@/lib/performance";
 import type { WorksheetTemplate } from "@/lib/templates";
+import { InteractiveWorksheetManager, type InteractiveWorksheet } from "@/lib/interactive-elements";
 
 type DifficultyLevel = "very_easy" | "easy" | "medium" | "hard" | "very_hard" | "custom";
 
@@ -131,6 +133,13 @@ export default function CreateWorksheet() {
   const [showBorders, setShowBorders] = useState(true);
   const [includeAnswerKey, setIncludeAnswerKey] = useState(false);
   const [customInstructions, setCustomInstructions] = useState("");
+
+  // Interactive worksheet states
+  const [worksheetType, setWorksheetType] = useState<"traditional" | "interactive">("traditional");
+  const [interactiveWorksheet, setInteractiveWorksheet] = useState<InteractiveWorksheet | null>(
+    null
+  );
+  const [showInteractiveViewer, setShowInteractiveViewer] = useState(false);
   const [vocabularyWords, setVocabularyWords] = useState<VocabularyItem[]>([]);
   const [writingPrompts, setWritingPrompts] = useState<WritingPrompt[]>([]);
   const [scienceProblems, setScienceProblems] = useState<ScienceProblem[]>([]);
@@ -200,6 +209,37 @@ export default function CreateWorksheet() {
     if (template.description) {
       setCustomInstructions(template.description);
     }
+  };
+
+  const handleCreateInteractiveWorksheet = () => {
+    const elementTypes = [];
+
+    // Add element types based on subject
+    if (subject === "math") {
+      elementTypes.push("drag-drop", "multiple-choice");
+    } else if (subject === "language_arts") {
+      elementTypes.push("fill-blank", "multiple-choice");
+    } else if (subject === "science") {
+      elementTypes.push("multiple-choice", "drag-drop");
+    }
+
+    const interactiveWS = InteractiveWorksheetManager.createInteractiveWorksheet(
+      title,
+      subject,
+      gradeLevel,
+      difficulty,
+      elementTypes,
+      problemCount
+    );
+
+    setInteractiveWorksheet(interactiveWS);
+    setShowInteractiveViewer(true);
+  };
+
+  const handleInteractiveWorksheetComplete = (results: { score: number }) => {
+    console.log("Interactive worksheet completed:", results);
+    // In a real app, you'd save results to database
+    alert(`Worksheet completed! Score: ${results.score}%`);
   };
 
   const handleGenerate = () => {
@@ -709,21 +749,40 @@ export default function CreateWorksheet() {
               </CardHeader>
               <CardContent className="pt-6">
                 <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant={useTemplate ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setUseTemplate(true)}
-                    >
-                      Use Template
-                    </Button>
-                    <Button
-                      variant={!useTemplate ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setUseTemplate(false)}
-                    >
-                      Create from Scratch
-                    </Button>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant={useTemplate ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setUseTemplate(true)}
+                      >
+                        Use Template
+                      </Button>
+                      <Button
+                        variant={!useTemplate ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setUseTemplate(false)}
+                      >
+                        Create from Scratch
+                      </Button>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant={worksheetType === "traditional" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setWorksheetType("traditional")}
+                      >
+                        📄 Traditional PDF
+                      </Button>
+                      <Button
+                        variant={worksheetType === "interactive" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setWorksheetType("interactive")}
+                      >
+                        🎮 Interactive
+                      </Button>
+                    </div>
                   </div>
 
                   {useTemplate && (
@@ -1032,24 +1091,35 @@ export default function CreateWorksheet() {
                   </p>
                 </div>
 
-                <Button
-                  onClick={handleGenerate}
-                  disabled={isGenerating}
-                  className="w-full text-lg shadow-md"
-                  size="lg"
-                >
-                  {isGenerating
-                    ? "Generating..."
-                    : subject === "math"
-                      ? "🎲 Generate Problems"
-                      : subject === "science"
-                        ? "🔬 Generate Science Questions"
-                        : languageArtsType === "spelling"
-                          ? "🔤 Generate Spelling Words"
-                          : languageArtsType === "vocabulary"
-                            ? "📚 Generate Vocabulary"
-                            : "✍️ Generate Writing Prompts"}
-                </Button>
+                {worksheetType === "traditional" ? (
+                  <Button
+                    onClick={handleGenerate}
+                    disabled={isGenerating}
+                    className="w-full text-lg shadow-md"
+                    size="lg"
+                  >
+                    {isGenerating
+                      ? "Generating..."
+                      : subject === "math"
+                        ? "🎲 Generate Problems"
+                        : subject === "science"
+                          ? "🔬 Generate Science Questions"
+                          : languageArtsType === "spelling"
+                            ? "🔤 Generate Spelling Words"
+                            : languageArtsType === "vocabulary"
+                              ? "📚 Generate Vocabulary"
+                              : "✍️ Generate Writing Prompts"}
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleCreateInteractiveWorksheet}
+                    disabled={isGenerating}
+                    className="w-full text-lg shadow-md"
+                    size="lg"
+                  >
+                    🎮 Create Interactive Worksheet
+                  </Button>
+                )}
               </CardContent>
             </Card>
 
@@ -1491,6 +1561,26 @@ export default function CreateWorksheet() {
           </div>
         </div>
       </div>
+
+      {/* Interactive Worksheet Viewer */}
+      {showInteractiveViewer && interactiveWorksheet && (
+        <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4">
+          <div className="max-h-[90vh] w-full max-w-6xl overflow-auto rounded-lg bg-white">
+            <div className="sticky top-0 flex items-center justify-between border-b bg-white p-4">
+              <h2 className="text-lg font-semibold">Interactive Worksheet</h2>
+              <Button variant="outline" onClick={() => setShowInteractiveViewer(false)}>
+                Close
+              </Button>
+            </div>
+            <div className="p-4">
+              <InteractiveWorksheetViewer
+                worksheet={interactiveWorksheet}
+                onComplete={handleInteractiveWorksheetComplete}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
