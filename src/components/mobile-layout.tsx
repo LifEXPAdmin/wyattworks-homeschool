@@ -19,6 +19,7 @@ import {
   PieChart,
   UserCircle,
   Crown,
+  Brain,
 } from "lucide-react";
 import {
   MobileDetector,
@@ -119,6 +120,7 @@ export function MobileLayout({ children, className }: MobileLayoutProps) {
   const navigationItems = [
     { icon: Home, label: "Dashboard", href: "/dashboard" },
     { icon: BookOpen, label: "Create Worksheet", href: "/dashboard/create" },
+    { icon: Brain, label: "Test Knowledge", href: "/dashboard/quiz" },
     { icon: BarChart3, label: "Progress", href: "/dashboard/progress" },
     { icon: PieChart, label: "Analytics", href: "/dashboard/analytics" },
     { icon: Palette, label: "Design", href: "/dashboard/design" },

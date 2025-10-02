@@ -22,7 +22,7 @@ import type { ScienceProblem, ScienceSubject } from "@/lib/generators/science";
 import type { WorksheetConfig } from "@/lib/config";
 // import { FontSelector } from "@/components/font-selector";
 import { TemplateSelector } from "@/components/template-selector";
-import { InteractiveWorksheetViewer } from "@/components/interactive-worksheet-viewer";
+// Removed InteractiveWorksheetViewer import
 import {
   Select,
   SelectContent,
@@ -39,7 +39,7 @@ import { QuotaDisplay } from "@/components/quota-warning";
 // import { subscriptionManager } from "@/lib/subscription";
 // import { worksheetCache, performanceMonitor, offlineManager } from "@/lib/performance";
 import type { WorksheetTemplate } from "@/lib/templates";
-import { InteractiveWorksheetManager, type InteractiveWorksheet } from "@/lib/interactive-elements";
+// Removed InteractiveWorksheetManager import
 import { CollaborationManager } from "@/lib/collaboration";
 import { AnalyticsManager } from "@/lib/analytics-simple";
 import { CollaborationPanel } from "@/components/collaboration";
@@ -137,12 +137,7 @@ export default function CreateWorksheet() {
   const [includeAnswerKey, setIncludeAnswerKey] = useState(false);
   const [customInstructions, setCustomInstructions] = useState("");
 
-  // Interactive worksheet states
-  const [worksheetType, setWorksheetType] = useState<"traditional" | "interactive">("traditional");
-  const [interactiveWorksheet, setInteractiveWorksheet] = useState<InteractiveWorksheet | null>(
-    null
-  );
-  const [showInteractiveViewer, setShowInteractiveViewer] = useState(false);
+  // Removed all interactive worksheet states - now only PDFs
 
   // Collaboration and analytics states
   const [showCollaboration, setShowCollaboration] = useState(false);
@@ -210,43 +205,7 @@ export default function CreateWorksheet() {
     }
   };
 
-  const handleCreateInteractiveWorksheet = () => {
-    const elementTypes = [];
-
-    // Add element types based on subject
-    if (subject === "math") {
-      elementTypes.push("drag-drop", "multiple-choice");
-    } else if (subject === "language_arts") {
-      elementTypes.push("fill-blank", "multiple-choice");
-    } else if (subject === "science") {
-      elementTypes.push("multiple-choice", "drag-drop");
-    }
-
-    const interactiveWS = InteractiveWorksheetManager.createInteractiveWorksheet(
-      title,
-      subject,
-      gradeLevel,
-      difficulty,
-      elementTypes,
-      problemCount
-    );
-
-    setInteractiveWorksheet(interactiveWS);
-    setShowInteractiveViewer(true);
-  };
-
-  const handleInteractiveWorksheetComplete = (results: { score: number }) => {
-    console.log("Interactive worksheet completed:", results);
-    // Track analytics
-    AnalyticsManager.trackEvent("user-123", "worksheet_completed", {
-      score: results.score,
-      type: "interactive",
-      subject,
-      gradeLevel,
-      difficulty,
-    });
-    alert(`Worksheet completed! Score: ${results.score}%`);
-  };
+  // Removed interactive worksheet functions
 
   const handleStartCollaboration = () => {
     const session = CollaborationManager.createSession(
@@ -772,23 +731,12 @@ export default function CreateWorksheet() {
           <div className="border-b bg-white p-4 shadow-sm">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                {/* Document Type */}
+                {/* Document Type - PDF Only */}
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium">Type:</span>
-                  <Button
-                    variant={worksheetType === "traditional" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setWorksheetType("traditional")}
-                  >
-                    📄 PDF
-                  </Button>
-                  <Button
-                    variant={worksheetType === "interactive" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setWorksheetType("interactive")}
-                  >
-                    🎮 Interactive
-                  </Button>
+                  <div className="rounded-md bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">
+                    📄 PDF Worksheet
+                  </div>
                 </div>
 
                 {/* Subject */}
@@ -1212,25 +1160,7 @@ export default function CreateWorksheet() {
           </div>
         )}
 
-        {/* Interactive Worksheet Viewer */}
-        {showInteractiveViewer && interactiveWorksheet && (
-          <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4">
-            <div className="max-h-[90vh] w-full max-w-6xl overflow-auto rounded-lg bg-white">
-              <div className="sticky top-0 flex items-center justify-between border-b bg-white p-4">
-                <h2 className="text-lg font-semibold">Interactive Worksheet</h2>
-                <Button variant="outline" onClick={() => setShowInteractiveViewer(false)}>
-                  Close
-                </Button>
-              </div>
-              <div className="p-4">
-                <InteractiveWorksheetViewer
-                  worksheet={interactiveWorksheet}
-                  onComplete={handleInteractiveWorksheetComplete}
-                />
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Removed Interactive Worksheet Viewer */}
 
         {/* Collaboration Panel */}
         {showCollaboration && collaborationSession && (
