@@ -1,0 +1,26 @@
+<svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle with gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F2760A;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#E55A00;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="starGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFA500;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="96" cy="96" r="96" fill="url(#bgGradient)"/>
+  
+  <!-- Letter A - larger and bolder -->
+  <path d="M96 36L60 156H75L90 126H102L117 156H132L96 36ZM90 108L96 93L102 108H90Z" fill="white" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+  
+  <!-- Small decorative star -->
+  <path d="M144 48L147.5 54L154.5 54L147.5 60L150.5 66L144 61.5L137.5 66L140.5 60L133.5 54L140.5 54L144 48Z" fill="url(#starGradient)"/>
+  
+  <!-- Additional small stars for decoration -->
+  <path d="M48 72L49 74L51 74L49.5 75.5L50 77L48 76L46 77L46.5 75.5L45 74L47 74L48 72Z" fill="url(#starGradient)"/>
+  <path d="M156 120L157 122L159 122L157.5 123.5L158 125L156 124L154 125L154.5 123.5L153 122L155 122L156 120Z" fill="url(#starGradient)"/>
+</svg>

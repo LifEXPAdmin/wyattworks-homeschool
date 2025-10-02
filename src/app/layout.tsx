@@ -19,6 +19,14 @@ export const metadata: Metadata = {
   title: "Astra Academy - Homeschool Worksheet Builder",
   description:
     "Create custom worksheets, track progress, and make learning fun with our intuitive worksheet builder designed specifically for homeschooling parents. By Wyatt Works.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "32x32" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/astra-academy-icon.svg", type: "image/svg+xml", sizes: "192x192" },
+    ],
+    apple: "/astra-academy-icon.svg",
+  },
 };
 
 export default function RootLayout({
@@ -31,9 +39,7 @@ export default function RootLayout({
       <html lang="en">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
           <ErrorHandler />
-          <ErrorBoundary>
-            {children}
-          </ErrorBoundary>
+          <ErrorBoundary>{children}</ErrorBoundary>
         </body>
       </html>
     </ClerkProvider>

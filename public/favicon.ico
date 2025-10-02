@@ -1,0 +1,10 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="16" cy="16" r="16" fill="#F2760A"/>
+  
+  <!-- Letter A -->
+  <path d="M16 6L10 26H12.5L14 21H18L19.5 26H22L16 6ZM15.2 18L16 15.5L16.8 18H15.2Z" fill="white"/>
+  
+  <!-- Small star accent -->
+  <path d="M24 8L24.5 9L25.5 9L24.8 9.8L25 10.8L24 10.3L23 10.8L23.2 9.8L22.5 9L23.5 9L24 8Z" fill="#FFD700"/>
+</svg>
