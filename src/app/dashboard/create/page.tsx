@@ -179,7 +179,7 @@ export default function CreateWorksheet() {
   const [layout, setLayout] = useState<"standard" | "wide" | "narrow">("standard");
   const [spacing, setSpacing] = useState<"tight" | "normal" | "loose">("normal");
   const [showBorders, setShowBorders] = useState(true);
-  const [includeAnswerKey, setIncludeAnswerKey] = useState(false);
+  const [includeAnswerKey, setIncludeAnswerKey] = useState(true);
   const [customInstructions, setCustomInstructions] = useState("");
 
   // Removed all interactive worksheet states - now only PDFs
@@ -281,7 +281,7 @@ export default function CreateWorksheet() {
       alert(
         "⏱️ Generation is taking longer than expected. Please try:\n\n• Reducing the number of problems\n• Choosing a different subject or difficulty\n• Refreshing the page and trying again\n\nIf the issue persists, please contact support."
       );
-    }, 15000); // 15 second timeout
+    }, 8000); // 8 second timeout
 
     // Track worksheet creation event
     AnalyticsManager.trackEvent("current-user", "worksheet_created", {
@@ -359,14 +359,20 @@ export default function CreateWorksheet() {
 
     try {
       if (subject === "math") {
+        console.log("Starting math generation:", { operation, difficulty, problemCount, seed });
+
         const range =
           difficulty === "custom"
             ? { min: customMin, max: customMax }
             : DIFFICULTY_RANGES[difficulty];
+
+        console.log("Using range:", range);
+
         let generated: MathProblem[] = [];
 
         switch (operation) {
           case "addition":
+            console.log("Generating addition problems...");
             generated = generateAddition({
               count: problemCount,
               minValue: range.min,
@@ -375,6 +381,7 @@ export default function CreateWorksheet() {
             });
             break;
           case "subtraction":
+            console.log("Generating subtraction problems...");
             generated = generateSubtraction({
               count: problemCount,
               minValue: range.min,
@@ -384,6 +391,7 @@ export default function CreateWorksheet() {
             });
             break;
           case "multiplication":
+            console.log("Generating multiplication problems...");
             // For multiplication, use smaller ranges to keep products reasonable
             const multMax = Math.min(
               range.max,
@@ -415,6 +423,7 @@ export default function CreateWorksheet() {
             });
             break;
           case "division":
+            console.log("Generating division problems...");
             // For division, keep divisor and quotient in the difficulty range
             const divMax = Math.min(
               range.max,
@@ -437,6 +446,8 @@ export default function CreateWorksheet() {
             });
             break;
         }
+
+        console.log("Generated problems:", generated.length, "problems");
         setProblems(generated);
       } else if (subject === "science") {
         const problems = generateScienceProblems(
@@ -960,6 +971,19 @@ export default function CreateWorksheet() {
                     className="w-20"
                   />
                 </div>
+
+                {/* Answer Key Toggle */}
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">Answer Key:</span>
+                  <Button
+                    variant={includeAnswerKey ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setIncludeAnswerKey(!includeAnswerKey)}
+                    className="h-8 px-3"
+                  >
+                    {includeAnswerKey ? "✓ On" : "✗ Off"}
+                  </Button>
+                </div>
               </div>
 
               {/* Action Buttons */}
@@ -1270,6 +1294,8 @@ export default function CreateWorksheet() {
                             bg.id === "custom" && customImage
                               ? `url('${customImage}') center/cover`
                               : bg.preview,
+                          backgroundSize: bg.id === "custom" && customImage ? "cover" : "100% 100%",
+                          backgroundRepeat: "no-repeat",
                         }}
                       >
                         <div className="bg-opacity-0 hover:bg-opacity-10 absolute inset-0 rounded-md bg-black transition-all" />
@@ -1357,17 +1383,6 @@ export default function CreateWorksheet() {
                     onClick={() => setShowBorders(!showBorders)}
                   >
                     {showBorders ? "Yes" : "No"}
-                  </Button>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium">Include Answer Key</label>
-                  <Button
-                    variant={includeAnswerKey ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setIncludeAnswerKey(!includeAnswerKey)}
-                  >
-                    {includeAnswerKey ? "Yes" : "No"}
                   </Button>
                 </div>
 
