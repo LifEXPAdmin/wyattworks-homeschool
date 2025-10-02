@@ -139,7 +139,11 @@ export function generateAddition(options: AdditionOptions = {}): MathProblem[] {
   const problems: MathProblem[] = [];
   const seen = new Set<string>();
 
-  while (problems.length < count) {
+  const maxAttempts = count * 3; // Prevent infinite loops
+  let attempts = 0;
+
+  while (problems.length < count && attempts < maxAttempts) {
+    attempts++;
     const operands: number[] = [];
     for (let i = 0; i < operandCount; i++) {
       operands.push(rng.nextInt(minValue, maxValue));
@@ -159,6 +163,24 @@ export function generateAddition(options: AdditionOptions = {}): MathProblem[] {
         operator: "+",
       });
     }
+  }
+
+  // If we couldn't get enough unique problems, fill with duplicates
+  while (problems.length < count) {
+    const operands: number[] = [];
+    for (let i = 0; i < operandCount; i++) {
+      operands.push(rng.nextInt(minValue, maxValue));
+    }
+
+    const answer = operands.reduce((sum, n) => sum + n, 0);
+    const problem = operands.join(" + ");
+
+    problems.push({
+      problem,
+      answer,
+      operands,
+      operator: "+",
+    });
   }
 
   return problems;
@@ -195,7 +217,11 @@ export function generateSubtraction(options: SubtractionOptions = {}): MathProbl
   const problems: MathProblem[] = [];
   const seen = new Set<string>();
 
-  while (problems.length < count) {
+  const maxAttempts = count * 3; // Prevent infinite loops
+  let attempts = 0;
+
+  while (problems.length < count && attempts < maxAttempts) {
+    attempts++;
     let a = rng.nextInt(minValue, maxValue);
     let b = rng.nextInt(minValue, maxValue);
 
@@ -218,6 +244,27 @@ export function generateSubtraction(options: SubtractionOptions = {}): MathProbl
         operator: "-",
       });
     }
+  }
+
+  // If we couldn't get enough unique problems, fill with duplicates
+  while (problems.length < count) {
+    let a = rng.nextInt(minValue, maxValue);
+    let b = rng.nextInt(minValue, maxValue);
+
+    // Ensure a >= b if negative results not allowed
+    if (!allowNegativeResults && b > a) {
+      [a, b] = [b, a];
+    }
+
+    const answer = a - b;
+    const problem = `${a} - ${b}`;
+
+    problems.push({
+      problem,
+      answer,
+      operands: [a, b],
+      operator: "-",
+    });
   }
 
   return problems;
@@ -248,7 +295,11 @@ export function generateMultiplication(options: MultiplicationOptions = {}): Mat
   const problems: MathProblem[] = [];
   const seen = new Set<string>();
 
-  while (problems.length < count) {
+  const maxAttempts = count * 3; // Prevent infinite loops
+  let attempts = 0;
+
+  while (problems.length < count && attempts < maxAttempts) {
+    attempts++;
     const a = rng.nextInt(minValue, maxValue);
     const b = rng.nextInt(minValue, maxValue);
     const answer = a * b;
@@ -271,6 +322,27 @@ export function generateMultiplication(options: MultiplicationOptions = {}): Mat
         operator: "×",
       });
     }
+  }
+
+  // If we couldn't get enough unique problems, fill with duplicates
+  while (problems.length < count) {
+    const a = rng.nextInt(minValue, maxValue);
+    const b = rng.nextInt(minValue, maxValue);
+    const answer = a * b;
+
+    // Check max product constraint
+    if (maxProduct && answer > maxProduct) {
+      continue;
+    }
+
+    const problem = `${a} × ${b}`;
+
+    problems.push({
+      problem,
+      answer,
+      operands: [a, b],
+      operator: "×",
+    });
   }
 
   return problems;
@@ -307,7 +379,11 @@ export function generateDivision(options: DivisionOptions = {}): MathProblem[] {
   const problems: MathProblem[] = [];
   const seen = new Set<string>();
 
-  while (problems.length < count) {
+  const maxAttempts = count * 3; // Prevent infinite loops
+  let attempts = 0;
+
+  while (problems.length < count && attempts < maxAttempts) {
+    attempts++;
     const divisor = rng.nextInt(minValue, maxValue);
     const quotient = rng.nextInt(minValue, maxValue);
     const dividend = divisor * quotient;
@@ -326,6 +402,23 @@ export function generateDivision(options: DivisionOptions = {}): MathProblem[] {
         operator: "÷",
       });
     }
+  }
+
+  // If we couldn't get enough unique problems, fill with duplicates
+  while (problems.length < count) {
+    const divisor = rng.nextInt(minValue, maxValue);
+    const quotient = rng.nextInt(minValue, maxValue);
+    const dividend = divisor * quotient;
+
+    const answer = requireWholeNumbers ? quotient : dividend / divisor;
+    const problem = `${dividend} ÷ ${divisor}`;
+
+    problems.push({
+      problem,
+      answer,
+      operands: [dividend, divisor],
+      operator: "÷",
+    });
   }
 
   return problems;
