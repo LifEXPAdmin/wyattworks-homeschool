@@ -1,10 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
-import { UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { MobileLayout } from "@/components/mobile-layout";
 import { Input } from "@/components/ui/input";
 import {
   generateAddition,
@@ -157,6 +155,7 @@ export default function CreateWorksheet() {
   const [isExporting, setIsExporting] = useState(false);
   const [selectedFont, setSelectedFont] = useState<FontInfo>(BUILT_IN_FONTS[0]);
   const [currentTheme, setCurrentTheme] = useState("default");
+  const [showCustomizeModal, setShowCustomizeModal] = useState(false);
 
   // Listen for theme changes
   React.useEffect(() => {
@@ -734,36 +733,7 @@ export default function CreateWorksheet() {
   const selectedBg = BACKGROUND_TEMPLATES.find((t) => t.id === background);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-      {/* Navbar */}
-      <nav className="border-b bg-white/80 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/60">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-3xl">📚</span>
-              <Link href="/" className="text-primary text-2xl font-bold">
-                <span className="flex items-center gap-2">
-                  <span className="text-3xl">✨</span>
-                  <span>Astra Academy</span>
-                </span>
-              </Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/dashboard">
-                <Button variant="ghost">← Dashboard</Button>
-              </Link>
-              <UserButton
-                appearance={{
-                  elements: {
-                    avatarBox: "h-10 w-10",
-                  },
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      </nav>
-
+    <MobileLayout>
       <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-8 text-center">
           <h1 className="text-foreground mb-2 text-4xl font-bold">Create Your Worksheet</h1>
@@ -772,46 +742,309 @@ export default function CreateWorksheet() {
           </p>
         </div>
 
-        {/* Step-by-Step Creation Flow */}
-        <div className="mx-auto max-w-6xl space-y-8">
-          {/* Step 1: Choose Your Approach */}
-          <div className="mb-8 text-center">
-            <h2 className="mb-2 text-2xl font-bold text-gray-900">Step 1: Choose Your Approach</h2>
-            <p className="text-gray-600">Select how you'd like to create your worksheet</p>
+        {/* Word-like Interface */}
+        <div className="flex h-screen flex-col">
+          {/* Toolbar - Always visible at top */}
+          <div className="border-b bg-white p-4 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                {/* Document Type */}
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">Type:</span>
+                  <Button
+                    variant={worksheetType === "traditional" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setWorksheetType("traditional")}
+                  >
+                    📄 PDF
+                  </Button>
+                  <Button
+                    variant={worksheetType === "interactive" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setWorksheetType("interactive")}
+                  >
+                    🎮 Interactive
+                  </Button>
+                </div>
+
+                {/* Subject */}
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">Subject:</span>
+                  <Select
+                    value={subject}
+                    onValueChange={(value) => {
+                      setSubject(value as SubjectType);
+                      setTitle(
+                        value === "math"
+                          ? "Math Practice Worksheet"
+                          : value === "language_arts"
+                            ? "Language Arts Worksheet"
+                            : "Science Worksheet"
+                      );
+                    }}
+                  >
+                    <SelectTrigger className="w-32">
+                      <SelectValue placeholder="Subject" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="math">📐 Math</SelectItem>
+                      <SelectItem value="language_arts">📖 Language Arts</SelectItem>
+                      <SelectItem value="science">🔬 Science</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Difficulty */}
+                {subject === "math" ? (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">Difficulty:</span>
+                    <Select
+                      value={difficulty}
+                      onValueChange={(value) => setDifficulty(value as DifficultyLevel)}
+                    >
+                      <SelectTrigger className="w-40">
+                        <SelectValue placeholder="Difficulty" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(DIFFICULTY_RANGES).map(([key, value]) => (
+                          <SelectItem key={key} value={key}>
+                            {value.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">Grade:</span>
+                    <Select
+                      value={gradeLevel}
+                      onValueChange={(value) => setGradeLevel(value as GradeLevel)}
+                    >
+                      <SelectTrigger className="w-32">
+                        <SelectValue placeholder="Grade" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="K">Kindergarten</SelectItem>
+                        <SelectItem value="1-2">Grades 1-2</SelectItem>
+                        <SelectItem value="3-4">Grades 3-4</SelectItem>
+                        <SelectItem value="5-6">Grades 5-6</SelectItem>
+                        <SelectItem value="7-8">Grades 7-8</SelectItem>
+                        <SelectItem value="9-12">Grades 9-12</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                {/* Problems Count */}
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">Problems:</span>
+                  <Input
+                    type="number"
+                    min="5"
+                    max="100"
+                    value={problemCount}
+                    onChange={(e) => setProblemCount(parseInt(e.target.value) || 20)}
+                    className="w-20"
+                  />
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={handleGenerate}
+                  disabled={isGenerating}
+                  className="homeschool-button"
+                >
+                  {isGenerating ? "Generating..." : "🎲 Generate"}
+                </Button>
+                <Button
+                  onClick={() => setShowCustomizeModal(true)}
+                  variant="outline"
+                  className="homeschool-button-secondary"
+                >
+                  🎨 Customize PDF
+                </Button>
+                <Button
+                  onClick={handleExport}
+                  disabled={isExporting}
+                  variant="outline"
+                  className="homeschool-button-secondary"
+                >
+                  {isExporting ? "Creating..." : "📄 Export"}
+                </Button>
+              </div>
+            </div>
           </div>
 
-          <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
-            {/* Template vs Scratch */}
-            <Card className="shadow-lg transition-shadow hover:shadow-xl">
-              <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  📋 Creation Method
-                </CardTitle>
-                <CardDescription>How would you like to start?</CardDescription>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-3">
+          {/* Main Content Area - PDF Preview + Sidebar */}
+          <div className="flex flex-1 overflow-hidden">
+            {/* PDF Preview - Takes most of the space */}
+            <div className="flex-1 overflow-auto bg-gray-50 p-6">
+              <div className="mx-auto max-w-4xl">
+                {problems.length === 0 &&
+                spellingWords.length === 0 &&
+                vocabularyWords.length === 0 &&
+                writingPrompts.length === 0 ? (
+                  <div className="flex h-96 items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-white">
+                    <div className="text-center">
+                      <div className="mb-4 text-6xl">📋</div>
+                      <h3 className="mb-2 text-xl font-semibold">
+                        Ready to create your worksheet?
+                      </h3>
+                      <p className="text-gray-600">
+                        Configure your settings in the toolbar above and click "Generate"
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="rounded-lg bg-white p-8 shadow-lg">
+                    {/* Worksheet Content */}
+                    {subject === "math" && problems.length > 0 ? (
+                      <div className="space-y-6">
+                        <div className="text-center">
+                          <h2 className="mb-2 text-2xl font-bold">{title}</h2>
+                          <p className="text-gray-600">
+                            Grade {gradeLevel} • {difficulty} • {problems.length} problems
+                          </p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          {problems.map((problem, index) => (
+                            <div key={index} className="flex items-center gap-2 rounded border p-3">
+                              <span className="font-medium">{index + 1}.</span>
+                              <span>{problem.question}</span>
+                              <span className="ml-auto text-gray-500">= ____</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : subject === "language_arts" && spellingWords.length > 0 ? (
+                      <div className="space-y-6">
+                        <div className="text-center">
+                          <h2 className="mb-2 text-2xl font-bold">{title}</h2>
+                          <p className="text-gray-600">Grade {gradeLevel} • Spelling Words</p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          {spellingWords.map((word, index) => (
+                            <div key={index} className="rounded border p-3">
+                              <span className="font-medium">{index + 1}.</span>
+                              <span className="ml-2">{word}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : subject === "science" && scienceProblems.length > 0 ? (
+                      <div className="space-y-6">
+                        <div className="text-center">
+                          <h2 className="mb-2 text-2xl font-bold">{title}</h2>
+                          <p className="text-gray-600">
+                            Grade {gradeLevel} • {scienceType}
+                          </p>
+                        </div>
+                        <div className="space-y-4">
+                          {scienceProblems.map((problem, index) => (
+                            <div key={index} className="rounded border p-4">
+                              <div className="mb-2">
+                                <span className="font-medium">{index + 1}.</span>
+                                <span className="ml-2">{problem.question}</span>
+                              </div>
+                              <div className="h-8 border-b border-gray-300"></div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Sidebar - Compact settings */}
+            <div className="w-80 overflow-auto border-l bg-white p-4">
+              <div className="space-y-4">
+                {/* Quick Settings */}
+                <div>
+                  <h3 className="mb-3 font-semibold">Quick Settings</h3>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-sm font-medium">Title</label>
+                      <Input
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        className="mt-1"
+                      />
+                    </div>
+
+                    {subject === "math" && (
+                      <div>
+                        <label className="text-sm font-medium">Operation</label>
+                        <Select
+                          value={operation}
+                          onValueChange={(value) =>
+                            setOperation(
+                              value as "addition" | "subtraction" | "multiplication" | "division"
+                            )
+                          }
+                        >
+                          <SelectTrigger className="mt-1">
+                            <SelectValue placeholder="Operation" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="addition">➕ Addition</SelectItem>
+                            <SelectItem value="subtraction">➖ Subtraction</SelectItem>
+                            <SelectItem value="multiplication">✖️ Multiplication</SelectItem>
+                            <SelectItem value="division">➗ Division</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+
+                    {subject === "language_arts" && (
+                      <div>
+                        <label className="text-sm font-medium">Type</label>
+                        <Select
+                          value={languageArtsType}
+                          onValueChange={(value) => setLanguageArtsType(value as LanguageArtsType)}
+                        >
+                          <SelectTrigger className="mt-1">
+                            <SelectValue placeholder="Type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="spelling">🔤 Spelling Words</SelectItem>
+                            <SelectItem value="vocabulary">📚 Vocabulary</SelectItem>
+                            <SelectItem value="writing">✍️ Writing Prompts</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Template Selection */}
+                <div>
+                  <h3 className="mb-3 font-semibold">Templates</h3>
+                  <div className="space-y-2">
                     <Button
                       variant={useTemplate ? "default" : "outline"}
-                      className="h-12 flex-col gap-2"
+                      size="sm"
+                      className="w-full justify-start"
                       onClick={() => setUseTemplate(true)}
                     >
-                      <span className="text-lg">📚</span>
-                      <span className="text-sm">Use Template</span>
+                      📚 Use Template
                     </Button>
                     <Button
                       variant={!useTemplate ? "default" : "outline"}
-                      className="h-12 flex-col gap-2"
+                      size="sm"
+                      className="w-full justify-start"
                       onClick={() => setUseTemplate(false)}
                     >
-                      <span className="text-lg">✏️</span>
-                      <span className="text-sm">From Scratch</span>
+                      ✏️ From Scratch
                     </Button>
                   </div>
 
                   {useTemplate && (
-                    <div className="mt-4">
+                    <div className="mt-3">
                       <TemplateSelector
                         onTemplateSelect={handleTemplateSelect}
                         selectedTemplate={selectedTemplate}
@@ -819,400 +1052,61 @@ export default function CreateWorksheet() {
                     </div>
                   )}
                 </div>
-              </CardContent>
-            </Card>
 
-            {/* Worksheet Type */}
-            <Card className="shadow-lg transition-shadow hover:shadow-xl">
-              <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50">
-                <CardTitle className="flex items-center gap-2 text-lg">🎯 Worksheet Type</CardTitle>
-                <CardDescription>Choose the format for your worksheet</CardDescription>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <div className="grid grid-cols-2 gap-3">
-                  <Button
-                    variant={worksheetType === "traditional" ? "default" : "outline"}
-                    className="h-12 flex-col gap-2"
-                    onClick={() => setWorksheetType("traditional")}
-                  >
-                    <span className="text-lg">📄</span>
-                    <span className="text-sm">Traditional PDF</span>
-                  </Button>
-                  <Button
-                    variant={worksheetType === "interactive" ? "default" : "outline"}
-                    className="h-12 flex-col gap-2"
-                    onClick={() => setWorksheetType("interactive")}
-                  >
-                    <span className="text-lg">🎮</span>
-                    <span className="text-sm">Interactive</span>
-                  </Button>
+                {/* Collaboration Tools */}
+                <div>
+                  <h3 className="mb-3 font-semibold">Tools</h3>
+                  <div className="space-y-2">
+                    <Button
+                      onClick={handleStartCollaboration}
+                      variant="outline"
+                      size="sm"
+                      className="w-full justify-start"
+                    >
+                      <Users className="mr-2 h-4 w-4" />
+                      Start Collaboration
+                    </Button>
+                    <Button
+                      onClick={() => setShowAnalytics(!showAnalytics)}
+                      variant="outline"
+                      size="sm"
+                      className="w-full justify-start"
+                    >
+                      <BarChart3 className="mr-2 h-4 w-4" />
+                      View Analytics
+                    </Button>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
 
-          {/* Step 2: Configure Your Worksheet */}
-          <div className="mb-8 text-center">
-            <h2 className="mb-2 text-2xl font-bold text-gray-900">
-              Step 2: Configure Your Worksheet
-            </h2>
-            <p className="text-gray-600">Set up the basic parameters for your worksheet</p>
-          </div>
-
-          <div className="mb-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
-            {/* Basic Settings */}
-            <div className="lg:col-span-2">
-              <Card className="shadow-lg">
-                <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50">
-                  <CardTitle className="flex items-center gap-2">⚙️ Basic Settings</CardTitle>
-                  <CardDescription>Configure your worksheet parameters</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6 pt-6">
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold">📚 Subject</label>
-                    <Select
-                      value={subject}
-                      onValueChange={(value) => {
-                        setSubject(value as SubjectType);
-                        setTitle(
-                          value === "math"
-                            ? "Math Practice Worksheet"
-                            : value === "language_arts"
-                              ? "Language Arts Worksheet"
-                              : "Science Worksheet"
-                        );
-                      }}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select subject" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="math">📐 Math</SelectItem>
-                        <SelectItem value="language_arts">📖 Language Arts</SelectItem>
-                        <SelectItem value="science">🔬 Science</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold">📝 Title</label>
-                    <Input
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                      placeholder="Enter worksheet title"
-                      className="border-2"
-                    />
-                  </div>
-
-                  {subject === "math" && (
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold">➕ Operation</label>
-                      <Select
-                        value={operation}
-                        onValueChange={(value) =>
-                          setOperation(
-                            value as "addition" | "subtraction" | "multiplication" | "division"
-                          )
-                        }
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select operation" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="addition">➕ Addition</SelectItem>
-                          <SelectItem value="subtraction">➖ Subtraction</SelectItem>
-                          <SelectItem value="multiplication">✖️ Multiplication</SelectItem>
-                          <SelectItem value="division">➗ Division</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-
-                  {subject === "language_arts" && (
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold">📖 Type</label>
-                      <Select
-                        value={languageArtsType}
-                        onValueChange={(value) => setLanguageArtsType(value as LanguageArtsType)}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="spelling">🔤 Spelling Words</SelectItem>
-                          <SelectItem value="vocabulary">📚 Vocabulary</SelectItem>
-                          <SelectItem value="writing">✍️ Writing Prompts</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-
-                  {subject === "science" && (
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold">🔬 Science Type</label>
-                      <Select
-                        value={scienceType}
-                        onValueChange={(value) => setScienceType(value as ScienceType)}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select science type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="biology">🧬 Biology</SelectItem>
-                          <SelectItem value="chemistry">⚗️ Chemistry</SelectItem>
-                          <SelectItem value="physics">⚡ Physics</SelectItem>
-                          <SelectItem value="earth-science">🌍 Earth Science</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-
-                  {subject === "language_arts" && languageArtsType === "writing" && (
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold">✍️ Writing Style</label>
-                      <Select
-                        value={writingType}
-                        onValueChange={(value) =>
-                          setWritingType(
-                            value as
-                              | "narrative"
-                              | "expository"
-                              | "persuasive"
-                              | "descriptive"
-                              | "mixed"
-                          )
-                        }
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select writing style" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="narrative">📖 Narrative (Tell a Story)</SelectItem>
-                          <SelectItem value="expository">📝 Expository (Explain/Inform)</SelectItem>
-                          <SelectItem value="persuasive">💬 Persuasive (Convince)</SelectItem>
-                          <SelectItem value="descriptive">
-                            🎨 Descriptive (Paint a Picture)
-                          </SelectItem>
-                          <SelectItem value="mixed">🎲 Mixed (Random)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-
-                  {subject === "math" ? (
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold">🎯 Difficulty Level</label>
-                      <Select
-                        value={difficulty}
-                        onValueChange={(value) => setDifficulty(value as DifficultyLevel)}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select difficulty" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Object.entries(DIFFICULTY_RANGES).map(([key, value]) => (
-                            <SelectItem key={key} value={key}>
-                              {value.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <p className="rounded bg-blue-50 px-3 py-2 text-xs text-blue-700">
-                        {DIFFICULTY_RANGES[difficulty].desc}
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold">🎓 Grade Level</label>
-                      <Select
-                        value={gradeLevel}
-                        onValueChange={(value) => setGradeLevel(value as GradeLevel)}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select grade level" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="K">Kindergarten</SelectItem>
-                          <SelectItem value="1-2">Grades 1-2</SelectItem>
-                          <SelectItem value="3-4">Grades 3-4</SelectItem>
-                          <SelectItem value="5-6">Grades 5-6</SelectItem>
-                          <SelectItem value="7-8">Grades 7-8</SelectItem>
-                          <SelectItem value="9-12">Grades 9-12</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <p className="rounded bg-green-50 px-3 py-2 text-xs text-green-700">
-                        {subject === "science"
-                          ? gradeLevel === "K"
-                            ? "Basic science concepts & observations"
-                            : gradeLevel === "1-2"
-                              ? "Simple experiments & nature study"
-                              : gradeLevel === "3-4"
-                                ? "Scientific method & basic processes"
-                                : gradeLevel === "5-6"
-                                  ? "Advanced concepts & lab skills"
-                                  : gradeLevel === "7-8"
-                                    ? "Complex theories & analysis"
-                                    : "Advanced science & research methods"
-                          : gradeLevel === "K"
-                            ? "Simple CVC words & basic sight words"
-                            : gradeLevel === "1-2"
-                              ? "Consonant blends, digraphs & common sight words"
-                              : gradeLevel === "3-4"
-                                ? "Multi-syllable words & common patterns"
-                                : gradeLevel === "5-6"
-                                  ? "Complex words & Greek/Latin roots"
-                                  : "Advanced vocabulary & challenging spellings"}
-                      </p>
-                    </div>
-                  )}
-
-                  {difficulty === "custom" && (
-                    <div className="space-y-4 rounded-lg border-2 border-dashed border-purple-300 bg-purple-50/50 p-4">
-                      <h4 className="text-sm font-semibold text-purple-900">🎨 Custom Range</h4>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <label className="text-xs font-medium">Minimum</label>
-                          <Input
-                            type="number"
-                            value={customMin}
-                            onChange={(e) => setCustomMin(parseInt(e.target.value) || 0)}
-                            min="0"
-                            className="border-2"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-xs font-medium">Maximum</label>
-                          <Input
-                            type="number"
-                            value={customMax}
-                            onChange={(e) => setCustomMax(parseInt(e.target.value) || 100)}
-                            min={customMin}
-                            className="border-2"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold">
-                      {subject === "math"
-                        ? "🔢 Number of Problems"
-                        : subject === "science"
-                          ? "🔬 Number of Questions"
-                          : languageArtsType === "spelling"
-                            ? "📝 Number of Words"
-                            : languageArtsType === "vocabulary"
-                              ? "📚 Number of Vocabulary Words"
-                              : "✍️ Number of Prompts"}
-                    </label>
-                    <Input
-                      type="number"
-                      min="5"
-                      max={
-                        subject === "language_arts" && languageArtsType === "vocabulary"
-                          ? "10"
-                          : "100"
-                      }
-                      value={problemCount}
-                      onChange={(e) => setProblemCount(parseInt(e.target.value) || 20)}
-                      className="border-2"
-                    />
-                    <p className="text-muted-foreground text-xs">
-                      {subject === "math"
-                        ? "Between 5 and 100 problems"
-                        : subject === "science"
-                          ? "Between 5 and 50 questions"
-                          : languageArtsType === "vocabulary"
-                            ? "Between 5 and 10 vocabulary words"
-                            : languageArtsType === "writing"
-                              ? "Between 1 and 5 writing prompts"
-                              : "Between 5 and 100 words"}
-                    </p>
-                  </div>
-
-                  {worksheetType === "traditional" ? (
-                    <Button
-                      onClick={handleGenerate}
-                      disabled={isGenerating}
-                      className="w-full text-lg shadow-md"
-                      size="lg"
-                    >
-                      {isGenerating
-                        ? "Generating..."
-                        : subject === "math"
-                          ? "🎲 Generate Problems"
-                          : subject === "science"
-                            ? "🔬 Generate Science Questions"
-                            : languageArtsType === "spelling"
-                              ? "🔤 Generate Spelling Words"
-                              : languageArtsType === "vocabulary"
-                                ? "📚 Generate Vocabulary"
-                                : "✍️ Generate Writing Prompts"}
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={handleCreateInteractiveWorksheet}
-                      disabled={isGenerating}
-                      className="w-full text-lg shadow-md"
-                      size="lg"
-                    >
-                      🎮 Create Interactive Worksheet
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Collaboration & Tools */}
-              <Card className="shadow-lg">
-                <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50">
-                  <CardTitle className="flex items-center gap-2">
-                    🤝 Collaboration & Tools
-                  </CardTitle>
-                  <CardDescription>Work together and track progress</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4 pt-6">
-                  <Button onClick={handleStartCollaboration} className="w-full" variant="outline">
-                    <Users className="mr-2 h-4 w-4" />
-                    Start Collaboration
-                  </Button>
-
-                  <Button
-                    onClick={() => setShowAnalytics(!showAnalytics)}
-                    className="w-full"
-                    variant="outline"
-                  >
-                    <BarChart3 className="mr-2 h-4 w-4" />
-                    View Analytics
-                  </Button>
-                </CardContent>
-              </Card>
+                {/* Usage Info */}
+                <div className="border-t pt-4">
+                  <QuotaDisplay userId="current-user" />
+                </div>
+              </div>
             </div>
+          </div>
+        </div>
 
-            {/* Step 3: Advanced Customization */}
-            <div className="mb-8 text-center">
-              <h2 className="mb-2 text-2xl font-bold text-gray-900">
-                Step 3: Advanced Customization
-              </h2>
-              <p className="text-gray-600">Fine-tune your worksheet appearance and behavior</p>
-            </div>
-
-            <div className="mb-8 grid grid-cols-1 gap-8 lg:grid-cols-2">
-              {/* Advanced Settings */}
-              <Card className="shadow-lg">
-                <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50">
-                  <CardTitle className="flex items-center gap-2">🎨 Advanced Settings</CardTitle>
-                  <CardDescription>Fine-tune your worksheet appearance</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6 pt-6">
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold">📐 Layout</label>
+        {/* Customize PDF Modal */}
+        {showCustomizeModal && (
+          <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4">
+            <div className="max-h-[90vh] w-full max-w-2xl overflow-auto rounded-lg bg-white">
+              <div className="sticky top-0 flex items-center justify-between border-b bg-white p-4">
+                <h2 className="text-lg font-semibold">🎨 Customize PDF Appearance</h2>
+                <Button variant="outline" onClick={() => setShowCustomizeModal(false)}>
+                  Close
+                </Button>
+              </div>
+              <div className="space-y-6 p-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium">Layout</label>
                     <Select
                       value={layout}
                       onValueChange={(value) => setLayout(value as "standard" | "wide" | "narrow")}
                     >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select layout" />
+                      <SelectTrigger className="mt-1">
+                        <SelectValue placeholder="Layout" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="standard">Standard (8.5" × 11")</SelectItem>
@@ -1222,1254 +1116,137 @@ export default function CreateWorksheet() {
                     </Select>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold">📏 Spacing</label>
+                  <div>
+                    <label className="text-sm font-medium">Spacing</label>
                     <Select
                       value={spacing}
                       onValueChange={(value) => setSpacing(value as "tight" | "normal" | "loose")}
                     >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select spacing" />
+                      <SelectTrigger className="mt-1">
+                        <SelectValue placeholder="Spacing" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="tight">Tight (More problems per page)</SelectItem>
-                        <SelectItem value="normal">Normal (Balanced spacing)</SelectItem>
-                        <SelectItem value="loose">Loose (More space for answers)</SelectItem>
+                        <SelectItem value="tight">Tight</SelectItem>
+                        <SelectItem value="normal">Normal</SelectItem>
+                        <SelectItem value="loose">Loose</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
+                </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold">📝 Custom Instructions</label>
-                    <Input
-                      value={customInstructions}
-                      onChange={(e) => setCustomInstructions(e.target.value)}
-                      placeholder="Add special instructions for students..."
-                      className="border-2"
-                    />
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <label className="text-sm font-semibold">🔲 Show Borders</label>
-                      <Button
-                        variant={showBorders ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setShowBorders(!showBorders)}
-                      >
-                        {showBorders ? "Yes" : "No"}
-                      </Button>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <label className="text-sm font-semibold">🔑 Include Answer Key</label>
-                      <Button
-                        variant={includeAnswerKey ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setIncludeAnswerKey(!includeAnswerKey)}
-                      >
-                        {includeAnswerKey ? "Yes" : "No"}
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Live Preview */}
-              <Card className="shadow-lg">
-                <CardHeader className="bg-gradient-to-r from-pink-50 to-orange-50">
-                  <CardTitle className="flex items-center gap-2">👁️ Live Preview</CardTitle>
-                  <CardDescription>See your worksheet as you create it</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6 pt-6">
-                  <div className="space-y-3">
-                    <label className="text-sm font-semibold">Background Theme</label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {BACKGROUND_TEMPLATES.map((template) => (
-                        <button
-                          key={template.id}
-                          onClick={() => setBackground(template.id)}
-                          className={`rounded-lg border-2 p-3 text-left transition-all hover:shadow-md ${
-                            background === template.id
-                              ? "border-primary bg-primary/10 ring-primary ring-2"
-                              : "border-gray-200"
-                          }`}
-                        >
-                          <div
-                            className="mb-2 h-8 w-full rounded"
-                            style={{ background: template.preview }}
-                          />
-                          <div className="text-xs font-medium">{template.name}</div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold">🔤 Font Style</label>
-                    <FontSelector selectedFont={selectedFont} onFontSelect={handleFontSelect} />
-                    <p className="text-xs text-gray-500">
-                      Choose a font that matches your teaching style. Upload custom fonts for
-                      handwriting practice.
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold">🖼️ Custom Background Image</label>
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="cursor-pointer border-2"
-                    />
-                    <p className="text-muted-foreground text-xs">
-                      Upload your own image (will be subtle/transparent)
-                    </p>
-                  </div>
-
-                  {/* Quota Display */}
-                  <div className="mb-4">
-                    <QuotaDisplay userId="current-user" />
-                  </div>
-
-                  <Button
-                    onClick={handleExport}
-                    disabled={isExporting}
-                    className="w-full text-lg shadow-md"
-                    size="lg"
-                    variant="default"
-                  >
-                    {isExporting ? "Creating..." : "📄 Print Worksheet"}
-                  </Button>
-
-                  {/* Usage Warning */}
-                  <UsageLimitWarning
-                    userId="current-user"
-                    action="exportsPerMonth"
-                    className="mt-4"
+                <div>
+                  <label className="text-sm font-medium">Custom Instructions</label>
+                  <Input
+                    value={customInstructions}
+                    onChange={(e) => setCustomInstructions(e.target.value)}
+                    placeholder="Add special instructions for students..."
+                    className="mt-1"
                   />
+                </div>
 
-                  {/* Upgrade Prompt for Free Users */}
-                  <div className="mt-4">
-                    <UpgradePrompt userId="current-user" variant="inline" />
-                  </div>
-
-                  {/* Session Tracking */}
-                  <div className="mt-4">
-                    <SessionRecorder
-                      studentId="current-user" // In a real app, this would come from auth
-                      worksheetId={`worksheet-${Date.now()}`}
-                      subject={subject}
-                      gradeLevel={gradeLevel}
-                      difficulty={difficulty}
-                      onSessionComplete={handleSessionComplete}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-
-          {/* Step 4: Generate Your Worksheet */}
-          <div className="mb-8 text-center">
-            <h2 className="mb-2 text-2xl font-bold text-gray-900">
-              Step 4: Generate Your Worksheet
-            </h2>
-            <p className="text-gray-600">
-              Create your worksheet with all the settings you've configured
-            </p>
-          </div>
-
-          <div className="mx-auto mb-8 max-w-2xl">
-            <Card className="shadow-lg">
-              <CardContent className="p-8 text-center">
-                {worksheetType === "traditional" ? (
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium">Show Borders</label>
                   <Button
-                    onClick={handleGenerate}
-                    disabled={isGenerating}
-                    className="w-full py-6 text-xl shadow-lg"
-                    size="lg"
+                    variant={showBorders ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setShowBorders(!showBorders)}
                   >
-                    {isGenerating ? (
-                      <div className="flex items-center gap-3">
-                        <div className="h-5 w-5 animate-spin rounded-full border-b-2 border-white"></div>
-                        <span>Generating...</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-3">
-                        <span className="text-2xl">🎲</span>
-                        <span>
-                          {subject === "math"
-                            ? "Generate Math Problems"
-                            : subject === "science"
-                              ? "Generate Science Questions"
-                              : languageArtsType === "spelling"
-                                ? "Generate Spelling Words"
-                                : languageArtsType === "vocabulary"
-                                  ? "Generate Vocabulary"
-                                  : "Generate Writing Prompts"}
-                        </span>
-                      </div>
-                    )}
+                    {showBorders ? "Yes" : "No"}
                   </Button>
-                ) : (
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium">Include Answer Key</label>
                   <Button
-                    onClick={handleCreateInteractiveWorksheet}
-                    disabled={isGenerating}
-                    className="w-full py-6 text-xl shadow-lg"
-                    size="lg"
+                    variant={includeAnswerKey ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setIncludeAnswerKey(!includeAnswerKey)}
                   >
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">🎮</span>
-                      <span>Create Interactive Worksheet</span>
-                    </div>
+                    {includeAnswerKey ? "Yes" : "No"}
                   </Button>
-                )}
+                </div>
 
-                <p className="mt-4 text-sm text-gray-500">
-                  Your worksheet will be generated based on all the settings you've configured
-                  above.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Step 5: Preview and Export */}
-          {problems.length > 0 ||
-          spellingWords.length > 0 ||
-          vocabularyWords.length > 0 ||
-          writingPrompts.length > 0 ? (
-            <div className="mb-8 text-center">
-              <h2 className="mb-2 text-2xl font-bold text-gray-900">Step 5: Preview and Export</h2>
-              <p className="text-gray-600">Review your worksheet and export it when ready</p>
-            </div>
-          ) : null}
-
-          {/* Preview Panel */}
-          <div className="mx-auto max-w-4xl">
-            <Card className="shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-green-50 to-teal-50">
-                <CardTitle className="flex items-center gap-2">👀 Live Preview</CardTitle>
-                <CardDescription>
-                  {problems.length > 0
-                    ? `${problems.length} problems ready to print!`
-                    : spellingWords.length > 0
-                      ? `${spellingWords.length} spelling words ready to print!`
-                      : vocabularyWords.length > 0
-                        ? `${vocabularyWords.length} vocabulary words ready to print!`
-                        : writingPrompts.length > 0
-                          ? `${writingPrompts.length} writing prompts ready to print!`
-                          : "Configure settings and generate content"}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-6">
-                {problems.length === 0 &&
-                spellingWords.length === 0 &&
-                vocabularyWords.length === 0 &&
-                writingPrompts.length === 0 ? (
-                  <div className="flex h-[400px] items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gradient-to-br from-blue-50/50 to-purple-50/50">
-                    <div className="text-center">
-                      <div className="mb-4 text-6xl">📋</div>
-                      <p className="text-foreground text-xl font-medium">
-                        Ready to create magic? ✨
-                      </p>
-                      <p className="text-muted-foreground mt-2">
-                        Configure your settings above and click "Generate"
-                      </p>
-                    </div>
-                  </div>
-                ) : subject === "math" && problems.length > 0 ? (
-                  <div className="space-y-6">
-                    {/* Worksheet Preview */}
-                    <div
-                      className="rounded-xl border-2 p-8 shadow-inner"
-                      style={
-                        background === "custom" && customImage
-                          ? {
-                              backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)), url('${customImage}')`,
-                              backgroundSize: "cover",
-                              backgroundPosition: "center",
-                            }
-                          : {
-                              background:
-                                selectedBg?.css.split("background:")[1]?.split(";")[0] || "white",
-                            }
+                <div className="flex justify-end gap-2 border-t pt-4">
+                  <Button variant="outline" onClick={() => setShowCustomizeModal(false)}>
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setShowCustomizeModal(false);
+                      // Regenerate with new settings
+                      if (problems.length > 0 || spellingWords.length > 0) {
+                        handleGenerate();
                       }
-                    >
-                      <div className="rounded-lg bg-white/90 p-6 shadow-sm">
-                        <h2 className="text-primary mb-2 text-center text-3xl font-bold">
-                          {title}
-                        </h2>
-                        <p className="text-muted-foreground mb-6 text-center text-lg font-medium">
-                          {operation.charAt(0).toUpperCase() + operation.slice(1)} -{" "}
-                          {DIFFICULTY_RANGES[difficulty].label}
-                        </p>
-
-                        <div className="mb-6 grid grid-cols-2 gap-4 rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 p-4">
-                          <div className="text-sm font-medium">
-                            <strong>Name:</strong> ___________________
-                          </div>
-                          <div className="text-sm font-medium">
-                            <strong>Date:</strong> ___________________
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                          {problems.slice(0, 12).map((problem, index) => (
-                            <div
-                              key={index}
-                              className="flex items-center gap-3 rounded-lg border bg-white p-3 shadow-sm"
-                            >
-                              <span className="bg-primary flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold text-white">
-                                {index + 1}
-                              </span>
-                              <span className="flex-1 text-lg font-medium">
-                                {problem.problem} =
-                              </span>
-                              <span className="border-primary min-w-[60px] border-b-2 px-2 font-medium">
-                                &nbsp;
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-
-                        {problems.length > 12 && (
-                          <p className="text-muted-foreground mt-6 text-center text-sm font-medium">
-                            + {problems.length - 12} more problems will appear when you print
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Answer Key Preview */}
-                    <div className="rounded-xl border-2 border-yellow-300 bg-gradient-to-br from-yellow-50 to-orange-50 p-6 shadow-lg">
-                      <h3 className="mb-4 text-center text-xl font-bold text-yellow-900">
-                        📝 Answer Key Preview
-                      </h3>
-                      <div className="grid grid-cols-4 gap-3 md:grid-cols-6">
-                        {problems.slice(0, 12).map((problem, index) => (
-                          <div
-                            key={index}
-                            className="rounded-lg bg-white p-2 text-center font-bold text-yellow-900 shadow-sm"
-                          >
-                            {index + 1}. {problem.answer}
-                          </div>
-                        ))}
-                      </div>
-                      {problems.length > 12 && (
-                        <p className="mt-4 text-center text-xs text-yellow-800">
-                          + {problems.length - 12} more answers
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Quick Stats */}
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className="rounded-xl bg-white p-4 text-center shadow-md">
-                        <div className="text-3xl font-bold text-blue-600">{problems.length}</div>
-                        <div className="text-muted-foreground text-xs font-medium">Problems</div>
-                      </div>
-                      <div className="rounded-xl bg-white p-4 text-center shadow-md">
-                        <div className="text-3xl font-bold text-purple-600">
-                          {difficulty === "custom"
-                            ? `${customMin}-${customMax}`
-                            : `${DIFFICULTY_RANGES[difficulty].min}-${DIFFICULTY_RANGES[difficulty].max}`}
-                        </div>
-                        <div className="text-muted-foreground text-xs font-medium">Range</div>
-                      </div>
-                      <div className="rounded-xl bg-white p-4 text-center shadow-md">
-                        <div className="text-3xl font-bold text-pink-600">
-                          {operation === "addition"
-                            ? "+"
-                            : operation === "subtraction"
-                              ? "−"
-                              : operation === "multiplication"
-                                ? "×"
-                                : "÷"}
-                        </div>
-                        <div className="text-muted-foreground text-xs font-medium">Operation</div>
-                      </div>
-                    </div>
-                  </div>
-                ) : subject === "language_arts" && spellingWords.length > 0 ? (
-                  <div className="space-y-6">
-                    {/* Spelling Words Preview */}
-                    <div className="rounded-xl border-2 bg-gradient-to-br from-blue-50 to-purple-50 p-8">
-                      <h2 className="text-primary mb-6 text-center text-3xl font-bold">{title}</h2>
-                      <p className="text-muted-foreground mb-6 text-center text-lg">
-                        Grade {gradeLevel} Spelling Words
-                      </p>
-                      <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-                        {spellingWords.map((word, index) => (
-                          <div
-                            key={index}
-                            className="flex items-center gap-3 rounded-lg border-2 bg-white p-4 shadow-sm"
-                          >
-                            <span className="bg-primary flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold text-white">
-                              {index + 1}
-                            </span>
-                            <span className="text-lg font-medium">{word.word}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ) : subject === "language_arts" && vocabularyWords.length > 0 ? (
-                  <div className="space-y-6">
-                    {/* Vocabulary Preview */}
-                    <div className="rounded-xl border-2 bg-gradient-to-br from-green-50 to-blue-50 p-8">
-                      <h2 className="text-primary mb-6 text-center text-3xl font-bold">{title}</h2>
-                      <p className="text-muted-foreground mb-6 text-center text-lg">
-                        Grade {gradeLevel} Vocabulary
-                      </p>
-                      <div className="space-y-4">
-                        {vocabularyWords.map((item, index) => (
-                          <div key={index} className="rounded-lg border-2 bg-white p-4 shadow-sm">
-                            <div className="flex items-start gap-3">
-                              <span className="bg-primary flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold text-white">
-                                {index + 1}
-                              </span>
-                              <div>
-                                <h3 className="text-lg font-bold text-purple-900">{item.word}</h3>
-                                <p className="text-muted-foreground mt-1">{item.definition}</p>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ) : subject === "language_arts" && writingPrompts.length > 0 ? (
-                  <div className="space-y-6">
-                    {/* Writing Prompts Preview */}
-                    <div className="rounded-xl border-2 bg-gradient-to-br from-yellow-50 to-orange-50 p-8">
-                      <h2 className="text-primary mb-6 text-center text-3xl font-bold">{title}</h2>
-                      <p className="text-muted-foreground mb-6 text-center text-lg">
-                        Writing Prompts
-                      </p>
-                      <div className="space-y-6">
-                        {writingPrompts.map((prompt, index) => (
-                          <div key={index} className="rounded-lg border-2 bg-white p-6 shadow-sm">
-                            <div className="flex items-start gap-3">
-                              <span className="bg-primary flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold text-white">
-                                {index + 1}
-                              </span>
-                              <div>
-                                <span className="mb-2 inline-block rounded-full bg-purple-100 px-3 py-1 text-xs font-semibold text-purple-800">
-                                  {prompt.type.charAt(0).toUpperCase() + prompt.type.slice(1)}
-                                </span>
-                                <p className="text-lg font-medium">{prompt.prompt}</p>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ) : subject === "science" && scienceProblems.length > 0 ? (
-                  <div className="space-y-6">
-                    {/* Science Questions Preview */}
-                    <div className="rounded-xl border-2 bg-gradient-to-br from-green-50 to-teal-50 p-8">
-                      <h2 className="text-primary mb-6 text-center text-3xl font-bold">{title}</h2>
-                      <p className="text-muted-foreground mb-6 text-center text-lg">
-                        Grade {gradeLevel}{" "}
-                        {scienceType.charAt(0).toUpperCase() + scienceType.slice(1)} Questions
-                      </p>
-                      <div className="space-y-4">
-                        {scienceProblems.map((problem, index) => (
-                          <div key={index} className="rounded-lg border-2 bg-white p-6 shadow-sm">
-                            <div className="flex items-start gap-3">
-                              <span className="bg-primary flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold text-white">
-                                {index + 1}
-                              </span>
-                              <div className="flex-1">
-                                <span className="mb-2 inline-block rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-800">
-                                  {problem.type.charAt(0).toUpperCase() + problem.type.slice(1)}
-                                </span>
-                                <p className="mb-2 text-lg font-medium">{problem.question}</p>
-                                <div className="rounded bg-gray-50 p-3">
-                                  <p className="text-sm text-gray-600">
-                                    <strong>Answer:</strong> {problem.answer}
-                                  </p>
-                                  {problem.explanation && (
-                                    <p className="mt-1 text-sm text-gray-500">
-                                      <strong>Explanation:</strong> {problem.explanation}
-                                    </p>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ) : null}
-              </CardContent>
-            </Card>
-
-            {/* Export Controls */}
-            {problems.length > 0 ||
-            spellingWords.length > 0 ||
-            vocabularyWords.length > 0 ||
-            writingPrompts.length > 0 ? (
-              <div className="mx-auto mt-8 max-w-2xl">
-                <Card className="shadow-lg">
-                  <CardHeader className="bg-gradient-to-r from-orange-50 to-red-50">
-                    <CardTitle className="flex items-center gap-2">
-                      📄 Export Your Worksheet
-                    </CardTitle>
-                    <CardDescription>Download and print your completed worksheet</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6 pt-6">
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                      <Button
-                        onClick={handleExport}
-                        disabled={isExporting}
-                        className="w-full py-6 text-lg shadow-md"
-                        size="lg"
-                        variant="default"
-                      >
-                        {isExporting ? (
-                          <div className="flex items-center gap-3">
-                            <div className="h-5 w-5 animate-spin rounded-full border-b-2 border-white"></div>
-                            <span>Creating...</span>
-                          </div>
-                        ) : (
-                          <div className="flex items-center gap-3">
-                            <span className="text-xl">📄</span>
-                            <span>Print Worksheet</span>
-                          </div>
-                        )}
-                      </Button>
-
-                      <Button
-                        onClick={() => window.print()}
-                        className="w-full py-6 text-lg shadow-md"
-                        size="lg"
-                        variant="outline"
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="text-xl">🖨️</span>
-                          <span>Print Preview</span>
-                        </div>
-                      </Button>
-                    </div>
-
-                    {/* Usage Warning */}
-                    <UsageLimitWarning
-                      userId="current-user"
-                      action="exportsPerMonth"
-                      className="mt-4"
-                    />
-
-                    {/* Upgrade Prompt for Free Users */}
-                    <div className="mt-4">
-                      <UpgradePrompt userId="current-user" variant="inline" />
-                    </div>
-                  </CardContent>
-                </Card>
+                    }}
+                    className="homeschool-button"
+                  >
+                    Save Changes
+                  </Button>
+                </div>
               </div>
-            ) : null}
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Interactive Worksheet Viewer */}
+        {showInteractiveViewer && interactiveWorksheet && (
+          <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4">
+            <div className="max-h-[90vh] w-full max-w-6xl overflow-auto rounded-lg bg-white">
+              <div className="sticky top-0 flex items-center justify-between border-b bg-white p-4">
+                <h2 className="text-lg font-semibold">Interactive Worksheet</h2>
+                <Button variant="outline" onClick={() => setShowInteractiveViewer(false)}>
+                  Close
+                </Button>
+              </div>
+              <div className="p-4">
+                <InteractiveWorksheetViewer
+                  worksheet={interactiveWorksheet}
+                  onComplete={handleInteractiveWorksheetComplete}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Collaboration Panel */}
+        {showCollaboration && collaborationSession && (
+          <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4">
+            <div className="max-h-[90vh] w-full max-w-4xl overflow-auto rounded-lg bg-white">
+              <div className="sticky top-0 flex items-center justify-between border-b bg-white p-4">
+                <h2 className="text-lg font-semibold">Collaboration Session</h2>
+                <Button variant="outline" onClick={() => setShowCollaboration(false)}>
+                  Close
+                </Button>
+              </div>
+              <div className="p-4">
+                <CollaborationPanel
+                  sessionId={collaborationSession}
+                  userId="user-123"
+                  userName="John Doe"
+                  userEmail="john@example.com"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Analytics Dashboard */}
+        {showAnalytics && (
+          <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4">
+            <div className="max-h-[90vh] w-full max-w-6xl overflow-auto rounded-lg bg-white">
+              <div className="sticky top-0 flex items-center justify-between border-b bg-white p-4">
+                <h2 className="text-lg font-semibold">Analytics Dashboard</h2>
+                <Button variant="outline" onClick={() => setShowAnalytics(false)}>
+                  Close
+                </Button>
+              </div>
+              <div className="p-4">
+                <AnalyticsDashboard userId="user-123" />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-
-      {/* Interactive Worksheet Viewer */}
-      {showInteractiveViewer && interactiveWorksheet && (
-        <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4">
-          <div className="max-h-[90vh] w-full max-w-6xl overflow-auto rounded-lg bg-white">
-            <div className="sticky top-0 flex items-center justify-between border-b bg-white p-4">
-              <h2 className="text-lg font-semibold">Interactive Worksheet</h2>
-              <Button variant="outline" onClick={() => setShowInteractiveViewer(false)}>
-                Close
-              </Button>
-            </div>
-            <div className="p-4">
-              <InteractiveWorksheetViewer
-                worksheet={interactiveWorksheet}
-                onComplete={handleInteractiveWorksheetComplete}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Collaboration Panel */}
-      {showCollaboration && collaborationSession && (
-        <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4">
-          <div className="max-h-[90vh] w-full max-w-4xl overflow-auto rounded-lg bg-white">
-            <div className="sticky top-0 flex items-center justify-between border-b bg-white p-4">
-              <h2 className="text-lg font-semibold">Collaboration Session</h2>
-              <Button variant="outline" onClick={() => setShowCollaboration(false)}>
-                Close
-              </Button>
-            </div>
-            <div className="p-4">
-              <CollaborationPanel
-                sessionId={collaborationSession}
-                userId="user-123"
-                userName="John Doe"
-                userEmail="john@example.com"
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Analytics Dashboard */}
-      {showAnalytics && (
-        <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4">
-          <div className="max-h-[90vh] w-full max-w-6xl overflow-auto rounded-lg bg-white">
-            <div className="sticky top-0 flex items-center justify-between border-b bg-white p-4">
-              <h2 className="text-lg font-semibold">Analytics Dashboard</h2>
-              <Button variant="outline" onClick={() => setShowAnalytics(false)}>
-                Close
-              </Button>
-            </div>
-            <div className="p-4">
-              <AnalyticsDashboard userId="user-123" />
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+    </MobileLayout>
   );
 }
-
-// Helper function to generate printable HTML
-function generatePrintHTML(
-  subject: string,
-  data: unknown,
-  backgroundStyle: string,
-  font: FontInfo,
-  theme: { colors: Record<string, string> }
-): string {
-  if (subject === "math") {
-    return generateMathPrintHTML(
-      data as { title: string; subtitle?: string; problems: MathProblem[] },
-      backgroundStyle,
-      font,
-      theme
-    );
-  } else if (subject === "science") {
-    return generateSciencePrintHTML(
-      data as { title: string; subtitle?: string; problems: ScienceProblem[] },
-      backgroundStyle,
-      font,
-      theme
-    );
-  }
-  return generateMathPrintHTML(
-    data as { title: string; subtitle?: string; problems: MathProblem[] },
-    backgroundStyle,
-    font,
-    theme
-  );
-}
-
-function generateMathPrintHTML(
-  data: {
-    title: string;
-    subtitle?: string;
-    problems: MathProblem[];
-  },
-  backgroundStyle: string,
-  font: FontInfo,
-  theme: { colors: Record<string, string> }
-): string {
-  const { title, subtitle, problems } = data;
-
-  const worksheetProblems = problems
-    .map(
-      (p: MathProblem, i: number) => `
-    <div class="problem">
-      <span class="number">${i + 1}</span>
-      <span class="text">${p.problem} = </span>
-      <span class="answer-space"></span>
-    </div>
-  `
-    )
-    .join("");
-
-  const answerKey = problems
-    .map((p: MathProblem, i: number) => `<div class="answer-item">${i + 1}. ${p.answer}</div>`)
-    .join("");
-
-  return `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>${title}</title>
-      <style>
-        * { 
-          margin: 0; 
-          padding: 0; 
-          box-sizing: border-box;
-          -webkit-print-color-adjust: exact !important;
-          print-color-adjust: exact !important;
-          color-adjust: exact !important;
-        }
-        
-        @media print {
-          .no-print { display: none; }
-          .page-break { page-break-before: always; }
-          * {
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-            color-adjust: exact !important;
-          }
-        }
-        
-        body { 
-          font-family: ${font.family}; 
-          padding: 40px; 
-          line-height: 1.6;
-          ${backgroundStyle}
-          -webkit-print-color-adjust: exact;
-          print-color-adjust: exact;
-          color-adjust: exact;
-          color: ${theme.colors.text};
-          background-color: ${theme.colors.background};
-        }
-        
-        .controls { 
-          margin: 20px 0; 
-          text-align: center; 
-          padding: 20px;
-          background: white;
-          border-radius: 12px;
-          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        
-        button { 
-          padding: 14px 32px; 
-          font-size: 16px; 
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-          color: white; 
-          border: none; 
-          border-radius: 8px; 
-          cursor: pointer; 
-          margin: 0 8px;
-          font-weight: 600;
-          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-          transition: all 0.2s;
-        }
-        
-        button:hover { 
-          transform: translateY(-2px);
-          box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-        }
-        
-        .worksheet-container {
-          background: rgba(255, 255, 255, 0.95);
-          padding: 40px;
-          border-radius: 16px;
-          box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-          margin-bottom: 30px;
-        }
-        
-        .header { 
-          text-align: center; 
-          margin-bottom: 30px; 
-          border-bottom: 3px solid #667eea; 
-          padding-bottom: 20px; 
-        }
-        
-        h1 { 
-          font-size: 32pt; 
-          margin-bottom: 8px; 
-          color: #667eea;
-          font-weight: bold;
-        }
-        
-        h2 { 
-          font-size: 18pt; 
-          color: #764ba2; 
-          font-weight: normal; 
-        }
-        
-        .meta { 
-          display: flex; 
-          justify-content: space-between; 
-          margin: 25px 0; 
-          padding: 20px; 
-          background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
-          border-radius: 10px;
-          font-size: 14pt;
-          -webkit-print-color-adjust: exact;
-          print-color-adjust: exact;
-          color-adjust: exact;
-        }
-        
-        .meta > div {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-        
-        .meta strong { 
-          color: #667eea;
-          white-space: nowrap;
-        }
-        
-        .meta .line {
-          border-bottom: 2px solid #667eea;
-          width: 200px;
-          display: inline-block;
-        }
-        
-        .problems { 
-          display: grid; 
-          grid-template-columns: repeat(2, 1fr); 
-          gap: 20px; 
-          margin-top: 30px; 
-        }
-        
-        .problem { 
-          display: flex; 
-          align-items: center; 
-          gap: 12px; 
-          padding: 14px; 
-          background: rgba(255, 255, 255, 0.9);
-          border-radius: 8px;
-          border: 2px solid #e0e0e0;
-        }
-        
-        .number { 
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 32px;
-          height: 32px;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-          border-radius: 50%;
-          font-weight: bold;
-          font-size: 14pt;
-        }
-        
-        .text { 
-          font-size: 20pt; 
-          flex: 1;
-          font-weight: 500;
-        }
-        
-        .answer-space { 
-          border-bottom: 2px solid #667eea; 
-          min-width: 100px; 
-          display: inline-block; 
-          margin-left: 8px;
-        }
-        
-        .answer-key { 
-          background: linear-gradient(135deg, #fff9c4 0%, #ffe0b2 100%);
-          padding: 30px; 
-          border: 3px solid #ffa726; 
-          border-radius: 16px; 
-          box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-          -webkit-print-color-adjust: exact;
-          print-color-adjust: exact;
-          color-adjust: exact;
-        }
-        
-        .answer-key h3 { 
-          text-align: center; 
-          color: #e65100; 
-          margin-bottom: 25px; 
-          font-size: 24pt;
-          font-weight: bold;
-        }
-        
-        .answers { 
-          display: grid; 
-          grid-template-columns: repeat(5, 1fr); 
-          gap: 12px; 
-        }
-        
-        .answer-item { 
-          padding: 12px; 
-          background: white; 
-          border-radius: 8px; 
-          text-align: center;
-          font-weight: bold;
-          border: 2px solid #ffb74d;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        
-        .footer {
-          margin-top: 40px;
-          padding: 20px;
-          text-align: center;
-          color: #999;
-          font-size: 10pt;
-          border-top: 1px solid #e0e0e0;
-        }
-        
-        .footer .brand {
-          color: #667eea;
-          font-weight: bold;
-        }
-        
-        .footer .copyright {
-          font-size: 9pt;
-          margin-top: 5px;
-          color: #bbb;
-        }
-        
-        .encouragement {
-          margin-top: 50px;
-          padding: 30px;
-          text-align: center;
-          background: rgba(255, 255, 255, 0.9);
-          border-radius: 16px;
-          border: 3px dashed #ffa726;
-          -webkit-print-color-adjust: exact;
-          print-color-adjust: exact;
-          color-adjust: exact;
-        }
-        
-        .encourage-text {
-          font-size: 24pt;
-          font-weight: bold;
-          color: #667eea;
-          margin-bottom: 10px;
-        }
-        
-        .tips {
-          font-size: 14pt;
-          color: #764ba2;
-          font-style: italic;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="controls no-print">
-        <button onclick="window.print()">🖨️ Print Worksheet</button>
-        <button onclick="window.close()">Close Window</button>
-      </div>
-      
-      <div class="worksheet-container">
-        <div class="header">
-          <h1>${title}</h1>
-          ${subtitle ? `<h2>${subtitle}</h2>` : ""}
-        </div>
-        
-        <div class="meta">
-          <div><strong>Name:</strong> <span class="line"></span></div>
-          <div><strong>Date:</strong> <span class="line"></span></div>
-        </div>
-        
-        <div class="problems">
-          ${worksheetProblems}
-        </div>
-      </div>
-      
-      <div class="page-break"></div>
-      
-      <div class="answer-key">
-        <h3>📝 Answer Key</h3>
-        <div class="answers">
-          ${answerKey}
-        </div>
-        
-        ${
-          problems.length < 30
-            ? `
-        <div class="encouragement">
-          <p class="encourage-text">🌟 Great job! 🌟</p>
-          <p class="tips">Keep practicing to improve your math skills!</p>
-        </div>
-        `
-            : ""
-        }
-      </div>
-      
-      <div class="footer">
-        <p>Created with <span class="brand">Wyatt Works™</span></p>
-        <p class="copyright">© ${new Date().getFullYear()} Wyatt Works. All rights reserved.</p>
-      </div>
-    </body>
-    </html>
-  `;
-}
-
-function generateSciencePrintHTML(
-  data: {
-    title: string;
-    subtitle?: string;
-    problems: ScienceProblem[];
-  },
-  backgroundStyle: string,
-  font: FontInfo,
-  theme: { colors: Record<string, string> }
-): string {
-  const { title, subtitle, problems } = data;
-
-  const worksheetProblems = problems
-    .map(
-      (p: ScienceProblem, i: number) => `
-    <div class="problem">
-      <span class="number">${i + 1}</span>
-      <span class="text">${p.question}</span>
-      <div class="answer-space"></div>
-    </div>
-  `
-    )
-    .join("");
-
-  const answerKey = problems
-    .map(
-      (p: ScienceProblem, i: number) => `
-      <div class="answer-item">
-        <strong>${i + 1}.</strong> ${p.answer}
-        ${p.explanation ? `<br><em>Explanation:</em> ${p.explanation}` : ""}
-      </div>
-    `
-    )
-    .join("");
-
-  return `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>${title}</title>
-      <style>
-        * { 
-          margin: 0; 
-          padding: 0; 
-          box-sizing: border-box;
-          print-color-adjust: exact !important;
-        }
-        
-        body {
-          font-family: ${font.family};
-          line-height: 1.6;
-          color: #333;
-          background: white;
-          print-color-adjust: exact !important;
-        }
-        
-        .worksheet {
-          max-width: 8.5in;
-          margin: 0 auto;
-          padding: 0.5in;
-          ${backgroundStyle}
-        }
-        
-        .header {
-          text-align: center;
-          margin-bottom: 30px;
-          border-bottom: 3px solid #3b82f6;
-          padding-bottom: 20px;
-        }
-        
-        .header h1 {
-          font-size: 2.5em;
-          color: #1e40af;
-          margin-bottom: 10px;
-        }
-        
-        .header h2 {
-          font-size: 1.2em;
-          color: #64748b;
-          font-weight: normal;
-        }
-        
-        .meta {
-          display: flex;
-          justify-content: space-between;
-          margin-bottom: 30px;
-          font-size: 1.1em;
-        }
-        
-        .meta .line {
-          display: inline-block;
-          width: 200px;
-          border-bottom: 2px solid #3b82f6;
-          margin-left: 10px;
-        }
-        
-        .problems {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 20px;
-          margin-bottom: 30px;
-        }
-        
-        .problem {
-          display: flex;
-          align-items: flex-start;
-          gap: 10px;
-          padding: 15px;
-          border: 2px solid #e5e7eb;
-          border-radius: 8px;
-          background: white;
-          min-height: 80px;
-        }
-        
-        .problem .number {
-          background: #3b82f6;
-          color: white;
-          width: 30px;
-          height: 30px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: bold;
-          flex-shrink: 0;
-        }
-        
-        .problem .text {
-          flex: 1;
-          font-size: 1.1em;
-          line-height: 1.4;
-        }
-        
-        .answer-space {
-          height: 30px;
-          border-bottom: 2px solid #3b82f6;
-          width: 100px;
-          margin-top: 10px;
-        }
-        
-        .page-break {
-          page-break-before: always;
-        }
-        
-        .answer-key {
-          background: #f8fafc;
-          padding: 30px;
-          border-radius: 12px;
-          border: 2px solid #e2e8f0;
-          print-color-adjust: exact !important;
-        }
-        
-        .answer-key h3 {
-          color: #1e40af;
-          font-size: 1.8em;
-          margin-bottom: 20px;
-          text-align: center;
-        }
-        
-        .answers {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 15px;
-        }
-        
-        .answer-item {
-          padding: 12px;
-          background: white;
-          border-radius: 6px;
-          border: 1px solid #d1d5db;
-          font-size: 0.95em;
-          line-height: 1.4;
-        }
-        
-        .encouragement {
-          margin-top: 30px;
-          text-align: center;
-          padding: 20px;
-          background: linear-gradient(135deg, #dbeafe, #e0e7ff);
-          border-radius: 12px;
-          border: 2px solid #3b82f6;
-          print-color-adjust: exact !important;
-        }
-        
-        .encourage-text {
-          font-size: 1.5em;
-          color: #1e40af;
-          font-weight: bold;
-          margin-bottom: 10px;
-        }
-        
-        .tips {
-          color: #475569;
-          font-size: 1.1em;
-        }
-        
-        .footer {
-          margin-top: 40px;
-          text-align: center;
-          font-size: 0.9em;
-          color: #64748b;
-          border-top: 1px solid #e5e7eb;
-          padding-top: 20px;
-        }
-        
-        .brand {
-          color: #3b82f6;
-          font-weight: bold;
-        }
-        
-        .copyright {
-          margin-top: 5px;
-          font-size: 0.8em;
-        }
-        
-        @media print {
-          .worksheet {
-            margin: 0;
-            padding: 0.3in;
-          }
-          
-          .problems {
-            grid-template-columns: 1fr 1fr;
-          }
-          
-          .answers {
-            grid-template-columns: 1fr 1fr;
-          }
-        }
-      </style>
-    </head>
-    <body>
-      <div class="worksheet">
-        <div class="header">
-          <h1>${title}</h1>
-          ${subtitle ? `<h2>${subtitle}</h2>` : ""}
-        </div>
-        
-        <div class="meta">
-          <div><strong>Name:</strong> <span class="line"></span></div>
-          <div><strong>Date:</strong> <span class="line"></span></div>
-        </div>
-        
-        <div class="problems">
-          ${worksheetProblems}
-        </div>
-      </div>
-      
-      <div class="page-break"></div>
-      
-      <div class="answer-key">
-        <h3>🔬 Answer Key</h3>
-        <div class="answers">
-          ${answerKey}
-        </div>
-        
-        ${
-          problems.length < 20
-            ? `
-        <div class="encouragement">
-          <p class="encourage-text">🌟 Great job! 🌟</p>
-          <p class="tips">Keep exploring science to discover amazing things!</p>
-        </div>
-        `
-            : ""
-        }
-      </div>
-      
-      <div class="footer">
-        <p>Created with <span class="brand">Wyatt Works™</span></p>
-        <p class="copyright">© ${new Date().getFullYear()} Wyatt Works. All rights reserved.</p>
-      </div>
-    </body>
-    </html>
-  `;
-}
-
-// Note: PDF generation via html2canvas has compatibility issues
-// Using browser's native print-to-PDF instead for better reliability

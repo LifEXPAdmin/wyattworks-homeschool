@@ -1,448 +1,447 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useUser } from "@clerk/nextjs";
+import React, { useState } from "react";
+import { MobileLayout } from "@/components/mobile-layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { MobileLayout } from "@/components/mobile-layout";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { User, Bell, Shield, Crown, AlertCircle, CheckCircle, Settings, Save } from "lucide-react";
-import { getQuotaUsage } from "@/lib/quota";
-import { SUBSCRIPTION_TIERS } from "@/lib/subscription";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  User,
+  Settings,
+  BarChart3,
+  History,
+  Clock,
+  BookOpen,
+  TrendingUp,
+  Target,
+  Star,
+  Download,
+} from "lucide-react";
 
-export default function AccountSettingsPage() {
-  const { user } = useUser();
-  const [quotaInfo, setQuotaInfo] = useState<{
-    currentMonth: string;
-    used: number;
-    limit: number;
-    remaining: number;
-    plan: string;
-    history: Array<{ month: string; count: number }>;
-  } | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+// Mock data - in a real app, this would come from an API
+const mockHomeworkHistory = [
+  {
+    id: "hw-1",
+    title: "Math Practice - Addition",
+    subject: "Math",
+    grade: "3-4",
+    completedAt: new Date("2024-01-15T14:30:00"),
+    timeSpent: 15, // minutes
+    score: 95,
+    totalProblems: 20,
+    correctAnswers: 19,
+    difficulty: "Medium",
+  },
+  {
+    id: "hw-2",
+    title: "Spelling Words - Week 1",
+    subject: "Language Arts",
+    grade: "1-2",
+    completedAt: new Date("2024-01-14T10:15:00"),
+    timeSpent: 8,
+    score: 100,
+    totalProblems: 10,
+    correctAnswers: 10,
+    difficulty: "Easy",
+  },
+  {
+    id: "hw-3",
+    title: "Science Quiz - Plants",
+    subject: "Science",
+    grade: "2-3",
+    completedAt: new Date("2024-01-13T16:45:00"),
+    timeSpent: 12,
+    score: 85,
+    totalProblems: 15,
+    correctAnswers: 13,
+    difficulty: "Medium",
+  },
+];
 
-  // Form state
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [timezone, setTimezone] = useState("UTC");
-  const [language, setLanguage] = useState("en");
-  const [notifications, setNotifications] = useState({
-    emailUpdates: true,
-    worksheetReminders: true,
-    quotaWarnings: true,
-    marketingEmails: false,
-  });
+const mockAnalytics = {
+  totalWorksheets: 47,
+  totalTimeSpent: 342, // minutes
+  averageScore: 91,
+  favoriteSubject: "Math",
+  streak: 12,
+  weeklyProgress: [
+    { week: "Week 1", completed: 8, averageScore: 88 },
+    { week: "Week 2", completed: 12, averageScore: 92 },
+    { week: "Week 3", completed: 15, averageScore: 94 },
+    { week: "Week 4", completed: 12, averageScore: 90 },
+  ],
+  subjectBreakdown: [
+    { subject: "Math", count: 28, averageScore: 93 },
+    { subject: "Language Arts", count: 12, averageScore: 89 },
+    { subject: "Science", count: 7, averageScore: 87 },
+  ],
+};
 
-  useEffect(() => {
-    const loadQuotaInfo = async () => {
-      if (!user?.id) return;
+export default function AccountSettings() {
+  const [activeTab, setActiveTab] = useState("overview");
 
-      try {
-        const quota = await getQuotaUsage(user.id);
-        setQuotaInfo(quota);
-      } catch (error) {
-        console.error("Failed to load quota info:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (user) {
-      setFirstName(user.firstName || "");
-      setLastName(user.lastName || "");
-      setEmail(user.emailAddresses[0]?.emailAddress || "");
-
-      loadQuotaInfo();
-    }
-  }, [user]);
-
-  const handleSave = async () => {
-    setSaving(true);
-    try {
-      // Update user profile
-      await user?.update({
-        firstName,
-        lastName,
-      });
-
-      // Here you would typically save other preferences to your database
-      // For now, we'll just show a success message
-      alert("Settings saved successfully!");
-    } catch (error) {
-      console.error("Failed to save settings:", error);
-      alert("Failed to save settings. Please try again.");
-    } finally {
-      setSaving(false);
-    }
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
-  const getPlanColor = (plan: string) => {
-    switch (plan) {
-      case "free":
-        return "bg-gray-500";
-      case "basic":
-        return "bg-blue-500";
-      case "pro":
-        return "bg-purple-500";
-      case "premium":
-        return "bg-yellow-500";
-      default:
-        return "bg-gray-500";
-    }
+  const getScoreColor = (score: number) => {
+    if (score >= 90) return "text-green-600 bg-green-100";
+    if (score >= 80) return "text-yellow-600 bg-yellow-100";
+    return "text-red-600 bg-red-100";
   };
-
-  const getPlanDisplayName = (plan: string) => {
-    const tier = SUBSCRIPTION_TIERS.find((t) => t.id === plan);
-    return tier?.name || "Free";
-  };
-
-  if (loading) {
-    return (
-      <MobileLayout>
-        <div className="space-y-6">
-          <div className="animate-pulse">
-            <div className="mb-4 h-8 w-1/4 rounded bg-gray-200"></div>
-            <div className="space-y-4">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-32 rounded bg-gray-200"></div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </MobileLayout>
-    );
-  }
 
   return (
     <MobileLayout>
-      <div className="space-y-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Account Settings</h1>
-          <p className="mt-2 text-gray-600">
-            Manage your profile, preferences, and account information
-          </p>
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="mb-2 text-3xl font-bold text-gray-900">Account Settings</h1>
+          <p className="text-gray-600">Manage your account, view analytics, and track progress</p>
         </div>
 
-        {/* Account Overview */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5" />
-              Account Overview
-            </CardTitle>
-            <CardDescription>Your current account status and usage</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-600">Current Plan:</span>
-                  <Badge className={`${getPlanColor(quotaInfo?.plan || "free")} text-white`}>
-                    {getPlanDisplayName(quotaInfo?.plan || "free")}
-                  </Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-600">Member since:</span>
-                  <span className="text-sm">{user?.createdAt?.toLocaleDateString()}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-600">Email verified:</span>
-                  <div className="flex items-center gap-1">
-                    {user?.emailAddresses[0]?.verification?.status === "verified" ? (
-                      <CheckCircle className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <AlertCircle className="h-4 w-4 text-yellow-500" />
-                    )}
-                    <span className="text-sm">
-                      {user?.emailAddresses[0]?.verification?.status === "verified" ? "Yes" : "No"}
-                    </span>
-                  </div>
-                </div>
-              </div>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="overview" className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              Overview
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Analytics
+            </TabsTrigger>
+            <TabsTrigger value="history" className="flex items-center gap-2">
+              <History className="h-4 w-4" />
+              History
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="flex items-center gap-2">
+              <Settings className="h-4 w-4" />
+              Settings
+            </TabsTrigger>
+          </TabsList>
 
-              {quotaInfo && (
-                <div className="space-y-4">
-                  <div>
-                    <div className="mb-2 flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-600">Monthly Exports:</span>
-                      <span className="text-sm">
-                        {quotaInfo.limit === Infinity
-                          ? "Unlimited"
-                          : `${quotaInfo.used}/${quotaInfo.limit}`}
-                      </span>
+          {/* Overview Tab */}
+          <TabsContent value="overview" className="space-y-6">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total Worksheets</CardTitle>
+                  <BookOpen className="text-muted-foreground h-4 w-4" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{mockAnalytics.totalWorksheets}</div>
+                  <p className="text-muted-foreground text-xs">+12% from last month</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Average Score</CardTitle>
+                  <TrendingUp className="text-muted-foreground h-4 w-4" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{mockAnalytics.averageScore}%</div>
+                  <p className="text-muted-foreground text-xs">+3% from last month</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Time Spent</CardTitle>
+                  <Clock className="text-muted-foreground h-4 w-4" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {Math.floor(mockAnalytics.totalTimeSpent / 60)}h{" "}
+                    {mockAnalytics.totalTimeSpent % 60}m
+                  </div>
+                  <p className="text-muted-foreground text-xs">This month</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Current Streak</CardTitle>
+                  <Star className="text-muted-foreground h-4 w-4" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{mockAnalytics.streak}</div>
+                  <p className="text-muted-foreground text-xs">Days in a row</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Favorite Subject</CardTitle>
+                  <CardDescription>Your most practiced subject</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+                      <span className="text-2xl">📐</span>
                     </div>
-                    {quotaInfo.limit !== Infinity && (
-                      <Progress value={(quotaInfo.used / quotaInfo.limit) * 100} className="h-2" />
-                    )}
-                  </div>
-
-                  {quotaInfo.plan === "free" && (
-                    <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
-                      <div className="mb-2 flex items-center gap-2">
-                        <Crown className="h-4 w-4 text-blue-600" />
-                        <span className="text-sm font-medium text-blue-900">Upgrade for More</span>
-                      </div>
-                      <p className="mb-2 text-xs text-blue-700">
-                        Get unlimited exports and premium features
+                    <div>
+                      <h3 className="font-semibold">{mockAnalytics.favoriteSubject}</h3>
+                      <p className="text-muted-foreground text-sm">
+                        {
+                          mockAnalytics.subjectBreakdown.find(
+                            (s) => s.subject === mockAnalytics.favoriteSubject
+                          )?.count
+                        }{" "}
+                        worksheets completed
                       </p>
-                      <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                        <Crown className="mr-1 h-3 w-3" />
-                        Upgrade Now
-                      </Button>
                     </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+                  </div>
+                </CardContent>
+              </Card>
 
-        {/* Profile Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5" />
-              Profile Information
-            </CardTitle>
-            <CardDescription>Update your personal information</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="firstName">First Name</Label>
-                <Input
-                  id="firstName"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  placeholder="Enter your first name"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="lastName">Last Name</Label>
-                <Input
-                  id="lastName"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  placeholder="Enter your last name"
-                />
-              </div>
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="email">Email Address</Label>
-                <Input id="email" type="email" value={email} disabled placeholder="Email address" />
-                <p className="text-xs text-gray-500">
-                  Email changes must be made through your authentication provider
-                </p>
-              </div>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Recent Activity</CardTitle>
+                  <CardDescription>Your latest worksheet completions</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {mockHomeworkHistory.slice(0, 3).map((homework) => (
+                      <div key={homework.id} className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium">{homework.title}</p>
+                          <p className="text-muted-foreground text-xs">
+                            {formatDate(homework.completedAt)}
+                          </p>
+                        </div>
+                        <Badge className={getScoreColor(homework.score)}>{homework.score}%</Badge>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-          </CardContent>
-        </Card>
+          </TabsContent>
 
-        {/* Preferences */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Settings className="h-5 w-5" />
-              Preferences
-            </CardTitle>
-            <CardDescription>Customize your experience</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="timezone">Timezone</Label>
-                <Select value={timezone} onValueChange={setTimezone}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select timezone" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="UTC">UTC</SelectItem>
-                    <SelectItem value="America/New_York">Eastern Time</SelectItem>
-                    <SelectItem value="America/Chicago">Central Time</SelectItem>
-                    <SelectItem value="America/Denver">Mountain Time</SelectItem>
-                    <SelectItem value="America/Los_Angeles">Pacific Time</SelectItem>
-                    <SelectItem value="Europe/London">London</SelectItem>
-                    <SelectItem value="Europe/Paris">Paris</SelectItem>
-                    <SelectItem value="Asia/Tokyo">Tokyo</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="language">Language</Label>
-                <Select value={language} onValueChange={setLanguage}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select language" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="es">Spanish</SelectItem>
-                    <SelectItem value="fr">French</SelectItem>
-                    <SelectItem value="de">German</SelectItem>
-                    <SelectItem value="it">Italian</SelectItem>
-                    <SelectItem value="pt">Portuguese</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+          {/* Analytics Tab */}
+          <TabsContent value="analytics" className="space-y-6">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Weekly Progress</CardTitle>
+                  <CardDescription>Worksheets completed and average scores</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {mockAnalytics.weeklyProgress.map((week, index) => (
+                      <div key={index} className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">{week.week}</p>
+                          <p className="text-muted-foreground text-sm">
+                            {week.completed} worksheets
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-semibold">{week.averageScore}%</p>
+                          <div className="h-2 w-20 rounded-full bg-gray-200">
+                            <div
+                              className="h-2 rounded-full bg-blue-600"
+                              style={{ width: `${week.averageScore}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Subject Breakdown</CardTitle>
+                  <CardDescription>Performance by subject area</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {mockAnalytics.subjectBreakdown.map((subject, index) => (
+                      <div key={index} className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100">
+                            <span className="text-sm">
+                              {subject.subject === "Math"
+                                ? "📐"
+                                : subject.subject === "Language Arts"
+                                  ? "📚"
+                                  : "🔬"}
+                            </span>
+                          </div>
+                          <div>
+                            <p className="font-medium">{subject.subject}</p>
+                            <p className="text-muted-foreground text-sm">
+                              {subject.count} worksheets
+                            </p>
+                          </div>
+                        </div>
+                        <Badge className={getScoreColor(subject.averageScore)}>
+                          {subject.averageScore}%
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-          </CardContent>
-        </Card>
 
-        {/* Notifications */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Bell className="h-5 w-5" />
-              Notification Preferences
-            </CardTitle>
-            <CardDescription>Choose what notifications you'd like to receive</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label className="text-sm font-medium">Email Updates</Label>
-                  <p className="text-xs text-gray-500">
-                    Receive updates about new features and improvements
-                  </p>
+            <Card>
+              <CardHeader>
+                <CardTitle>Export Data</CardTitle>
+                <CardDescription>Download your progress and analytics data</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex gap-2">
+                  <Button variant="outline" className="flex items-center gap-2">
+                    <Download className="h-4 w-4" />
+                    Export CSV
+                  </Button>
+                  <Button variant="outline" className="flex items-center gap-2">
+                    <Download className="h-4 w-4" />
+                    Export PDF Report
+                  </Button>
                 </div>
-                <input
-                  type="checkbox"
-                  checked={notifications.emailUpdates}
-                  onChange={(e) =>
-                    setNotifications((prev) => ({ ...prev, emailUpdates: e.target.checked }))
-                  }
-                  className="rounded border-gray-300"
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label className="text-sm font-medium">Worksheet Reminders</Label>
-                  <p className="text-xs text-gray-500">Get reminders about incomplete worksheets</p>
-                </div>
-                <input
-                  type="checkbox"
-                  checked={notifications.worksheetReminders}
-                  onChange={(e) =>
-                    setNotifications((prev) => ({ ...prev, worksheetReminders: e.target.checked }))
-                  }
-                  className="rounded border-gray-300"
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label className="text-sm font-medium">Quota Warnings</Label>
-                  <p className="text-xs text-gray-500">
-                    Get notified when approaching your export limit
-                  </p>
-                </div>
-                <input
-                  type="checkbox"
-                  checked={notifications.quotaWarnings}
-                  onChange={(e) =>
-                    setNotifications((prev) => ({ ...prev, quotaWarnings: e.target.checked }))
-                  }
-                  className="rounded border-gray-300"
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label className="text-sm font-medium">Marketing Emails</Label>
-                  <p className="text-xs text-gray-500">
-                    Receive promotional content and special offers
-                  </p>
-                </div>
-                <input
-                  type="checkbox"
-                  checked={notifications.marketingEmails}
-                  onChange={(e) =>
-                    setNotifications((prev) => ({ ...prev, marketingEmails: e.target.checked }))
-                  }
-                  className="rounded border-gray-300"
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-        {/* Security & Privacy */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5" />
-              Security & Privacy
-            </CardTitle>
-            <CardDescription>Manage your account security and privacy settings</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label className="text-sm font-medium">Two-Factor Authentication</Label>
-                  <p className="text-xs text-gray-500">
-                    Add an extra layer of security to your account
-                  </p>
+          {/* History Tab */}
+          <TabsContent value="history" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Homework History</CardTitle>
+                <CardDescription>Complete record of all completed worksheets</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {mockHomeworkHistory.map((homework) => (
+                    <div key={homework.id} className="rounded-lg border p-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="mb-2 flex items-center gap-2">
+                            <h3 className="font-semibold">{homework.title}</h3>
+                            <Badge variant="outline">{homework.difficulty}</Badge>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4 text-sm md:grid-cols-4">
+                            <div>
+                              <p className="text-muted-foreground">Subject</p>
+                              <p className="font-medium">{homework.subject}</p>
+                            </div>
+                            <div>
+                              <p className="text-muted-foreground">Grade Level</p>
+                              <p className="font-medium">{homework.grade}</p>
+                            </div>
+                            <div>
+                              <p className="text-muted-foreground">Time Spent</p>
+                              <p className="font-medium">{homework.timeSpent} minutes</p>
+                            </div>
+                            <div>
+                              <p className="text-muted-foreground">Completed</p>
+                              <p className="font-medium">{formatDate(homework.completedAt)}</p>
+                            </div>
+                          </div>
+                          <div className="mt-3 flex items-center gap-4">
+                            <div className="flex items-center gap-2">
+                              <Target className="text-muted-foreground h-4 w-4" />
+                              <span className="text-sm">
+                                {homework.correctAnswers}/{homework.totalProblems} correct
+                              </span>
+                            </div>
+                            <Badge className={getScoreColor(homework.score)}>
+                              {homework.score}% Score
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <Button variant="outline" size="sm">
-                  <Shield className="mr-1 h-3 w-3" />
-                  Enable
-                </Button>
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label className="text-sm font-medium">Data Export</Label>
-                  <p className="text-xs text-gray-500">
-                    Download all your data in a portable format
-                  </p>
-                </div>
-                <Button variant="outline" size="sm">
-                  <Settings className="mr-1 h-3 w-3" />
-                  Export
-                </Button>
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label className="text-sm font-medium">Delete Account</Label>
-                  <p className="text-xs text-gray-500">
-                    Permanently delete your account and all data
-                  </p>
-                </div>
-                <Button variant="destructive" size="sm">
-                  Delete Account
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-        {/* Save Button */}
-        <div className="flex justify-end">
-          <Button onClick={handleSave} disabled={saving} className="min-w-32">
-            {saving ? (
-              <>
-                <Settings className="mr-2 h-4 w-4 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className="mr-2 h-4 w-4" />
-                Save Changes
-              </>
-            )}
-          </Button>
-        </div>
+          {/* Settings Tab */}
+          <TabsContent value="settings" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Account Information</CardTitle>
+                <CardDescription>Manage your account details</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium">Display Name</label>
+                  <input
+                    type="text"
+                    defaultValue="Student Name"
+                    className="mt-1 w-full rounded-md border px-3 py-2"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Email</label>
+                  <input
+                    type="email"
+                    defaultValue="student@example.com"
+                    className="mt-1 w-full rounded-md border px-3 py-2"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Grade Level</label>
+                  <select className="mt-1 w-full rounded-md border px-3 py-2">
+                    <option>Grades 1-2</option>
+                    <option>Grades 3-4</option>
+                    <option>Grades 5-6</option>
+                    <option>Grades 7-8</option>
+                  </select>
+                </div>
+                <Button className="homeschool-button">Save Changes</Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Preferences</CardTitle>
+                <CardDescription>Customize your learning experience</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Email Notifications</p>
+                    <p className="text-muted-foreground text-sm">
+                      Get notified about progress and achievements
+                    </p>
+                  </div>
+                  <input type="checkbox" defaultChecked className="h-4 w-4" />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Auto-save Progress</p>
+                    <p className="text-muted-foreground text-sm">Automatically save your work</p>
+                  </div>
+                  <input type="checkbox" defaultChecked className="h-4 w-4" />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Show Hints</p>
+                    <p className="text-muted-foreground text-sm">
+                      Display helpful hints during exercises
+                    </p>
+                  </div>
+                  <input type="checkbox" defaultChecked className="h-4 w-4" />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </MobileLayout>
   );

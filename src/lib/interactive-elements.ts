@@ -118,6 +118,64 @@ export interface InteractiveWorksheet {
 
 // Interactive element generators
 export class InteractiveElementGenerator {
+  // Generate math question text
+  static generateMathQuestion(operation: string, _difficulty: string): string {
+    const num1 = Math.floor(Math.random() * 20) + 1;
+    const num2 = Math.floor(Math.random() * 20) + 1;
+
+    switch (operation) {
+      case "addition":
+        return `${num1} + ${num2}`;
+      case "subtraction":
+        return `${Math.max(num1, num2)} - ${Math.min(num1, num2)}`;
+      case "multiplication":
+        return `${num1} × ${num2}`;
+      case "division":
+        return `${Math.max(num1, num2)} ÷ ${Math.min(num1, num2)}`;
+      default:
+        return `${num1} + ${num2}`;
+    }
+  }
+
+  // Generate drag items for math problems
+  static generateMathDragItems(operation: string, _difficulty: string) {
+    const num1 = Math.floor(Math.random() * 20) + 1;
+    const num2 = Math.floor(Math.random() * 20) + 1;
+    let correctAnswer: number;
+
+    switch (operation) {
+      case "addition":
+        correctAnswer = num1 + num2;
+        break;
+      case "subtraction":
+        correctAnswer = Math.max(num1, num2) - Math.min(num1, num2);
+        break;
+      case "multiplication":
+        correctAnswer = num1 * num2;
+        break;
+      case "division":
+        correctAnswer = Math.max(num1, num2) / Math.min(num1, num2);
+        break;
+      default:
+        correctAnswer = num1 + num2;
+    }
+
+    // Create wrong answers
+    const wrongAnswers = [
+      correctAnswer + 1,
+      correctAnswer - 1,
+      correctAnswer + 2,
+      correctAnswer - 2,
+    ].filter((ans) => ans > 0 && ans !== correctAnswer);
+
+    const allAnswers = [correctAnswer, ...wrongAnswers.slice(0, 3)].sort(() => Math.random() - 0.5);
+
+    return allAnswers.map((answer) => ({
+      id: `answer-${answer}`,
+      text: answer.toString(),
+      correctDropZoneId: answer === correctAnswer ? "answer-box" : undefined,
+    }));
+  }
   // Generate drag-and-drop math problems
   static generateDragDropMath(
     operation: string,
@@ -131,14 +189,12 @@ export class InteractiveElementGenerator {
         id: `drag-drop-${i}`,
         type: "drag-drop",
         content: {
-          question: `Drag the correct answer to complete the equation:`,
-          options: this.generateMathOptions(operation, difficulty),
-          correctAnswers: [],
+          question: `What is ${this.generateMathQuestion(operation, difficulty)}?`,
+          draggableItems: this.generateMathDragItems(operation, difficulty),
           dropZones: [
             {
-              id: "answer-zone",
-              label: "Answer",
-              position: { x: 300, y: 100 },
+              id: "answer-box",
+              text: "Drop your answer here",
               accepts: ["correct-answer"],
             },
           ],
