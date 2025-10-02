@@ -101,6 +101,51 @@ const BACKGROUND_TEMPLATES = [
     preview: "linear-gradient(90deg, #fce4ec, #e1f5fe)",
     css: "background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 25%, #e1f5fe 50%, #e8f5e9 75%, #fff9c4 100%);",
   },
+  {
+    id: "ocean",
+    name: "Ocean Waves",
+    preview: "linear-gradient(45deg, #e0f7fa, #b3e5fc)",
+    css: "background: linear-gradient(45deg, #e0f7fa 0%, #b3e5fc 50%, #81d4fa 100%);",
+  },
+  {
+    id: "forest",
+    name: "Forest Green",
+    preview: "linear-gradient(135deg, #e8f5e9, #c8e6c9)",
+    css: "background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 50%, #a5d6a7 100%);",
+  },
+  {
+    id: "lavender",
+    name: "Lavender Dreams",
+    preview: "linear-gradient(135deg, #f3e5f5, #e1bee7)",
+    css: "background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 50%, #ce93d8 100%);",
+  },
+  {
+    id: "sunset",
+    name: "Vibrant Sunset",
+    preview: "linear-gradient(135deg, #ffecb3, #ffcc02)",
+    css: "background: linear-gradient(135deg, #ffecb3 0%, #ffcc02 50%, #ff8f00 100%);",
+  },
+  {
+    id: "custom",
+    name: "Custom Image",
+    preview: "linear-gradient(45deg, #f0f0f0, #e0e0e0)",
+    css: "background: #f5f5f5;",
+  },
+];
+
+const FONT_OPTIONS = [
+  { id: "Inter", name: "Inter", category: "Modern" },
+  { id: "Times New Roman", name: "Times New Roman", category: "Serif" },
+  { id: "Arial", name: "Arial", category: "Sans-serif" },
+  { id: "Helvetica", name: "Helvetica", category: "Sans-serif" },
+  { id: "Georgia", name: "Georgia", category: "Serif" },
+  { id: "Verdana", name: "Verdana", category: "Sans-serif" },
+  { id: "Comic Sans MS", name: "Comic Sans MS", category: "Casual" },
+  { id: "Trebuchet MS", name: "Trebuchet MS", category: "Sans-serif" },
+  { id: "Palatino", name: "Palatino", category: "Serif" },
+  { id: "Garamond", name: "Garamond", category: "Serif" },
+  { id: "Bookman", name: "Bookman", category: "Serif" },
+  { id: "Courier New", name: "Courier New", category: "Monospace" },
 ];
 
 type SubjectType = "math" | "language_arts" | "science";
@@ -659,23 +704,74 @@ export default function CreateWorksheet() {
       const printWindow = window.open("", "_blank");
 
       if (printWindow) {
+        const selectedBg = BACKGROUND_TEMPLATES.find((t) => t.id === background);
+        const backgroundStyle =
+          background === "custom" && customImage
+            ? `background-image: url('${customImage}'); background-size: cover; background-position: center; background-repeat: no-repeat;`
+            : selectedBg?.css || "background: white;";
+
+        const spacingStyle =
+          spacing === "tight"
+            ? "gap: 10px; padding: 5px;"
+            : spacing === "loose"
+              ? "gap: 30px; padding: 15px;"
+              : "gap: 20px; padding: 10px;";
+
+        const borderStyle = showBorders ? "border: 1px solid #ccc;" : "border: none;";
+
         printWindow.document.write(`
         <html>
           <head>
             <title>${title}</title>
             <style>
-              body { font-family: ${selectedFont}; margin: 20px; }
-              .worksheet { max-width: 800px; margin: 0 auto; }
-              .header { text-align: center; margin-bottom: 30px; }
-              .problems { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-              .problem { padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+              body { 
+                font-family: "${selectedFont}", sans-serif; 
+                margin: 20px; 
+                ${backgroundStyle}
+                min-height: 100vh;
+              }
+              .worksheet { 
+                max-width: 800px; 
+                margin: 0 auto; 
+                background: rgba(255, 255, 255, 0.9);
+                padding: 20px;
+                border-radius: 10px;
+              }
+              .header { 
+                text-align: center; 
+                margin-bottom: 30px; 
+              }
+              .problems { 
+                display: grid; 
+                grid-template-columns: 1fr 1fr; 
+                ${spacingStyle}
+              }
+              .problem { 
+                ${borderStyle}
+                border-radius: 5px; 
+                font-family: "${selectedFont}", sans-serif;
+                font-size: ${spacing === "tight" ? "14px" : spacing === "loose" ? "18px" : "16px"};
+              }
+              h1 {
+                font-family: "${selectedFont}", sans-serif;
+                font-size: ${spacing === "tight" ? "24px" : spacing === "loose" ? "32px" : "28px"};
+              }
+              p {
+                font-family: "${selectedFont}", sans-serif;
+                font-size: ${spacing === "tight" ? "12px" : spacing === "loose" ? "16px" : "14px"};
+              }
+              @media print {
+                body { margin: 0; }
+                .worksheet { max-width: none; background: white; }
+              }
             </style>
           </head>
           <body>
             <div class="worksheet">
               <div class="header">
                 <h1>${title}</h1>
-                <p>Grade ${gradeLevel} • ${difficulty}</p>
+                <p>Grade ${gradeLevel} • ${difficulty || scienceType || languageArtsType}</p>
+                ${customInstructions ? `<p><strong>Instructions:</strong> ${customInstructions}</p>` : ""}
               </div>
               <div class="problems">
                 ${
@@ -708,6 +804,23 @@ export default function CreateWorksheet() {
                     : ""
                 }
               </div>
+              ${
+                includeAnswerKey && subject === "math" && problems.length > 0
+                  ? `
+                <div class="header" style="margin-top: 40px; border-top: 2px solid #ccc; padding-top: 20px;">
+                  <h2>Answer Key</h2>
+                  <div class="problems">
+                    ${problems
+                      .map(
+                        (problem, index) =>
+                          `<div class="problem">${index + 1}. ${problem.problem} = ${problem.answer}</div>`
+                      )
+                      .join("")}
+                  </div>
+                </div>
+              `
+                  : ""
+              }
             </div>
           </body>
         </html>
@@ -898,7 +1011,31 @@ export default function CreateWorksheet() {
                     </div>
                   </div>
                 ) : (
-                  <div className="rounded-lg bg-white p-8 shadow-lg">
+                  <div
+                    className="rounded-lg p-8 shadow-lg"
+                    style={{
+                      fontFamily: selectedFont,
+                      ...(background === "custom" && customImage
+                        ? {
+                            backgroundImage: `url('${customImage}')`,
+                            backgroundSize: "cover",
+                            backgroundPosition: "center",
+                            backgroundRepeat: "no-repeat",
+                          }
+                        : BACKGROUND_TEMPLATES.find((t) => t.id === background)
+                            ?.css.split(";")
+                            .reduce(
+                              (acc, rule) => {
+                                const [property, value] = rule.split(":");
+                                if (property && value) {
+                                  acc[property.trim()] = value.trim();
+                                }
+                                return acc;
+                              },
+                              {} as Record<string, string>
+                            )),
+                    }}
+                  >
                     {/* Worksheet Content */}
                     {subject === "math" && problems.length > 0 ? (
                       <div className="space-y-6">
@@ -1097,6 +1234,75 @@ export default function CreateWorksheet() {
                 </Button>
               </div>
               <div className="space-y-6 p-6">
+                {/* Font Selection */}
+                <div>
+                  <label className="text-sm font-medium">Font</label>
+                  <Select value={selectedFont} onValueChange={(value) => setSelectedFont(value)}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Select Font" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {FONT_OPTIONS.map((font) => (
+                        <SelectItem key={font.id} value={font.id}>
+                          <span style={{ fontFamily: font.id }}>{font.name}</span>
+                          <span className="ml-2 text-xs text-gray-500">({font.category})</span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Background Selection */}
+                <div>
+                  <label className="text-sm font-medium">Background</label>
+                  <div className="mt-2 grid grid-cols-3 gap-2">
+                    {BACKGROUND_TEMPLATES.map((bg) => (
+                      <button
+                        key={bg.id}
+                        onClick={() => setBackground(bg.id)}
+                        className={`relative h-16 rounded-lg border-2 p-2 text-xs font-medium transition-all ${
+                          background === bg.id
+                            ? "border-orange-500 ring-2 ring-orange-200"
+                            : "border-gray-200 hover:border-gray-300"
+                        }`}
+                        style={{
+                          background:
+                            bg.id === "custom" && customImage
+                              ? `url('${customImage}') center/cover`
+                              : bg.preview,
+                        }}
+                      >
+                        <div className="bg-opacity-0 hover:bg-opacity-10 absolute inset-0 rounded-md bg-black transition-all" />
+                        <div className="relative z-10 text-center">
+                          <div className="text-white drop-shadow-sm">{bg.name}</div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Custom Image Upload */}
+                {background === "custom" && (
+                  <div>
+                    <label className="text-sm font-medium">Upload Custom Background</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-orange-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-orange-700 hover:file:bg-orange-100"
+                    />
+                    {customImage && (
+                      <div className="mt-2">
+                        <img
+                          src={customImage}
+                          alt="Custom background preview"
+                          className="h-20 w-full rounded-lg object-cover"
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium">Layout</label>
