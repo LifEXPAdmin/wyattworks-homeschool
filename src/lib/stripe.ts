@@ -28,8 +28,9 @@ export const STRIPE_CONFIG = {
     },
     homeschool: {
       name: "Homeschool",
-      priceId: process.env.STRIPE_HOMESCHOOL_PRICE_ID || "price_homeschool_monthly",
-      yearlyPriceId: process.env.STRIPE_HOMESCHOOL_YEARLY_PRICE_ID || "price_homeschool_yearly",
+      priceId: process.env.STRIPE_HOMESCHOOL_PRICE_ID || "price_1SDapB1S6TukLrEPIsC4YbGz",
+      yearlyPriceId:
+        process.env.STRIPE_HOMESCHOOL_YEARLY_PRICE_ID || "price_1SDasJ1S6TukLrEPIbt6y5MN",
       monthlyPrice: 9.99,
       yearlyPrice: 99.99,
       features: [
@@ -49,8 +50,8 @@ export const STRIPE_CONFIG = {
     },
     school: {
       name: "School",
-      priceId: process.env.STRIPE_SCHOOL_PRICE_ID || "price_school_monthly",
-      yearlyPriceId: process.env.STRIPE_SCHOOL_YEARLY_PRICE_ID || "price_school_yearly",
+      priceId: process.env.STRIPE_SCHOOL_PRICE_ID || "price_1SDauC1S6TukLrEPvos069EZ",
+      yearlyPriceId: process.env.STRIPE_SCHOOL_YEARLY_PRICE_ID || "price_1SDavL1S6TukLrEPJI8DLuG6",
       monthlyPrice: 29.99,
       yearlyPrice: 299.99,
       features: [
