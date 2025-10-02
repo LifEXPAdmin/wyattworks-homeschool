@@ -5,26 +5,27 @@ import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Menu, 
-  X, 
-  Search, 
-  Settings, 
-  Home, 
-  BookOpen, 
+import { Logo } from "@/components/logo";
+import {
+  Menu,
+  X,
+  Search,
+  Settings,
+  Home,
+  BookOpen,
   BarChart3,
   ArrowLeft,
   Palette,
   PieChart,
-  UserCircle
+  UserCircle,
 } from "lucide-react";
-import { 
-  MobileDetector, 
-  TouchGestureDetector, 
-  responsiveUtils, 
+import {
+  MobileDetector,
+  TouchGestureDetector,
+  responsiveUtils,
   mobileOptimizations,
   type MobileConfig,
-  type TouchGesture 
+  type TouchGesture,
 } from "@/lib/mobile-utils";
 
 interface MobileLayoutProps {
@@ -37,7 +38,7 @@ export function MobileLayout({ children, className }: MobileLayoutProps) {
     try {
       return MobileDetector.getInstance().getConfig();
     } catch (error) {
-      console.error('Error initializing mobile config:', error);
+      console.error("Error initializing mobile config:", error);
       // Fallback config
       return {
         isMobile: false,
@@ -45,7 +46,7 @@ export function MobileLayout({ children, className }: MobileLayoutProps) {
         isDesktop: true,
         screenWidth: 1920,
         screenHeight: 1080,
-        orientation: 'landscape',
+        orientation: "landscape",
         touchSupport: false,
         devicePixelRatio: 1,
       };
@@ -73,7 +74,7 @@ export function MobileLayout({ children, className }: MobileLayoutProps) {
       // Setup gesture detection
       if (layoutRef.current && mobileConfig.touchSupport) {
         gestureDetectorRef.current = new TouchGestureDetector(layoutRef.current);
-        
+
         gestureDetectorRef.current.addListener(handleGesture);
       }
 
@@ -84,27 +85,30 @@ export function MobileLayout({ children, className }: MobileLayoutProps) {
         }
       };
     } catch (error) {
-      console.error('Error in MobileLayout useEffect:', error);
+      console.error("Error in MobileLayout useEffect:", error);
     }
   }, [mobileConfig.touchSupport]);
 
-  const handleGesture = React.useCallback((gesture: TouchGesture) => {
-    switch (gesture.type) {
-      case 'swipe':
-        if (gesture.direction === 'left' && isMenuOpen) {
-          setIsMenuOpen(false);
-        } else if (gesture.direction === 'right' && !isMenuOpen) {
-          setIsMenuOpen(true);
-        }
-        break;
-      case 'tap':
-        // Close menu on tap outside
-        if (isMenuOpen) {
-          setIsMenuOpen(false);
-        }
-        break;
-    }
-  }, [isMenuOpen]);
+  const handleGesture = React.useCallback(
+    (gesture: TouchGesture) => {
+      switch (gesture.type) {
+        case "swipe":
+          if (gesture.direction === "left" && isMenuOpen) {
+            setIsMenuOpen(false);
+          } else if (gesture.direction === "right" && !isMenuOpen) {
+            setIsMenuOpen(true);
+          }
+          break;
+        case "tap":
+          // Close menu on tap outside
+          if (isMenuOpen) {
+            setIsMenuOpen(false);
+          }
+          break;
+      }
+    },
+    [isMenuOpen]
+  );
 
   const responsiveClasses = responsiveUtils.getResponsiveClasses(mobileConfig);
   const fontSizes = responsiveUtils.getFontSizes(mobileConfig);
@@ -122,21 +126,18 @@ export function MobileLayout({ children, className }: MobileLayoutProps) {
   ];
 
   return (
-    <div 
-      ref={layoutRef}
-      className={`min-h-screen bg-background ${responsiveClasses} ${className}`}
-    >
+    <div ref={layoutRef} className={`bg-background min-h-screen ${responsiveClasses} ${className}`}>
       {/* Mobile Header */}
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+      <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 border-b backdrop-blur">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
             <div className="flex items-center">
-              <Link href="/" className="text-primary font-bold hover:text-primary/80 transition-colors">
-                <span className={`flex items-center gap-2 ${fontSizes['2xl']}`}>
-                  <span className="text-3xl">✨</span>
-                  <span>Astra Academy</span>
-                </span>
+              <Link
+                href="/"
+                className="text-primary hover:text-primary/80 font-bold transition-colors"
+              >
+                <Logo size="md" />
               </Link>
             </div>
 
@@ -169,13 +170,13 @@ export function MobileLayout({ children, className }: MobileLayoutProps) {
           {isSearchOpen && mobileConfig.isMobile && (
             <div className="pb-4">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
                 <input
                   type="text"
                   placeholder="Search worksheets..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className={`w-full ${spacing.md} pl-10 pr-4 border rounded-lg mobile-input touch-friendly`}
+                  className={`w-full ${spacing.md} mobile-input touch-friendly rounded-lg border pr-4 pl-10`}
                 />
               </div>
             </div>
@@ -186,12 +187,12 @@ export function MobileLayout({ children, className }: MobileLayoutProps) {
       {/* Mobile Navigation Overlay */}
       {isMenuOpen && mobileConfig.isMobile && (
         <div className="fixed inset-0 z-40 bg-black/50" onClick={() => setIsMenuOpen(false)}>
-          <div 
-            className="fixed left-0 top-0 h-full w-80 bg-background border-r shadow-lg"
+          <div
+            className="bg-background fixed top-0 left-0 h-full w-80 border-r shadow-lg"
             onClick={(e) => e.stopPropagation()}
           >
             <div className={`${spacing.lg}`}>
-              <div className="flex items-center justify-between mb-6">
+              <div className="mb-6 flex items-center justify-between">
                 <h2 className={`font-semibold ${fontSizes.lg}`}>Navigation</h2>
                 <Button
                   variant="ghost"
@@ -220,7 +221,7 @@ export function MobileLayout({ children, className }: MobileLayoutProps) {
 
               {/* Mobile-specific quick actions */}
               <div className="mt-8">
-                <h3 className={`font-medium mb-4 ${fontSizes.sm} text-muted-foreground`}>
+                <h3 className={`mb-4 font-medium ${fontSizes.sm} text-muted-foreground`}>
                   Quick Actions
                 </h3>
                 <div className="space-y-2">
@@ -252,7 +253,9 @@ export function MobileLayout({ children, className }: MobileLayoutProps) {
       )}
 
       {/* Main Content */}
-      <main className={`container mx-auto px-4 py-6 sm:px-6 lg:px-8 ${mobileConfig.isMobile ? 'mobile-scroll' : ''}`}>
+      <main
+        className={`container mx-auto px-4 py-6 sm:px-6 lg:px-8 ${mobileConfig.isMobile ? "mobile-scroll" : ""}`}
+      >
         {/* Mobile-specific content adjustments */}
         {mobileConfig.isMobile && (
           <div className="mb-4">
@@ -260,7 +263,7 @@ export function MobileLayout({ children, className }: MobileLayoutProps) {
               <Badge variant="outline" className="text-xs">
                 📱 Mobile View
               </Badge>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <div className="text-muted-foreground flex items-center gap-2 text-xs">
                 <span>Swipe</span>
                 <ArrowLeft className="h-3 w-3" />
                 <span>for menu</span>
@@ -270,14 +273,12 @@ export function MobileLayout({ children, className }: MobileLayoutProps) {
         )}
 
         {/* Responsive content */}
-        <div className={`${mobileConfig.isMobile ? 'space-y-4' : 'space-y-6'}`}>
-          {children}
-        </div>
+        <div className={`${mobileConfig.isMobile ? "space-y-4" : "space-y-6"}`}>{children}</div>
       </main>
 
       {/* Mobile Bottom Navigation */}
       {mobileConfig.isMobile && (
-        <nav className="fixed bottom-0 left-0 right-0 bg-background border-t z-40">
+        <nav className="bg-background fixed right-0 bottom-0 left-0 z-40 border-t">
           <div className="flex items-center justify-around py-2">
             {navigationItems.slice(0, 4).map((item, index) => (
               <Link key={item.label} href={item.href}>
@@ -286,7 +287,7 @@ export function MobileLayout({ children, className }: MobileLayoutProps) {
                   size="sm"
                   className={`flex flex-col items-center ${spacing.sm} touch-friendly`}
                 >
-                  <item.icon className="h-4 w-4 mb-1" />
+                  <item.icon className="mb-1 h-4 w-4" />
                   <span className="text-xs">{item.label}</span>
                 </Button>
               </Link>
@@ -298,19 +299,19 @@ export function MobileLayout({ children, className }: MobileLayoutProps) {
       {/* Mobile-specific styles */}
       <style jsx>{`
         .mobile-scroll {
-          padding-bottom: ${mobileConfig.isMobile ? '80px' : '0'};
+          padding-bottom: ${mobileConfig.isMobile ? "80px" : "0"};
         }
-        
+
         .touch-friendly {
           -webkit-tap-highlight-color: transparent;
           touch-action: manipulation;
         }
-        
+
         .touch-friendly:active {
           transform: scale(0.98);
           transition: transform 0.1s ease;
         }
-        
+
         @media (max-width: 768px) {
           .container {
             padding-left: 1rem;
@@ -336,14 +337,14 @@ export function MobileCard({ title, description, children, className, onClick }:
     try {
       return MobileDetector.getInstance().getConfig();
     } catch (error) {
-      console.error('Error initializing mobile config in MobileCard:', error);
+      console.error("Error initializing mobile config in MobileCard:", error);
       return {
         isMobile: false,
         isTablet: false,
         isDesktop: true,
         screenWidth: 1920,
         screenHeight: 1080,
-        orientation: 'landscape',
+        orientation: "landscape",
         touchSupport: false,
         devicePixelRatio: 1,
       };
@@ -353,19 +354,15 @@ export function MobileCard({ title, description, children, className, onClick }:
   const fontSizes = responsiveUtils.getFontSizes(mobileConfig);
 
   return (
-    <Card 
-      className={`${mobileConfig.isMobile ? 'touch-friendly' : ''} ${className}`}
+    <Card
+      className={`${mobileConfig.isMobile ? "touch-friendly" : ""} ${className}`}
       onClick={onClick}
     >
       <CardHeader className={`${spacing.md}`}>
         <CardTitle className={fontSizes.lg}>{title}</CardTitle>
-        {description && (
-          <CardDescription className={fontSizes.sm}>{description}</CardDescription>
-        )}
+        {description && <CardDescription className={fontSizes.sm}>{description}</CardDescription>}
       </CardHeader>
-      <CardContent className={`${spacing.md}`}>
-        {children}
-      </CardContent>
+      <CardContent className={`${spacing.md}`}>{children}</CardContent>
     </Card>
   );
 }
@@ -380,26 +377,26 @@ interface MobileButtonProps {
   disabled?: boolean;
 }
 
-export function MobileButton({ 
-  children, 
-  variant = "default", 
-  size = "md", 
-  className, 
-  onClick, 
-  disabled 
+export function MobileButton({
+  children,
+  variant = "default",
+  size = "md",
+  className,
+  onClick,
+  disabled,
 }: MobileButtonProps) {
   const [mobileConfig] = useState<MobileConfig>(() => {
     try {
       return MobileDetector.getInstance().getConfig();
     } catch (error) {
-      console.error('Error initializing mobile config in MobileButton:', error);
+      console.error("Error initializing mobile config in MobileButton:", error);
       return {
         isMobile: false,
         isTablet: false,
         isDesktop: true,
         screenWidth: 1920,
         screenHeight: 1080,
-        orientation: 'landscape',
+        orientation: "landscape",
         touchSupport: false,
         devicePixelRatio: 1,
       };
@@ -410,7 +407,7 @@ export function MobileButton({
   return (
     <Button
       variant={variant}
-      className={`${buttonSizes[size]} ${mobileConfig.isMobile ? 'touch-friendly' : ''} ${className}`}
+      className={`${buttonSizes[size]} ${mobileConfig.isMobile ? "touch-friendly" : ""} ${className}`}
       onClick={onClick}
       disabled={disabled}
     >
@@ -432,31 +429,29 @@ export function MobileGrid({ children, columns = 2, gap = "md", className }: Mob
     try {
       return MobileDetector.getInstance().getConfig();
     } catch (error) {
-      console.error('Error initializing mobile config in MobileGrid:', error);
+      console.error("Error initializing mobile config in MobileGrid:", error);
       return {
         isMobile: false,
         isTablet: false,
         isDesktop: true,
         screenWidth: 1920,
         screenHeight: 1080,
-        orientation: 'landscape',
+        orientation: "landscape",
         touchSupport: false,
         devicePixelRatio: 1,
       };
     }
   });
   const responsiveColumns = responsiveUtils.getGridColumns(mobileConfig, columns);
-  
+
   const gapClasses = {
     sm: "gap-2",
-    md: "gap-4", 
+    md: "gap-4",
     lg: "gap-6",
   };
 
   return (
-    <div 
-      className={`grid grid-cols-${responsiveColumns} ${gapClasses[gap]} ${className}`}
-    >
+    <div className={`grid grid-cols-${responsiveColumns} ${gapClasses[gap]} ${className}`}>
       {children}
     </div>
   );

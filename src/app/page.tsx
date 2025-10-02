@@ -2,6 +2,7 @@ import Link from "next/link";
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Logo } from "@/components/logo";
 
 export default function Home() {
   return (
@@ -12,8 +13,7 @@ export default function Home() {
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center">
               <Link href="/" className="flex items-center gap-2">
-                <span className="text-3xl">✨</span>
-                <span className="text-primary text-2xl font-bold">Astra Academy</span>
+                <Logo size="lg" />
               </Link>
             </div>
             <div className="flex items-center space-x-4">
