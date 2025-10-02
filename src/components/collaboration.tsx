@@ -66,7 +66,7 @@ export function CollaborationPanel({
   useEffect(() => {
     loadSession();
     loadComments();
-  }, [sessionId, loadSession, loadComments]);
+  }, [sessionId]);
 
   useEffect(() => {
     if (commentsEndRef.current) {
@@ -480,7 +480,7 @@ export function CollaborationSessionList({ userId, className }: CollaborationSes
 
   useEffect(() => {
     loadSessions();
-  }, [userId, loadSessions]);
+  }, [userId]);
 
   const loadSessions = () => {
     const userSessions = CollaborationManager.getUserSessions(userId);
