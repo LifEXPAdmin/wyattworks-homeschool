@@ -18,6 +18,7 @@ import {
   Palette,
   PieChart,
   UserCircle,
+  Crown,
 } from "lucide-react";
 import {
   MobileDetector,
@@ -87,7 +88,7 @@ export function MobileLayout({ children, className }: MobileLayoutProps) {
     } catch (error) {
       console.error("Error in MobileLayout useEffect:", error);
     }
-  }, [mobileConfig.touchSupport]);
+  }, [mobileConfig.touchSupport, handleGesture]);
 
   const handleGesture = React.useCallback(
     (gesture: TouchGesture) => {
@@ -121,6 +122,7 @@ export function MobileLayout({ children, className }: MobileLayoutProps) {
     { icon: BarChart3, label: "Progress", href: "/dashboard/progress" },
     { icon: PieChart, label: "Analytics", href: "/dashboard/analytics" },
     { icon: Palette, label: "Design", href: "/dashboard/design" },
+    { icon: Crown, label: "Subscription", href: "/dashboard/subscription" },
     { icon: UserCircle, label: "Profile", href: "/dashboard/profile" },
     { icon: Settings, label: "Settings", href: "/dashboard/settings" },
   ];
@@ -235,6 +237,16 @@ export function MobileLayout({ children, className }: MobileLayoutProps) {
                       New Math Worksheet
                     </Button>
                   </Link>
+                  <Link href="/dashboard/subscription">
+                    <Button
+                      variant="outline"
+                      className={`w-full ${buttonSizes.sm} touch-friendly border-blue-200 text-blue-700`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <Crown className="mr-2 h-4 w-4" />
+                      Manage Subscription
+                    </Button>
+                  </Link>
                   <Link href="/dashboard/progress">
                     <Button
                       variant="outline"
@@ -280,7 +292,7 @@ export function MobileLayout({ children, className }: MobileLayoutProps) {
       {mobileConfig.isMobile && (
         <nav className="bg-background fixed right-0 bottom-0 left-0 z-40 border-t">
           <div className="flex items-center justify-around py-2">
-            {navigationItems.slice(0, 4).map((item, index) => (
+            {navigationItems.slice(0, 4).map((item) => (
               <Link key={item.label} href={item.href}>
                 <Button
                   variant="ghost"

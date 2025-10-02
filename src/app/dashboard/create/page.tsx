@@ -23,6 +23,7 @@ import { generateScienceProblems } from "@/lib/generators/science";
 import type { ScienceProblem, ScienceSubject } from "@/lib/generators/science";
 import type { WorksheetConfig } from "@/lib/config";
 import { FontSelector } from "@/components/font-selector";
+import { QuotaDisplay, UpgradePrompt } from "@/components/quota-warning";
 import { BUILT_IN_FONTS, type FontInfo } from "@/lib/fonts";
 import { themeManager } from "@/lib/design-system";
 import { analyticsStorage } from "@/lib/analytics";
@@ -124,7 +125,7 @@ export default function CreateWorksheet() {
   React.useEffect(() => {
     const handleThemeChange = (theme: typeof currentTheme) => {
       setCurrentTheme(theme);
-      
+
       // Track theme change
       analyticsStorage.trackEvent({
         userId: "current-user",
@@ -141,13 +142,15 @@ export default function CreateWorksheet() {
     return () => themeManager.removeListener(handleThemeChange);
   }, []);
 
-  const handleSessionComplete = (_completedSessionId: string) => {
-    alert("🎉 Session completed! Your progress has been tracked. Check your dashboard for insights!");
+  const handleSessionComplete = (completedSessionId: string) => {
+    alert(
+      "🎉 Session completed! Your progress has been tracked. Check your dashboard for insights!"
+    );
   };
 
   const handleFontSelect = (font: FontInfo) => {
     setSelectedFont(font);
-    
+
     // Track font change
     analyticsStorage.trackEvent({
       userId: "current-user",
@@ -173,20 +176,36 @@ export default function CreateWorksheet() {
       eventType: "worksheet_created",
       data: {
         subject,
-        type: subject === "math" ? operation : subject === "language_arts" ? languageArtsType : scienceType,
+        type:
+          subject === "math"
+            ? operation
+            : subject === "language_arts"
+              ? languageArtsType
+              : scienceType,
         difficulty: subject === "math" ? difficulty : gradeLevel,
-        problemCount: subject === "math" ? problemCount : 
-          subject === "language_arts" ? 
-            (languageArtsType === "spelling" ? 10 : languageArtsType === "vocabulary" ? 10 : 5) : 
-          10,
+        problemCount:
+          subject === "math"
+            ? problemCount
+            : subject === "language_arts"
+              ? languageArtsType === "spelling"
+                ? 10
+                : languageArtsType === "vocabulary"
+                  ? 10
+                  : 5
+              : 10,
         seed,
       },
     });
 
     // Determine the current type based on subject
-    const currentType = subject === "math" ? operation :
-      subject === "language_arts" ? languageArtsType :
-      subject === "science" ? scienceType : "unknown";
+    const currentType =
+      subject === "math"
+        ? operation
+        : subject === "language_arts"
+          ? languageArtsType
+          : subject === "science"
+            ? scienceType
+            : "unknown";
 
     // Check cache first
     const cachedContent = worksheetCache.getGeneratedContent(subject, {
@@ -198,20 +217,23 @@ export default function CreateWorksheet() {
     });
 
     if (cachedContent) {
-      console.log('Using cached content');
+      console.log("Using cached content");
       performanceMonitor.recordCacheHit();
-      
+
       // Use cached content
       if (subject === "math") {
         setProblems(cachedContent as unknown as MathProblem[]);
       } else if (subject === "language_arts") {
-        if (languageArtsType === "spelling") setSpellingWords(cachedContent as unknown as SpellingWord[]);
-        else if (languageArtsType === "vocabulary") setVocabularyWords(cachedContent as unknown as VocabularyItem[]);
-        else if (languageArtsType === "writing") setWritingPrompts(cachedContent as unknown as WritingPrompt[]);
+        if (languageArtsType === "spelling")
+          setSpellingWords(cachedContent as unknown as SpellingWord[]);
+        else if (languageArtsType === "vocabulary")
+          setVocabularyWords(cachedContent as unknown as VocabularyItem[]);
+        else if (languageArtsType === "writing")
+          setWritingPrompts(cachedContent as unknown as WritingPrompt[]);
       } else if (subject === "science") {
         setScienceProblems(cachedContent as unknown as ScienceProblem[]);
       }
-      
+
       setIsGenerating(false);
       performanceMonitor.endRender(startTime);
       return;
@@ -344,23 +366,31 @@ export default function CreateWorksheet() {
       alert("Failed to generate content. Please try different settings.");
     } finally {
       setIsGenerating(false);
-      
+
       // Cache the generated content
-      const contentToCache = subject === "math" ? problems :
-        subject === "language_arts" ? (
-          languageArtsType === "spelling" ? spellingWords :
-          languageArtsType === "vocabulary" ? vocabularyWords :
-          writingPrompts
-        ) : scienceProblems;
-      
-      worksheetCache.cacheGeneratedContent(subject, {
-        type: currentType,
-        difficulty,
-        problemCount,
-        seed,
-        gradeLevel,
-      }, contentToCache as unknown as Record<string, unknown>);
-      
+      const contentToCache =
+        subject === "math"
+          ? problems
+          : subject === "language_arts"
+            ? languageArtsType === "spelling"
+              ? spellingWords
+              : languageArtsType === "vocabulary"
+                ? vocabularyWords
+                : writingPrompts
+            : scienceProblems;
+
+      worksheetCache.cacheGeneratedContent(
+        subject,
+        {
+          type: currentType,
+          difficulty,
+          problemCount,
+          seed,
+          gradeLevel,
+        },
+        contentToCache as unknown as Record<string, unknown>
+      );
+
       performanceMonitor.endRender(startTime);
     }
   };
@@ -379,7 +409,7 @@ export default function CreateWorksheet() {
 
   const handleExport = async () => {
     const userId = "current-user"; // In a real app, this would come from auth
-    
+
     // Track export attempt
     analyticsStorage.trackEvent({
       userId,
@@ -387,27 +417,43 @@ export default function CreateWorksheet() {
       eventType: "worksheet_exported",
       data: {
         subject,
-        type: subject === "math" ? operation : subject === "language_arts" ? languageArtsType : scienceType,
+        type:
+          subject === "math"
+            ? operation
+            : subject === "language_arts"
+              ? languageArtsType
+              : scienceType,
         difficulty: subject === "math" ? difficulty : gradeLevel,
-        problemCount: subject === "math" ? problemCount : 
-          subject === "language_arts" ? 
-            (languageArtsType === "spelling" ? 10 : languageArtsType === "vocabulary" ? 10 : 5) : 
-          10,
+        problemCount:
+          subject === "math"
+            ? problemCount
+            : subject === "language_arts"
+              ? languageArtsType === "spelling"
+                ? 10
+                : languageArtsType === "vocabulary"
+                  ? 10
+                  : 5
+              : 10,
         font: selectedFont.name,
         theme: currentTheme.id,
       },
     });
-    
+
     // Determine the current type based on subject
-    const currentType = subject === "math" ? operation :
-      subject === "language_arts" ? languageArtsType :
-      subject === "science" ? scienceType : "unknown";
-    
+    const currentType =
+      subject === "math"
+        ? operation
+        : subject === "language_arts"
+          ? languageArtsType
+          : subject === "science"
+            ? scienceType
+            : "unknown";
+
     // Check if offline
     if (offlineManager.canWorkOffline()) {
       // Add to pending actions for later sync
       offlineManager.addPendingAction({
-        type: 'export_worksheet',
+        type: "export_worksheet",
         data: {
           subject,
           type: currentType,
@@ -421,19 +467,25 @@ export default function CreateWorksheet() {
           scienceProblems,
         },
       });
-      
-      alert('📡 You\'re offline! Your worksheet export has been queued and will sync when you\'re back online.');
+
+      alert(
+        "📡 You're offline! Your worksheet export has been queued and will sync when you're back online."
+      );
       return;
     }
-    
+
     // Check usage limits
-    if (!subscriptionManager.canPerformAction(userId, 'exportsPerMonth')) {
-      alert('You\'ve reached your monthly export limit. Please upgrade your plan to continue exporting worksheets.');
+    if (!subscriptionManager.canPerformAction(userId, "exportsPerMonth")) {
+      alert(
+        "You've reached your monthly export limit. Please upgrade your plan to continue exporting worksheets."
+      );
       return;
     }
-    
-    if (!subscriptionManager.canPerformAction(userId, 'worksheetsPerMonth')) {
-      alert('You\'ve reached your monthly worksheet limit. Please upgrade your plan to create more worksheets.');
+
+    if (!subscriptionManager.canPerformAction(userId, "worksheetsPerMonth")) {
+      alert(
+        "You've reached your monthly worksheet limit. Please upgrade your plan to create more worksheets."
+      );
       return;
     }
 
@@ -529,20 +581,34 @@ export default function CreateWorksheet() {
       const printWindow = window.open("", "_blank");
 
       if (printWindow) {
-        printWindow.document.write(generatePrintHTML(subject, result.data || contentData, bgStyle, selectedFont, currentTheme as unknown as { colors: Record<string, string> }));
+        printWindow.document.write(
+          generatePrintHTML(
+            subject,
+            result.data || contentData,
+            bgStyle,
+            selectedFont,
+            currentTheme as unknown as { colors: Record<string, string> }
+          )
+        );
         printWindow.document.close();
         alert(
           "✅ Worksheet Ready!\n\nA new window has opened with your worksheet.\n\nClick the 'Print Worksheet' button and use your browser's print dialog to:\n• Save as PDF\n• Print directly"
         );
-        
+
         // Track usage
-        subscriptionManager.incrementUsage(userId, 'exportsPerMonth');
-        subscriptionManager.incrementUsage(userId, 'worksheetsPerMonth');
+        subscriptionManager.incrementUsage(userId, "exportsPerMonth");
+        subscriptionManager.incrementUsage(userId, "worksheetsPerMonth");
       } else {
         alert(
           "Popup blocked! Please allow popups for this site, then try again.\n\nOr click OK and I'll show the worksheet on this page instead."
         );
-        document.body.innerHTML = generatePrintHTML(subject, result.data || contentData, bgStyle, selectedFont, currentTheme as unknown as { colors: Record<string, string> });
+        document.body.innerHTML = generatePrintHTML(
+          subject,
+          result.data || contentData,
+          bgStyle,
+          selectedFont,
+          currentTheme as unknown as { colors: Record<string, string> }
+        );
       }
     } catch (error) {
       console.error("Export error:", error);
@@ -894,12 +960,10 @@ export default function CreateWorksheet() {
 
                   <div className="space-y-2">
                     <label className="text-sm font-semibold">🔤 Font Style</label>
-                    <FontSelector
-                      selectedFont={selectedFont}
-                      onFontSelect={handleFontSelect}
-                    />
+                    <FontSelector selectedFont={selectedFont} onFontSelect={handleFontSelect} />
                     <p className="text-xs text-gray-500">
-                      Choose a font that matches your teaching style. Upload custom fonts for handwriting practice.
+                      Choose a font that matches your teaching style. Upload custom fonts for
+                      handwriting practice.
                     </p>
                   </div>
 
@@ -916,6 +980,11 @@ export default function CreateWorksheet() {
                     </p>
                   </div>
 
+                  {/* Quota Display */}
+                  <div className="mb-4">
+                    <QuotaDisplay userId="current-user" />
+                  </div>
+
                   <Button
                     onClick={handleExport}
                     disabled={isExporting}
@@ -927,7 +996,16 @@ export default function CreateWorksheet() {
                   </Button>
 
                   {/* Usage Warning */}
-                  <UsageLimitWarning userId="current-user" action="exportsPerMonth" className="mt-4" />
+                  <UsageLimitWarning
+                    userId="current-user"
+                    action="exportsPerMonth"
+                    className="mt-4"
+                  />
+
+                  {/* Upgrade Prompt for Free Users */}
+                  <div className="mt-4">
+                    <UpgradePrompt userId="current-user" variant="inline" />
+                  </div>
 
                   {/* Session Tracking */}
                   <div className="mt-4">
@@ -1215,7 +1293,13 @@ export default function CreateWorksheet() {
 }
 
 // Helper function to generate printable HTML
-function generatePrintHTML(subject: string, data: unknown, backgroundStyle: string, font: FontInfo, theme: { colors: Record<string, string> }): string {
+function generatePrintHTML(
+  subject: string,
+  data: unknown,
+  backgroundStyle: string,
+  font: FontInfo,
+  theme: { colors: Record<string, string> }
+): string {
   if (subject === "math") {
     return generateMathPrintHTML(
       data as { title: string; subtitle?: string; problems: MathProblem[] },

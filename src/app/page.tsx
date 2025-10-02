@@ -173,6 +173,151 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Pricing Section */}
+      <section className="px-4 py-20 sm:px-6 lg:px-8">
+        <div className="container mx-auto">
+          <div className="mb-16 text-center">
+            <h2 className="text-foreground mb-4 text-3xl font-bold sm:text-4xl">
+              Choose Your Plan
+            </h2>
+            <p className="text-muted-foreground mx-auto max-w-2xl text-xl">
+              Start free and upgrade as your needs grow. All plans include our core worksheet
+              builder.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+            {/* Free Plan */}
+            <Card className="relative">
+              <CardHeader className="text-center">
+                <CardTitle className="text-2xl">Free</CardTitle>
+                <CardDescription>Perfect for getting started</CardDescription>
+                <div className="mt-4">
+                  <div className="text-4xl font-bold">$0</div>
+                  <div className="text-muted-foreground text-sm">forever</div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-3">
+                  <li className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                    <span className="text-sm">15 worksheet exports per month</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                    <span className="text-sm">Basic templates</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                    <span className="text-sm">PDF export</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                    <span className="text-sm">Progress tracking</span>
+                  </li>
+                </ul>
+                <Link href="/dashboard" className="mt-6 block">
+                  <Button variant="outline" className="w-full">
+                    Get Started Free
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            {/* Pro Plan */}
+            <Card className="relative border-blue-200 bg-blue-50">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 transform">
+                <div className="rounded-full bg-blue-500 px-3 py-1 text-xs font-medium text-white">
+                  Most Popular
+                </div>
+              </div>
+              <CardHeader className="text-center">
+                <CardTitle className="text-2xl">Pro</CardTitle>
+                <CardDescription>For active homeschooling families</CardDescription>
+                <div className="mt-4">
+                  <div className="text-4xl font-bold">$9</div>
+                  <div className="text-muted-foreground text-sm">per month</div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-3">
+                  <li className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+                    <span className="text-sm">Unlimited worksheet exports</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+                    <span className="text-sm">Premium templates</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+                    <span className="text-sm">Multiple export formats</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+                    <span className="text-sm">Advanced analytics</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+                    <span className="text-sm">Priority support</span>
+                  </li>
+                </ul>
+                <Link href="/dashboard/subscription" className="mt-6 block">
+                  <Button className="w-full bg-blue-600 hover:bg-blue-700">Upgrade to Pro</Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            {/* Premium Plan */}
+            <Card className="relative">
+              <CardHeader className="text-center">
+                <CardTitle className="text-2xl">Premium</CardTitle>
+                <CardDescription>For educators and co-ops</CardDescription>
+                <div className="mt-4">
+                  <div className="text-4xl font-bold">$19</div>
+                  <div className="text-muted-foreground text-sm">per month</div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-3">
+                  <li className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-purple-500"></div>
+                    <span className="text-sm">Everything in Pro</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-purple-500"></div>
+                    <span className="text-sm">Custom branding</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-purple-500"></div>
+                    <span className="text-sm">Team collaboration</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-purple-500"></div>
+                    <span className="text-sm">API access</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-purple-500"></div>
+                    <span className="text-sm">White-label options</span>
+                  </li>
+                </ul>
+                <Link href="/dashboard/subscription" className="mt-6 block">
+                  <Button variant="outline" className="w-full">
+                    Upgrade to Premium
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="mt-12 text-center">
+            <p className="text-muted-foreground text-sm">
+              All plans include a 14-day free trial. Cancel anytime.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="px-4 py-20 sm:px-6 lg:px-8">
         <div className="container mx-auto text-center">
