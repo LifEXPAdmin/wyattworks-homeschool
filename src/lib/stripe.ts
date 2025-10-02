@@ -5,6 +5,22 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "sk_test_place
   apiVersion: "2025-09-30.clover",
 });
 
+// Define plan interface
+interface PlanConfig {
+  name: string;
+  priceId: string | null;
+  yearlyPriceId?: string;
+  monthlyPrice: number;
+  yearlyPrice: number;
+  trialDays?: number;
+  features: string[];
+  limits: {
+    worksheets: number;
+    exports: number;
+    students: number;
+  };
+}
+
 // Stripe configuration
 export const STRIPE_CONFIG = {
   // Subscription plans
@@ -72,7 +88,7 @@ export const STRIPE_CONFIG = {
         students: -1,
       },
     },
-  },
+  } as Record<string, PlanConfig>,
 
   // Webhook endpoints
   webhookSecret: process.env.STRIPE_WEBHOOK_SECRET || "",
