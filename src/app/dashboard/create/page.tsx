@@ -42,6 +42,11 @@ import { subscriptionManager } from "@/lib/subscription";
 import { worksheetCache, performanceMonitor, offlineManager } from "@/lib/performance";
 import type { WorksheetTemplate } from "@/lib/templates";
 import { InteractiveWorksheetManager, type InteractiveWorksheet } from "@/lib/interactive-elements";
+import { CollaborationManager } from "@/lib/collaboration";
+import { AnalyticsManager } from "@/lib/analytics-simple";
+import { CollaborationPanel } from "@/components/collaboration";
+import { AnalyticsDashboard } from "@/components/analytics-dashboard";
+import { Users, BarChart3 } from "lucide-react";
 
 type DifficultyLevel = "very_easy" | "easy" | "medium" | "hard" | "very_hard" | "custom";
 
@@ -140,6 +145,11 @@ export default function CreateWorksheet() {
     null
   );
   const [showInteractiveViewer, setShowInteractiveViewer] = useState(false);
+
+  // Collaboration and analytics states
+  const [showCollaboration, setShowCollaboration] = useState(false);
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [collaborationSession, setCollaborationSession] = useState<string | null>(null);
   const [vocabularyWords, setVocabularyWords] = useState<VocabularyItem[]>([]);
   const [writingPrompts, setWritingPrompts] = useState<WritingPrompt[]>([]);
   const [scienceProblems, setScienceProblems] = useState<ScienceProblem[]>([]);
@@ -238,8 +248,33 @@ export default function CreateWorksheet() {
 
   const handleInteractiveWorksheetComplete = (results: { score: number }) => {
     console.log("Interactive worksheet completed:", results);
-    // In a real app, you'd save results to database
+    // Track analytics
+    AnalyticsManager.trackEvent("user-123", "worksheet_completed", {
+      score: results.score,
+      type: "interactive",
+      subject,
+      gradeLevel,
+      difficulty,
+    });
     alert(`Worksheet completed! Score: ${results.score}%`);
+  };
+
+  const handleStartCollaboration = () => {
+    const session = CollaborationManager.createSession(
+      "worksheet-123",
+      title || "Untitled Worksheet",
+      "user-123",
+      "John Doe",
+      "john@example.com"
+    );
+    setCollaborationSession(session.id);
+    setShowCollaboration(true);
+
+    // Track analytics
+    AnalyticsManager.trackEvent("user-123", "collaboration_session_joined", {
+      sessionId: session.id,
+      worksheetId: "worksheet-123",
+    });
   };
 
   const handleGenerate = () => {
@@ -737,7 +772,7 @@ export default function CreateWorksheet() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
           {/* Template Selection */}
           <div className="space-y-6 lg:col-span-1">
             <Card className="shadow-lg">
@@ -815,6 +850,31 @@ export default function CreateWorksheet() {
                     </div>
                   )}
                 </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Collaboration & Analytics */}
+          <div className="space-y-6 lg:col-span-1">
+            <Card className="shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50">
+                <CardTitle className="flex items-center gap-2">🤝 Collaboration</CardTitle>
+                <CardDescription>Work together on worksheets</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4 pt-6">
+                <Button onClick={handleStartCollaboration} className="w-full" variant="outline">
+                  <Users className="mr-2 h-4 w-4" />
+                  Start Collaboration
+                </Button>
+
+                <Button
+                  onClick={() => setShowAnalytics(!showAnalytics)}
+                  className="w-full"
+                  variant="outline"
+                >
+                  <BarChart3 className="mr-2 h-4 w-4" />
+                  View Analytics
+                </Button>
               </CardContent>
             </Card>
           </div>
@@ -1577,6 +1637,45 @@ export default function CreateWorksheet() {
                 worksheet={interactiveWorksheet}
                 onComplete={handleInteractiveWorksheetComplete}
               />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Collaboration Panel */}
+      {showCollaboration && collaborationSession && (
+        <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4">
+          <div className="max-h-[90vh] w-full max-w-4xl overflow-auto rounded-lg bg-white">
+            <div className="sticky top-0 flex items-center justify-between border-b bg-white p-4">
+              <h2 className="text-lg font-semibold">Collaboration Session</h2>
+              <Button variant="outline" onClick={() => setShowCollaboration(false)}>
+                Close
+              </Button>
+            </div>
+            <div className="p-4">
+              <CollaborationPanel
+                sessionId={collaborationSession}
+                userId="user-123"
+                userName="John Doe"
+                userEmail="john@example.com"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Analytics Dashboard */}
+      {showAnalytics && (
+        <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4">
+          <div className="max-h-[90vh] w-full max-w-6xl overflow-auto rounded-lg bg-white">
+            <div className="sticky top-0 flex items-center justify-between border-b bg-white p-4">
+              <h2 className="text-lg font-semibold">Analytics Dashboard</h2>
+              <Button variant="outline" onClick={() => setShowAnalytics(false)}>
+                Close
+              </Button>
+            </div>
+            <div className="p-4">
+              <AnalyticsDashboard userId="user-123" />
             </div>
           </div>
         </div>
