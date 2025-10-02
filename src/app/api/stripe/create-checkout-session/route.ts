@@ -20,6 +20,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
     }
 
+    // Check if Stripe is properly configured
+    if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY === "sk_test_placeholder") {
+      return NextResponse.json(
+        {
+          error: "Stripe not configured. Please contact support to set up billing.",
+          details:
+            "The subscription system is not yet configured. Please contact support for assistance.",
+        },
+        { status: 503 }
+      );
+    }
+
     const plan = STRIPE_CONFIG.plans[planKey as keyof typeof STRIPE_CONFIG.plans];
     if (!plan) {
       return NextResponse.json({ error: "Plan not found" }, { status: 404 });

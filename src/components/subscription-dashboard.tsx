@@ -60,7 +60,16 @@ export function SubscriptionDashboard({ userId, className }: SubscriptionDashboa
       });
 
       if (!response.ok) {
-        throw new Error("Failed to create checkout session");
+        const errorData = await response.json();
+        if (response.status === 503) {
+          // Stripe not configured
+          alert(
+            `🚧 Subscription System Coming Soon!\n\n${errorData.details}\n\nFor now, you can use the free plan with 15 exports per month.`
+          );
+        } else {
+          throw new Error(errorData.error || "Failed to create checkout session");
+        }
+        return;
       }
 
       const { url } = await response.json();

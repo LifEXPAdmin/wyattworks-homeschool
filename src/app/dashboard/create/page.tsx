@@ -142,7 +142,7 @@ export default function CreateWorksheet() {
     return () => themeManager.removeListener(handleThemeChange);
   }, []);
 
-  const handleSessionComplete = (completedSessionId: string) => {
+  const handleSessionComplete = (_completedSessionId: string) => {
     alert(
       "🎉 Session completed! Your progress has been tracked. Check your dashboard for insights!"
     );
