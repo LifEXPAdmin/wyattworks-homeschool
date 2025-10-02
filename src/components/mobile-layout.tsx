@@ -88,7 +88,7 @@ export function MobileLayout({ children, className }: MobileLayoutProps) {
     } catch (error) {
       console.error("Error in MobileLayout useEffect:", error);
     }
-  }, [mobileConfig.touchSupport, handleGesture]);
+  }, [mobileConfig.touchSupport]);
 
   const handleGesture = React.useCallback(
     (gesture: TouchGesture) => {

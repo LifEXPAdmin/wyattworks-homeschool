@@ -20,6 +20,7 @@ export function QuotaWarning({ userId, className, showUpgradePrompt = true }: Qu
     allowed: boolean;
     remaining: number;
     limit: number;
+    used: number;
     currentMonth: string;
     paywall: boolean;
     plan: string;
@@ -182,6 +183,7 @@ export function UpgradePrompt({ userId, className, variant = "card" }: UpgradePr
     allowed: boolean;
     remaining: number;
     limit: number;
+    used: number;
     currentMonth: string;
     paywall: boolean;
     plan: string;
@@ -311,6 +313,7 @@ export function QuotaDisplay({ userId, className, showProgress = true }: QuotaDi
     allowed: boolean;
     remaining: number;
     limit: number;
+    used: number;
     currentMonth: string;
     paywall: boolean;
     plan: string;
