@@ -43,8 +43,23 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="px-4 py-20 sm:px-6 lg:px-8">
-        <div className="container mx-auto text-center">
+      <section className="relative overflow-hidden px-4 py-20 sm:px-6 lg:px-8">
+        {/* Warm background gradient */}
+        <div className="bg-warm-gradient absolute inset-0"></div>
+
+        {/* Subtle pattern overlay */}
+        <div
+          className="absolute inset-0 opacity-5"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23f2760a' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          }}
+        ></div>
+
+        <div className="relative z-10 container mx-auto text-center">
+          <div className="mb-8">
+            <div className="edu-icon mx-auto mb-6">📚</div>
+          </div>
+
           <h1 className="text-foreground mb-6 text-4xl font-bold sm:text-6xl">
             Build Amazing Worksheets
             <span className="text-primary block">for Your Homeschool</span>
@@ -55,11 +70,15 @@ export default function Home() {
           </p>
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
             <Link href="/dashboard">
-              <Button size="lg" className="px-8 py-6 text-lg">
+              <Button size="lg" className="homeschool-button px-8 py-6 text-lg">
                 Start Building
               </Button>
             </Link>
-            <Button variant="outline" size="lg" className="px-8 py-6 text-lg">
+            <Button
+              variant="outline"
+              size="lg"
+              className="homeschool-button-secondary px-8 py-6 text-lg"
+            >
               Learn More
             </Button>
           </div>
@@ -67,7 +86,7 @@ export default function Home() {
       </section>
 
       {/* Features Grid */}
-      <section className="bg-muted/50 px-4 py-20 sm:px-6 lg:px-8">
+      <section className="bg-cool-gradient px-4 py-20 sm:px-6 lg:px-8">
         <div className="container mx-auto">
           <div className="mb-16 text-center">
             <h2 className="text-foreground mb-4 text-3xl font-bold sm:text-4xl">
@@ -80,9 +99,12 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            <Card>
+            <Card className="homeschool-card shadow-homeschool">
               <CardHeader>
-                <CardTitle>Easy Worksheet Builder</CardTitle>
+                <div className="mb-2 flex items-center gap-3">
+                  <div className="edu-icon">🧮</div>
+                  <CardTitle>Easy Worksheet Builder</CardTitle>
+                </div>
                 <CardDescription>
                   Drag and drop interface to create custom worksheets in minutes
                 </CardDescription>
@@ -95,9 +117,12 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="homeschool-card shadow-homeschool">
               <CardHeader>
-                <CardTitle>Subject-Specific Templates</CardTitle>
+                <div className="mb-2 flex items-center gap-3">
+                  <div className="edu-icon">📚</div>
+                  <CardTitle>Subject-Specific Templates</CardTitle>
+                </div>
                 <CardDescription>
                   Pre-made templates for math, science, language arts, and more
                 </CardDescription>
@@ -110,9 +135,12 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="homeschool-card shadow-homeschool">
               <CardHeader>
-                <CardTitle>Progress Tracking</CardTitle>
+                <div className="mb-2 flex items-center gap-3">
+                  <div className="edu-icon">📊</div>
+                  <CardTitle>Progress Tracking</CardTitle>
+                </div>
                 <CardDescription>
                   Monitor your child&apos;s learning progress with built-in analytics
                 </CardDescription>

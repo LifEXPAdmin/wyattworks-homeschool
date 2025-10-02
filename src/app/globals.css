@@ -46,71 +46,108 @@
 
 :root {
   --radius: 0.75rem;
-  --background: oklch(0.99 0.005 85);
-  --foreground: oklch(0.15 0.01 265);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.15 0.01 265);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.15 0.01 265);
-  --primary: oklch(0.55 0.18 255);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.85 0.08 140);
-  --secondary-foreground: oklch(0.15 0.01 265);
-  --muted: oklch(0.96 0.005 85);
-  --muted-foreground: oklch(0.5 0.01 265);
-  --accent: oklch(0.92 0.06 45);
-  --accent-foreground: oklch(0.15 0.01 265);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.92 0.01 85);
-  --input: oklch(0.95 0.01 85);
-  --ring: oklch(0.55 0.18 255);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.141 0.005 285.823);
-  --sidebar-primary: oklch(0.21 0.006 285.885);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.967 0.001 286.375);
-  --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
-  --sidebar-border: oklch(0.92 0.004 286.32);
-  --sidebar-ring: oklch(0.705 0.015 286.067);
+
+  /* Professional Homeschool Theme - Warm and Trustworthy */
+  --background: #fef7ee; /* Warm cream background */
+  --foreground: #1c1917; /* Dark brown text */
+  --card: #ffffff;
+  --card-foreground: #1c1917;
+  --popover: #ffffff;
+  --popover-foreground: #1c1917;
+
+  /* Primary - Warm Orange */
+  --primary: #f2760a;
+  --primary-foreground: #ffffff;
+
+  /* Secondary - Earth Green */
+  --secondary: #32985b;
+  --secondary-foreground: #ffffff;
+
+  /* Muted - Warm Neutrals */
+  --muted: #f5f5f4;
+  --muted-foreground: #57534e;
+
+  /* Accent - Warm Coral */
+  --accent: #f43f5e;
+  --accent-foreground: #ffffff;
+
+  /* Destructive - Warm Red */
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+
+  /* Borders and Inputs */
+  --border: #e7e5e4;
+  --input: #f5f5f4;
+  --ring: #f2760a;
+
+  /* Chart Colors - Warm Palette */
+  --chart-1: #f2760a;
+  --chart-2: #32985b;
+  --chart-3: #f43f5e;
+  --chart-4: #fbbf24;
+  --chart-5: #8b5cf6;
+
+  /* Sidebar */
+  --sidebar: #fef7ee;
+  --sidebar-foreground: #1c1917;
+  --sidebar-primary: #f2760a;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #fdedd3;
+  --sidebar-accent-foreground: #1c1917;
+  --sidebar-border: #e7e5e4;
+  --sidebar-ring: #f2760a;
 }
 
 .dark {
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.21 0.006 285.885);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.21 0.006 285.885);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.92 0.004 286.32);
-  --primary-foreground: oklch(0.21 0.006 285.885);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.274 0.006 286.033);
-  --muted-foreground: oklch(0.705 0.015 286.067);
-  --accent: oklch(0.274 0.006 286.033);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.552 0.016 285.938);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.21 0.006 285.885);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.274 0.006 286.033);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.552 0.016 285.938);
+  /* Dark mode - Warm and cozy for evening use */
+  --background: #1c1917; /* Dark brown background */
+  --foreground: #fef7ee; /* Warm cream text */
+  --card: #292524; /* Slightly lighter dark card */
+  --card-foreground: #fef7ee;
+  --popover: #292524;
+  --popover-foreground: #fef7ee;
+
+  /* Primary - Brighter orange for dark mode */
+  --primary: #f8bb6d;
+  --primary-foreground: #1c1917;
+
+  /* Secondary - Brighter green for dark mode */
+  --secondary: #56b37d;
+  --secondary-foreground: #1c1917;
+
+  /* Muted - Dark neutrals */
+  --muted: #44403c;
+  --muted-foreground: #a8a29e;
+
+  /* Accent - Brighter coral for dark mode */
+  --accent: #fb7185;
+  --accent-foreground: #1c1917;
+
+  /* Destructive - Warm red */
+  --destructive: #f87171;
+  --destructive-foreground: #1c1917;
+
+  /* Borders and Inputs */
+  --border: #44403c;
+  --input: #44403c;
+  --ring: #f8bb6d;
+
+  /* Chart Colors - Brighter for dark mode */
+  --chart-1: #f8bb6d;
+  --chart-2: #56b37d;
+  --chart-3: #fb7185;
+  --chart-4: #fcd34d;
+  --chart-5: #a78bfa;
+
+  /* Sidebar */
+  --sidebar: #1c1917;
+  --sidebar-foreground: #fef7ee;
+  --sidebar-primary: #f8bb6d;
+  --sidebar-primary-foreground: #1c1917;
+  --sidebar-accent: #44403c;
+  --sidebar-accent-foreground: #fef7ee;
+  --sidebar-border: #44403c;
+  --sidebar-ring: #f8bb6d;
 }
 
 @layer base {
@@ -119,5 +156,142 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: "Inter", system-ui, sans-serif;
+  }
+
+  /* Professional Homeschool Typography */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: 600;
+    line-height: 1.2;
+    color: #1c1917;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+  }
+  h2 {
+    font-size: 2rem;
+  }
+  h3 {
+    font-size: 1.5rem;
+  }
+  h4 {
+    font-size: 1.25rem;
+  }
+
+  /* Warm, readable text */
+  p {
+    line-height: 1.6;
+    color: #44403c;
+  }
+}
+
+@layer components {
+  /* Professional Homeschool Components */
+  .homeschool-card {
+    @apply rounded-xl border border-neutral-200 bg-white p-6 shadow-lg;
+    background: linear-gradient(135deg, #ffffff 0%, #fef7ee 100%);
+  }
+
+  .homeschool-button {
+    @apply rounded-lg px-6 py-3 font-medium transition-all duration-200;
+    background: linear-gradient(135deg, #f2760a 0%, #e35d05 100%);
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(242, 118, 10, 0.3);
+  }
+
+  .homeschool-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 15px -3px rgba(242, 118, 10, 0.4);
+  }
+
+  .homeschool-button-secondary {
+    @apply rounded-lg border-2 px-6 py-3 font-medium transition-all duration-200;
+    background: transparent;
+    color: #f2760a;
+    border-color: #f2760a;
+  }
+
+  .homeschool-button-secondary:hover {
+    background: #f2760a;
+    color: white;
+    transform: translateY(-1px);
+  }
+
+  /* Warm gradient backgrounds */
+  .bg-warm-gradient {
+    background: linear-gradient(135deg, #fef7ee 0%, #fdedd3 100%);
+  }
+
+  .bg-cool-gradient {
+    background: linear-gradient(135deg, #f0f9f4 0%, #dcf2e4 100%);
+  }
+
+  .bg-accent-gradient {
+    background: linear-gradient(135deg, #fef3f2 0%, #fee4e2 100%);
+  }
+
+  /* Professional shadows */
+  .shadow-homeschool {
+    box-shadow:
+      0 10px 15px -3px rgba(242, 118, 10, 0.1),
+      0 4px 6px -4px rgba(242, 118, 10, 0.1);
+  }
+
+  .shadow-homeschool-lg {
+    box-shadow:
+      0 20px 25px -5px rgba(242, 118, 10, 0.1),
+      0 8px 10px -6px rgba(242, 118, 10, 0.1);
+  }
+
+  /* Educational icons styling */
+  .edu-icon {
+    @apply flex h-8 w-8 items-center justify-center rounded-full text-lg;
+    background: linear-gradient(135deg, #f2760a 0%, #e35d05 100%);
+    color: white;
+  }
+
+  /* Progress indicators */
+  .progress-warm {
+    background: linear-gradient(90deg, #f2760a 0%, #f8bb6d 100%);
+  }
+
+  .progress-cool {
+    background: linear-gradient(90deg, #32985b 0%, #56b37d 100%);
+  }
+
+  /* Input styling */
+  .input-homeschool {
+    @apply rounded-lg border-2 border-neutral-300 px-4 py-3 transition-all duration-200;
+    background: #ffffff;
+  }
+
+  .input-homeschool:focus {
+    @apply border-primary ring-primary/20 ring-4;
+    outline: none;
+  }
+
+  /* Badge styling */
+  .badge-primary {
+    @apply rounded-full px-3 py-1 text-sm font-medium;
+    background: #fdedd3;
+    color: #bc4508;
+  }
+
+  .badge-secondary {
+    @apply rounded-full px-3 py-1 text-sm font-medium;
+    background: #dcf2e4;
+    color: #1f613c;
+  }
+
+  .badge-accent {
+    @apply rounded-full px-3 py-1 text-sm font-medium;
+    background: #fee4e2;
+    color: #be123c;
   }
 }
