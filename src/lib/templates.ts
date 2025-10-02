@@ -288,7 +288,7 @@ export class TemplateManager {
     }
 
     if (preferences.gradeLevel) {
-      templates = templates.filter((t) => t.gradeLevel.includes(preferences.gradeLevel));
+      templates = templates.filter((t) => t.gradeLevel.includes(preferences.gradeLevel!));
     }
 
     if (preferences.difficulty) {
