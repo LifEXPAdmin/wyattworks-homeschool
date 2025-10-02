@@ -23,6 +23,7 @@ import { generateScienceProblems } from "@/lib/generators/science";
 import type { ScienceProblem, ScienceSubject } from "@/lib/generators/science";
 import type { WorksheetConfig } from "@/lib/config";
 import { FontSelector } from "@/components/font-selector";
+import { TemplateSelector } from "@/components/template-selector";
 import {
   Select,
   SelectContent,
@@ -38,6 +39,7 @@ import { SessionRecorder } from "@/components/progress-dashboard";
 import { UsageLimitWarning } from "@/components/subscription-dashboard";
 import { subscriptionManager } from "@/lib/subscription";
 import { worksheetCache, performanceMonitor, offlineManager } from "@/lib/performance";
+import type { WorksheetTemplate } from "@/lib/templates";
 
 type DifficultyLevel = "very_easy" | "easy" | "medium" | "hard" | "very_hard" | "custom";
 
@@ -120,6 +122,15 @@ export default function CreateWorksheet() {
   const [customImage, setCustomImage] = useState<string | null>(null);
   const [problems, setProblems] = useState<MathProblem[]>([]);
   const [spellingWords, setSpellingWords] = useState<SpellingWord[]>([]);
+
+  // Template and customization states
+  const [selectedTemplate, setSelectedTemplate] = useState<WorksheetTemplate | null>(null);
+  const [useTemplate, setUseTemplate] = useState(false);
+  const [layout, setLayout] = useState<"standard" | "wide" | "narrow">("standard");
+  const [spacing, setSpacing] = useState<"tight" | "normal" | "loose">("normal");
+  const [showBorders, setShowBorders] = useState(true);
+  const [includeAnswerKey, setIncludeAnswerKey] = useState(false);
+  const [customInstructions, setCustomInstructions] = useState("");
   const [vocabularyWords, setVocabularyWords] = useState<VocabularyItem[]>([]);
   const [writingPrompts, setWritingPrompts] = useState<WritingPrompt[]>([]);
   const [scienceProblems, setScienceProblems] = useState<ScienceProblem[]>([]);
@@ -169,6 +180,26 @@ export default function CreateWorksheet() {
         fontCategory: font.category,
       },
     });
+  };
+
+  const handleTemplateSelect = (template: WorksheetTemplate) => {
+    setSelectedTemplate(template);
+    setUseTemplate(true);
+
+    // Apply template settings to form
+    setSubject(template.subject as SubjectType);
+    setTitle(template.name);
+    setGradeLevel(template.gradeLevel as GradeLevel);
+
+    // Set difficulty based on template
+    if (template.difficulty === "easy") setDifficulty("easy");
+    else if (template.difficulty === "medium") setDifficulty("medium");
+    else if (template.difficulty === "hard") setDifficulty("hard");
+
+    // Set custom instructions if available
+    if (template.description) {
+      setCustomInstructions(template.description);
+    }
   };
 
   const handleGenerate = () => {
@@ -667,6 +698,68 @@ export default function CreateWorksheet() {
         </div>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+          {/* Template Selection */}
+          <div className="space-y-6 lg:col-span-1">
+            <Card className="shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-green-50 to-blue-50">
+                <CardTitle className="flex items-center gap-2">📋 Choose Template</CardTitle>
+                <CardDescription>
+                  Start with a pre-made template or create from scratch
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant={useTemplate ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setUseTemplate(true)}
+                    >
+                      Use Template
+                    </Button>
+                    <Button
+                      variant={!useTemplate ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setUseTemplate(false)}
+                    >
+                      Create from Scratch
+                    </Button>
+                  </div>
+
+                  {useTemplate && (
+                    <TemplateSelector
+                      onTemplateSelect={handleTemplateSelect}
+                      selectedTemplate={selectedTemplate}
+                    />
+                  )}
+
+                  {selectedTemplate && (
+                    <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
+                      <div className="mb-2 flex items-center gap-2">
+                        <span className="text-lg">
+                          {selectedTemplate.subject === "math"
+                            ? "📐"
+                            : selectedTemplate.subject === "language_arts"
+                              ? "📖"
+                              : "🔬"}
+                        </span>
+                        <span className="text-sm font-medium">{selectedTemplate.name}</span>
+                      </div>
+                      <p className="mb-2 text-xs text-gray-600">{selectedTemplate.description}</p>
+                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <span>{selectedTemplate.gradeLevel}</span>
+                        <span>•</span>
+                        <span>{selectedTemplate.estimatedTime}</span>
+                        <span>•</span>
+                        <span>⭐ {selectedTemplate.rating}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
           {/* Configuration Panel */}
           <div className="space-y-6 lg:col-span-1">
             {/* Basic Settings */}
@@ -957,6 +1050,83 @@ export default function CreateWorksheet() {
                             ? "📚 Generate Vocabulary"
                             : "✍️ Generate Writing Prompts"}
                 </Button>
+              </CardContent>
+            </Card>
+
+            {/* Advanced Customization */}
+            <Card className="shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50">
+                <CardTitle className="flex items-center gap-2">🎨 Advanced Customization</CardTitle>
+                <CardDescription>Fine-tune your worksheet appearance</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6 pt-6">
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold">📐 Layout</label>
+                  <Select
+                    value={layout}
+                    onValueChange={(value) => setLayout(value as "standard" | "wide" | "narrow")}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select layout" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="standard">Standard (8.5" × 11")</SelectItem>
+                      <SelectItem value="wide">Wide (11" × 8.5")</SelectItem>
+                      <SelectItem value="narrow">Narrow (6" × 9")</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold">📏 Spacing</label>
+                  <Select
+                    value={spacing}
+                    onValueChange={(value) => setSpacing(value as "tight" | "normal" | "loose")}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select spacing" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="tight">Tight (More problems per page)</SelectItem>
+                      <SelectItem value="normal">Normal (Balanced spacing)</SelectItem>
+                      <SelectItem value="loose">Loose (More space for answers)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold">📝 Custom Instructions</label>
+                  <Input
+                    value={customInstructions}
+                    onChange={(e) => setCustomInstructions(e.target.value)}
+                    placeholder="Add special instructions for students..."
+                    className="border-2"
+                  />
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-semibold">🔲 Show Borders</label>
+                    <Button
+                      variant={showBorders ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setShowBorders(!showBorders)}
+                    >
+                      {showBorders ? "Yes" : "No"}
+                    </Button>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-semibold">🔑 Include Answer Key</label>
+                    <Button
+                      variant={includeAnswerKey ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setIncludeAnswerKey(!includeAnswerKey)}
+                    >
+                      {includeAnswerKey ? "Yes" : "No"}
+                    </Button>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
