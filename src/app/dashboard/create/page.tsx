@@ -156,7 +156,7 @@ export default function CreateWorksheet() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [selectedFont, setSelectedFont] = useState<FontInfo>(BUILT_IN_FONTS[0]);
-  const [currentTheme, setCurrentTheme] = useState(themeManager.getCurrentTheme());
+  const [currentTheme, setCurrentTheme] = useState("default");
 
   // Listen for theme changes
   React.useEffect(() => {
@@ -175,8 +175,8 @@ export default function CreateWorksheet() {
       });
     };
 
-    themeManager.addListener(handleThemeChange);
-    return () => themeManager.removeListener(handleThemeChange);
+    // themeManager.addListener(handleThemeChange);
+    // return () => themeManager.removeListener(handleThemeChange);
   }, []);
 
   const handleSessionComplete = (_completedSessionId: string) => {
