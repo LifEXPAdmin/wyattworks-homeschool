@@ -25,6 +25,8 @@ import {
   Trophy,
   Download,
 } from "lucide-react";
+import { InteractiveQuizPreview } from "@/components/interactive-quiz-preview";
+import { InteractiveTemplatePreview } from "@/components/interactive-template-preview";
 
 const FREE_FEATURES = [
   {
@@ -242,10 +244,12 @@ export default function BuildPage() {
                     <Eye className="mr-2 h-4 w-4" />
                     Preview Quiz
                   </Button>
-                  <Button className="w-full bg-orange-600 hover:bg-orange-700">
-                    <Crown className="mr-2 h-4 w-4" />
-                    Upgrade to Access
-                  </Button>
+                  <Link href="/dashboard/subscription" className="w-full">
+                    <Button className="w-full bg-orange-600 hover:bg-orange-700">
+                      <Crown className="mr-2 h-4 w-4" />
+                      Upgrade to Access
+                    </Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>
@@ -293,10 +297,12 @@ export default function BuildPage() {
                     <Eye className="mr-2 h-4 w-4" />
                     Preview Templates
                   </Button>
-                  <Button className="w-full bg-purple-600 hover:bg-purple-700">
-                    <Crown className="mr-2 h-4 w-4" />
-                    Upgrade to Access
-                  </Button>
+                  <Link href="/dashboard/subscription" className="w-full">
+                    <Button className="w-full bg-purple-600 hover:bg-purple-700">
+                      <Crown className="mr-2 h-4 w-4" />
+                      Upgrade to Access
+                    </Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>
@@ -365,164 +371,25 @@ export default function BuildPage() {
                     </div>
                   ))}
                 </div>
-                <Button className="mt-4 w-full bg-yellow-600 hover:bg-yellow-700">
-                  <Crown className="mr-2 h-4 w-4" />
-                  Upgrade to Premium
-                </Button>
+                <Link href="/dashboard/subscription" className="mt-4 w-full">
+                  <Button className="w-full bg-yellow-600 hover:bg-yellow-700">
+                    <Crown className="mr-2 h-4 w-4" />
+                    Upgrade to Premium
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           </div>
         </div>
 
-        {/* Quiz Preview Modal */}
+        {/* Interactive Quiz Preview */}
         {showQuizPreview && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-            <div className="w-full max-w-2xl rounded-lg bg-white">
-              <div className="flex items-center justify-between border-b p-4">
-                <h3 className="text-lg font-semibold">Interactive Quiz Preview</h3>
-                <Button variant="outline" onClick={() => setShowQuizPreview(false)}>
-                  Close
-                </Button>
-              </div>
-              <div className="p-6">
-                <div className="mb-4 rounded-lg bg-orange-50 p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Brain className="h-5 w-5 text-orange-500" />
-                    <h4 className="font-semibold">Math Quiz - Addition</h4>
-                    <Badge variant="outline">Easy • 5 questions • 5 min</Badge>
-                  </div>
-                  <p className="text-sm text-gray-600">
-                    Test your addition skills with this interactive quiz featuring drag-and-drop answers and instant feedback.
-                  </p>
-                </div>
-                
-                <div className="space-y-4">
-                  <div className="rounded-lg border p-4">
-                    <div className="mb-3 flex items-center justify-between">
-                      <span className="font-medium">Question 1 of 5</span>
-                      <div className="flex items-center gap-1 text-sm text-orange-600">
-                        <Clock className="h-4 w-4" />
-                        <span>4:23 remaining</span>
-                      </div>
-                    </div>
-                    <p className="mb-4 text-lg">What is 7 + 5?</p>
-                    <div className="grid grid-cols-3 gap-2">
-                      {[10, 11, 12, 13, 14, 15].map((num) => (
-                        <div
-                          key={num}
-                          className={`rounded-lg border-2 border-dashed p-3 text-center ${
-                            num === 12 ? 'border-green-300 bg-green-50' : 'border-gray-300'
-                          }`}
-                        >
-                          {num}
-                        </div>
-                      ))}
-                    </div>
-                    <div className="mt-3 rounded-lg bg-blue-50 p-3">
-                      <p className="text-sm text-blue-800">
-                        💡 Drag the correct answer to the box above
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
-                    <div className="flex items-center gap-2">
-                      <Target className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm">Score: 0/5</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Trophy className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm">Best: --</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="mt-6 flex gap-3">
-                  <Button className="flex-1 bg-orange-600 hover:bg-orange-700">
-                    <Crown className="mr-2 h-4 w-4" />
-                    Upgrade to Take Quiz
-                  </Button>
-                  <Button variant="outline" onClick={() => setShowQuizPreview(false)}>
-                    Close Preview
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
+          <InteractiveQuizPreview onClose={() => setShowQuizPreview(false)} />
         )}
 
-        {/* Template Preview Modal */}
+        {/* Interactive Template Preview */}
         {showTemplatePreview && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-            <div className="w-full max-w-4xl rounded-lg bg-white">
-              <div className="flex items-center justify-between border-b p-4">
-                <h3 className="text-lg font-semibold">Premium Template Preview</h3>
-                <Button variant="outline" onClick={() => setShowTemplatePreview(false)}>
-                  Close
-                </Button>
-              </div>
-              <div className="p-6">
-                <div className="mb-4 rounded-lg bg-purple-50 p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Zap className="h-5 w-5 text-purple-500" />
-                    <h4 className="font-semibold">Professional Templates</h4>
-                    <Badge variant="outline">50+ templates</Badge>
-                  </div>
-                  <p className="text-sm text-gray-600">
-                    Access to professionally designed templates with advanced styling, custom fonts, and branding options.
-                  </p>
-                </div>
-                
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <div className="rounded-lg border p-4">
-                    <div className="mb-3 h-32 rounded bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
-                      <FileText className="h-8 w-8 text-blue-600" />
-                    </div>
-                    <h5 className="font-medium">Math Master Template</h5>
-                    <p className="text-sm text-gray-600 mb-2">Professional math worksheet with custom styling</p>
-                    <Badge className="bg-purple-100 text-purple-800">Premium</Badge>
-                  </div>
-                  
-                  <div className="rounded-lg border p-4">
-                    <div className="mb-3 h-32 rounded bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center">
-                      <BookOpen className="h-8 w-8 text-green-600" />
-                    </div>
-                    <h5 className="font-medium">Language Arts Pro</h5>
-                    <p className="text-sm text-gray-600 mb-2">Advanced language arts template with custom fonts</p>
-                    <Badge className="bg-purple-100 text-purple-800">Premium</Badge>
-                  </div>
-                  
-                  <div className="rounded-lg border p-4">
-                    <div className="mb-3 h-32 rounded bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center">
-                      <Brain className="h-8 w-8 text-orange-600" />
-                    </div>
-                    <h5 className="font-medium">Science Explorer</h5>
-                    <p className="text-sm text-gray-600 mb-2">Interactive science template with diagrams</p>
-                    <Badge className="bg-purple-100 text-purple-800">Premium</Badge>
-                  </div>
-                  
-                  <div className="rounded-lg border p-4">
-                    <div className="mb-3 h-32 rounded bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center">
-                      <Crown className="h-8 w-8 text-purple-600" />
-                    </div>
-                    <h5 className="font-medium">Custom Branded</h5>
-                    <p className="text-sm text-gray-600 mb-2">Add your own logo and branding</p>
-                    <Badge className="bg-purple-100 text-purple-800">Premium</Badge>
-                  </div>
-                </div>
-                
-                <div className="mt-6 flex gap-3">
-                  <Button className="flex-1 bg-purple-600 hover:bg-purple-700">
-                    <Crown className="mr-2 h-4 w-4" />
-                    Upgrade to Access Templates
-                  </Button>
-                  <Button variant="outline" onClick={() => setShowTemplatePreview(false)}>
-                    Close Preview
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
+          <InteractiveTemplatePreview onClose={() => setShowTemplatePreview(false)} />
         )}
       </div>
     </MobileLayout>
