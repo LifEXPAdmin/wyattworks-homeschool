@@ -193,7 +193,7 @@ export default function Home() {
                 <CardTitle className="text-2xl">Free</CardTitle>
                 <CardDescription>Perfect for getting started</CardDescription>
                 <div className="mt-4">
-                  <div className="text-4xl font-bold">$0</div>
+                  <div className="text-4xl font-bold">Free</div>
                   <div className="text-muted-foreground text-sm">forever</div>
                 </div>
               </CardHeader>
@@ -312,7 +312,8 @@ export default function Home() {
 
           <div className="mt-12 text-center">
             <p className="text-muted-foreground text-sm">
-              All plans include a 14-day free trial. Cancel anytime.
+              All paid plans include a 14-day free trial. Cancel anytime with no long-term
+              commitments.
             </p>
           </div>
         </div>

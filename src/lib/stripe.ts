@@ -33,6 +33,7 @@ export const STRIPE_CONFIG = {
         process.env.STRIPE_HOMESCHOOL_YEARLY_PRICE_ID || "price_1SDasJ1S6TukLrEPIbt6y5MN",
       monthlyPrice: 9.99,
       yearlyPrice: 99.99,
+      trialDays: 14, // 14-day free trial
       features: [
         "Unlimited worksheets",
         "All subjects (Math, Science, Language Arts)",
@@ -54,6 +55,7 @@ export const STRIPE_CONFIG = {
       yearlyPriceId: process.env.STRIPE_SCHOOL_YEARLY_PRICE_ID || "price_1SDavL1S6TukLrEPJI8DLuG6",
       monthlyPrice: 29.99,
       yearlyPrice: 299.99,
+      trialDays: 14, // 14-day free trial
       features: [
         "Everything in Homeschool",
         "Unlimited students",

@@ -128,6 +128,7 @@ export function SubscriptionDashboard({ userId, className }: SubscriptionDashboa
   };
 
   const formatPriceDisplay = (price: number) => {
+    if (price === 0) return "Free";
     return formatPrice(price);
   };
 

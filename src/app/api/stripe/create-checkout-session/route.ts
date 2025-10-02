@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Create checkout session
+    // Create checkout session with trial period
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       payment_method_types: ["card"],
@@ -106,6 +106,14 @@ export async function POST(request: NextRequest) {
         },
       ],
       mode: "subscription",
+      subscription_data: {
+        trial_period_days: plan.trialDays || 14, // Default to 14 days if not specified
+        metadata: {
+          clerkUserId: user.id,
+          planKey,
+          isYearly: isYearly.toString(),
+        },
+      },
       success_url: STRIPE_CONFIG.successUrl,
       cancel_url: STRIPE_CONFIG.cancelUrl,
       metadata: {

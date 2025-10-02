@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ProgressDashboard } from "@/components/progress-dashboard";
 import { MobileLayout, MobileCard, MobileButton, MobileGrid } from "@/components/mobile-layout";
 import { QuotaWarning } from "@/components/quota-warning";
+import { TrialReminder } from "@/components/trial-reminder";
 
 export default async function Dashboard() {
   const user = await currentUser();
@@ -21,6 +22,9 @@ export default async function Dashboard() {
 
         {/* Quota Warning */}
         {user?.id && <QuotaWarning userId={user.id} className="mb-6" />}
+
+        {/* Trial Reminder */}
+        {user?.id && <TrialReminder userId={user.id} className="mb-6" />}
 
         {/* Quick Actions */}
         <MobileGrid columns={4} gap="md">
