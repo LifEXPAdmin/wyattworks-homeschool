@@ -772,500 +772,514 @@ export default function CreateWorksheet() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
-          {/* Template Selection */}
-          <div className="space-y-6 lg:col-span-1">
-            <Card className="shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-green-50 to-blue-50">
-                <CardTitle className="flex items-center gap-2">📋 Choose Template</CardTitle>
-                <CardDescription>
-                  Start with a pre-made template or create from scratch
-                </CardDescription>
+        {/* Step-by-Step Creation Flow */}
+        <div className="mx-auto max-w-6xl space-y-8">
+          {/* Step 1: Choose Your Approach */}
+          <div className="mb-8 text-center">
+            <h2 className="mb-2 text-2xl font-bold text-gray-900">Step 1: Choose Your Approach</h2>
+            <p className="text-gray-600">Select how you'd like to create your worksheet</p>
+          </div>
+
+          <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
+            {/* Template vs Scratch */}
+            <Card className="shadow-lg transition-shadow hover:shadow-xl">
+              <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  📋 Creation Method
+                </CardTitle>
+                <CardDescription>How would you like to start?</CardDescription>
               </CardHeader>
               <CardContent className="pt-6">
                 <div className="space-y-4">
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant={useTemplate ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setUseTemplate(true)}
-                      >
-                        Use Template
-                      </Button>
-                      <Button
-                        variant={!useTemplate ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setUseTemplate(false)}
-                      >
-                        Create from Scratch
-                      </Button>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant={worksheetType === "traditional" ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setWorksheetType("traditional")}
-                      >
-                        📄 Traditional PDF
-                      </Button>
-                      <Button
-                        variant={worksheetType === "interactive" ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setWorksheetType("interactive")}
-                      >
-                        🎮 Interactive
-                      </Button>
-                    </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button
+                      variant={useTemplate ? "default" : "outline"}
+                      className="h-12 flex-col gap-2"
+                      onClick={() => setUseTemplate(true)}
+                    >
+                      <span className="text-lg">📚</span>
+                      <span className="text-sm">Use Template</span>
+                    </Button>
+                    <Button
+                      variant={!useTemplate ? "default" : "outline"}
+                      className="h-12 flex-col gap-2"
+                      onClick={() => setUseTemplate(false)}
+                    >
+                      <span className="text-lg">✏️</span>
+                      <span className="text-sm">From Scratch</span>
+                    </Button>
                   </div>
 
                   {useTemplate && (
-                    <TemplateSelector
-                      onTemplateSelect={handleTemplateSelect}
-                      selectedTemplate={selectedTemplate}
-                    />
-                  )}
-
-                  {selectedTemplate && (
-                    <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
-                      <div className="mb-2 flex items-center gap-2">
-                        <span className="text-lg">
-                          {selectedTemplate.subject === "math"
-                            ? "📐"
-                            : selectedTemplate.subject === "language_arts"
-                              ? "📖"
-                              : "🔬"}
-                        </span>
-                        <span className="text-sm font-medium">{selectedTemplate.name}</span>
-                      </div>
-                      <p className="mb-2 text-xs text-gray-600">{selectedTemplate.description}</p>
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
-                        <span>{selectedTemplate.gradeLevel}</span>
-                        <span>•</span>
-                        <span>{selectedTemplate.estimatedTime}</span>
-                        <span>•</span>
-                        <span>⭐ {selectedTemplate.rating}</span>
-                      </div>
+                    <div className="mt-4">
+                      <TemplateSelector
+                        onTemplateSelect={handleTemplateSelect}
+                        selectedTemplate={selectedTemplate}
+                      />
                     </div>
                   )}
                 </div>
               </CardContent>
             </Card>
-          </div>
 
-          {/* Collaboration & Analytics */}
-          <div className="space-y-6 lg:col-span-1">
-            <Card className="shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50">
-                <CardTitle className="flex items-center gap-2">🤝 Collaboration</CardTitle>
-                <CardDescription>Work together on worksheets</CardDescription>
+            {/* Worksheet Type */}
+            <Card className="shadow-lg transition-shadow hover:shadow-xl">
+              <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50">
+                <CardTitle className="flex items-center gap-2 text-lg">🎯 Worksheet Type</CardTitle>
+                <CardDescription>Choose the format for your worksheet</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4 pt-6">
-                <Button onClick={handleStartCollaboration} className="w-full" variant="outline">
-                  <Users className="mr-2 h-4 w-4" />
-                  Start Collaboration
-                </Button>
-
-                <Button
-                  onClick={() => setShowAnalytics(!showAnalytics)}
-                  className="w-full"
-                  variant="outline"
-                >
-                  <BarChart3 className="mr-2 h-4 w-4" />
-                  View Analytics
-                </Button>
+              <CardContent className="pt-6">
+                <div className="grid grid-cols-2 gap-3">
+                  <Button
+                    variant={worksheetType === "traditional" ? "default" : "outline"}
+                    className="h-12 flex-col gap-2"
+                    onClick={() => setWorksheetType("traditional")}
+                  >
+                    <span className="text-lg">📄</span>
+                    <span className="text-sm">Traditional PDF</span>
+                  </Button>
+                  <Button
+                    variant={worksheetType === "interactive" ? "default" : "outline"}
+                    className="h-12 flex-col gap-2"
+                    onClick={() => setWorksheetType("interactive")}
+                  >
+                    <span className="text-lg">🎮</span>
+                    <span className="text-sm">Interactive</span>
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Configuration Panel */}
-          <div className="space-y-6 lg:col-span-1">
+          {/* Step 2: Configure Your Worksheet */}
+          <div className="mb-8 text-center">
+            <h2 className="mb-2 text-2xl font-bold text-gray-900">
+              Step 2: Configure Your Worksheet
+            </h2>
+            <p className="text-gray-600">Set up the basic parameters for your worksheet</p>
+          </div>
+
+          <div className="mb-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
             {/* Basic Settings */}
-            <Card className="shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50">
-                <CardTitle className="flex items-center gap-2">⚙️ Basic Settings</CardTitle>
-                <CardDescription>Configure your worksheet</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6 pt-6">
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold">📚 Subject</label>
-                  <Select
-                    value={subject}
-                    onValueChange={(value) => {
-                      setSubject(value as SubjectType);
-                      setTitle(
-                        value === "math"
-                          ? "Math Practice Worksheet"
-                          : value === "language_arts"
-                            ? "Language Arts Worksheet"
-                            : "Science Worksheet"
-                      );
-                    }}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select subject" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="math">📐 Math</SelectItem>
-                      <SelectItem value="language_arts">📖 Language Arts</SelectItem>
-                      <SelectItem value="science">🔬 Science</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold">📝 Title</label>
-                  <Input
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Enter worksheet title"
-                    className="border-2"
-                  />
-                </div>
-
-                {subject === "math" && (
+            <div className="lg:col-span-2">
+              <Card className="shadow-lg">
+                <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50">
+                  <CardTitle className="flex items-center gap-2">⚙️ Basic Settings</CardTitle>
+                  <CardDescription>Configure your worksheet parameters</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6 pt-6">
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold">➕ Operation</label>
+                    <label className="text-sm font-semibold">📚 Subject</label>
                     <Select
-                      value={operation}
-                      onValueChange={(value) =>
-                        setOperation(
-                          value as "addition" | "subtraction" | "multiplication" | "division"
-                        )
-                      }
+                      value={subject}
+                      onValueChange={(value) => {
+                        setSubject(value as SubjectType);
+                        setTitle(
+                          value === "math"
+                            ? "Math Practice Worksheet"
+                            : value === "language_arts"
+                              ? "Language Arts Worksheet"
+                              : "Science Worksheet"
+                        );
+                      }}
                     >
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select operation" />
+                        <SelectValue placeholder="Select subject" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="addition">➕ Addition</SelectItem>
-                        <SelectItem value="subtraction">➖ Subtraction</SelectItem>
-                        <SelectItem value="multiplication">✖️ Multiplication</SelectItem>
-                        <SelectItem value="division">➗ Division</SelectItem>
+                        <SelectItem value="math">📐 Math</SelectItem>
+                        <SelectItem value="language_arts">📖 Language Arts</SelectItem>
+                        <SelectItem value="science">🔬 Science</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                )}
 
-                {subject === "language_arts" && (
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold">📖 Type</label>
-                    <Select
-                      value={languageArtsType}
-                      onValueChange={(value) => setLanguageArtsType(value as LanguageArtsType)}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="spelling">🔤 Spelling Words</SelectItem>
-                        <SelectItem value="vocabulary">📚 Vocabulary</SelectItem>
-                        <SelectItem value="writing">✍️ Writing Prompts</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <label className="text-sm font-semibold">📝 Title</label>
+                    <Input
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      placeholder="Enter worksheet title"
+                      className="border-2"
+                    />
                   </div>
-                )}
 
-                {subject === "science" && (
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold">🔬 Science Type</label>
-                    <Select
-                      value={scienceType}
-                      onValueChange={(value) => setScienceType(value as ScienceType)}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select science type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="biology">🧬 Biology</SelectItem>
-                        <SelectItem value="chemistry">⚗️ Chemistry</SelectItem>
-                        <SelectItem value="physics">⚡ Physics</SelectItem>
-                        <SelectItem value="earth-science">🌍 Earth Science</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
+                  {subject === "math" && (
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold">➕ Operation</label>
+                      <Select
+                        value={operation}
+                        onValueChange={(value) =>
+                          setOperation(
+                            value as "addition" | "subtraction" | "multiplication" | "division"
+                          )
+                        }
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select operation" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="addition">➕ Addition</SelectItem>
+                          <SelectItem value="subtraction">➖ Subtraction</SelectItem>
+                          <SelectItem value="multiplication">✖️ Multiplication</SelectItem>
+                          <SelectItem value="division">➗ Division</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
 
-                {subject === "language_arts" && languageArtsType === "writing" && (
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold">✍️ Writing Style</label>
-                    <Select
-                      value={writingType}
-                      onValueChange={(value) =>
-                        setWritingType(
-                          value as
-                            | "narrative"
-                            | "expository"
-                            | "persuasive"
-                            | "descriptive"
-                            | "mixed"
-                        )
-                      }
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select writing style" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="narrative">📖 Narrative (Tell a Story)</SelectItem>
-                        <SelectItem value="expository">📝 Expository (Explain/Inform)</SelectItem>
-                        <SelectItem value="persuasive">💬 Persuasive (Convince)</SelectItem>
-                        <SelectItem value="descriptive">
-                          🎨 Descriptive (Paint a Picture)
-                        </SelectItem>
-                        <SelectItem value="mixed">🎲 Mixed (Random)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
+                  {subject === "language_arts" && (
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold">📖 Type</label>
+                      <Select
+                        value={languageArtsType}
+                        onValueChange={(value) => setLanguageArtsType(value as LanguageArtsType)}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="spelling">🔤 Spelling Words</SelectItem>
+                          <SelectItem value="vocabulary">📚 Vocabulary</SelectItem>
+                          <SelectItem value="writing">✍️ Writing Prompts</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
 
-                {subject === "math" ? (
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold">🎯 Difficulty Level</label>
-                    <Select
-                      value={difficulty}
-                      onValueChange={(value) => setDifficulty(value as DifficultyLevel)}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select difficulty" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(DIFFICULTY_RANGES).map(([key, value]) => (
-                          <SelectItem key={key} value={key}>
-                            {value.label}
+                  {subject === "science" && (
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold">🔬 Science Type</label>
+                      <Select
+                        value={scienceType}
+                        onValueChange={(value) => setScienceType(value as ScienceType)}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select science type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="biology">🧬 Biology</SelectItem>
+                          <SelectItem value="chemistry">⚗️ Chemistry</SelectItem>
+                          <SelectItem value="physics">⚡ Physics</SelectItem>
+                          <SelectItem value="earth-science">🌍 Earth Science</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  {subject === "language_arts" && languageArtsType === "writing" && (
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold">✍️ Writing Style</label>
+                      <Select
+                        value={writingType}
+                        onValueChange={(value) =>
+                          setWritingType(
+                            value as
+                              | "narrative"
+                              | "expository"
+                              | "persuasive"
+                              | "descriptive"
+                              | "mixed"
+                          )
+                        }
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select writing style" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="narrative">📖 Narrative (Tell a Story)</SelectItem>
+                          <SelectItem value="expository">📝 Expository (Explain/Inform)</SelectItem>
+                          <SelectItem value="persuasive">💬 Persuasive (Convince)</SelectItem>
+                          <SelectItem value="descriptive">
+                            🎨 Descriptive (Paint a Picture)
                           </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <p className="rounded bg-blue-50 px-3 py-2 text-xs text-blue-700">
-                      {DIFFICULTY_RANGES[difficulty].desc}
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold">🎓 Grade Level</label>
-                    <Select
-                      value={gradeLevel}
-                      onValueChange={(value) => setGradeLevel(value as GradeLevel)}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select grade level" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="K">Kindergarten</SelectItem>
-                        <SelectItem value="1-2">Grades 1-2</SelectItem>
-                        <SelectItem value="3-4">Grades 3-4</SelectItem>
-                        <SelectItem value="5-6">Grades 5-6</SelectItem>
-                        <SelectItem value="7-8">Grades 7-8</SelectItem>
-                        <SelectItem value="9-12">Grades 9-12</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <p className="rounded bg-green-50 px-3 py-2 text-xs text-green-700">
-                      {subject === "science"
-                        ? gradeLevel === "K"
-                          ? "Basic science concepts & observations"
-                          : gradeLevel === "1-2"
-                            ? "Simple experiments & nature study"
-                            : gradeLevel === "3-4"
-                              ? "Scientific method & basic processes"
-                              : gradeLevel === "5-6"
-                                ? "Advanced concepts & lab skills"
-                                : gradeLevel === "7-8"
-                                  ? "Complex theories & analysis"
-                                  : "Advanced science & research methods"
-                        : gradeLevel === "K"
-                          ? "Simple CVC words & basic sight words"
-                          : gradeLevel === "1-2"
-                            ? "Consonant blends, digraphs & common sight words"
-                            : gradeLevel === "3-4"
-                              ? "Multi-syllable words & common patterns"
-                              : gradeLevel === "5-6"
-                                ? "Complex words & Greek/Latin roots"
-                                : "Advanced vocabulary & challenging spellings"}
-                    </p>
-                  </div>
-                )}
+                          <SelectItem value="mixed">🎲 Mixed (Random)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
 
-                {difficulty === "custom" && (
-                  <div className="space-y-4 rounded-lg border-2 border-dashed border-purple-300 bg-purple-50/50 p-4">
-                    <h4 className="text-sm font-semibold text-purple-900">🎨 Custom Range</h4>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-xs font-medium">Minimum</label>
-                        <Input
-                          type="number"
-                          value={customMin}
-                          onChange={(e) => setCustomMin(parseInt(e.target.value) || 0)}
-                          min="0"
-                          className="border-2"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-xs font-medium">Maximum</label>
-                        <Input
-                          type="number"
-                          value={customMax}
-                          onChange={(e) => setCustomMax(parseInt(e.target.value) || 100)}
-                          min={customMin}
-                          className="border-2"
-                        />
+                  {subject === "math" ? (
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold">🎯 Difficulty Level</label>
+                      <Select
+                        value={difficulty}
+                        onValueChange={(value) => setDifficulty(value as DifficultyLevel)}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select difficulty" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.entries(DIFFICULTY_RANGES).map(([key, value]) => (
+                            <SelectItem key={key} value={key}>
+                              {value.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <p className="rounded bg-blue-50 px-3 py-2 text-xs text-blue-700">
+                        {DIFFICULTY_RANGES[difficulty].desc}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold">🎓 Grade Level</label>
+                      <Select
+                        value={gradeLevel}
+                        onValueChange={(value) => setGradeLevel(value as GradeLevel)}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select grade level" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="K">Kindergarten</SelectItem>
+                          <SelectItem value="1-2">Grades 1-2</SelectItem>
+                          <SelectItem value="3-4">Grades 3-4</SelectItem>
+                          <SelectItem value="5-6">Grades 5-6</SelectItem>
+                          <SelectItem value="7-8">Grades 7-8</SelectItem>
+                          <SelectItem value="9-12">Grades 9-12</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <p className="rounded bg-green-50 px-3 py-2 text-xs text-green-700">
+                        {subject === "science"
+                          ? gradeLevel === "K"
+                            ? "Basic science concepts & observations"
+                            : gradeLevel === "1-2"
+                              ? "Simple experiments & nature study"
+                              : gradeLevel === "3-4"
+                                ? "Scientific method & basic processes"
+                                : gradeLevel === "5-6"
+                                  ? "Advanced concepts & lab skills"
+                                  : gradeLevel === "7-8"
+                                    ? "Complex theories & analysis"
+                                    : "Advanced science & research methods"
+                          : gradeLevel === "K"
+                            ? "Simple CVC words & basic sight words"
+                            : gradeLevel === "1-2"
+                              ? "Consonant blends, digraphs & common sight words"
+                              : gradeLevel === "3-4"
+                                ? "Multi-syllable words & common patterns"
+                                : gradeLevel === "5-6"
+                                  ? "Complex words & Greek/Latin roots"
+                                  : "Advanced vocabulary & challenging spellings"}
+                      </p>
+                    </div>
+                  )}
+
+                  {difficulty === "custom" && (
+                    <div className="space-y-4 rounded-lg border-2 border-dashed border-purple-300 bg-purple-50/50 p-4">
+                      <h4 className="text-sm font-semibold text-purple-900">🎨 Custom Range</h4>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <label className="text-xs font-medium">Minimum</label>
+                          <Input
+                            type="number"
+                            value={customMin}
+                            onChange={(e) => setCustomMin(parseInt(e.target.value) || 0)}
+                            min="0"
+                            className="border-2"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-xs font-medium">Maximum</label>
+                          <Input
+                            type="number"
+                            value={customMax}
+                            onChange={(e) => setCustomMax(parseInt(e.target.value) || 100)}
+                            min={customMin}
+                            className="border-2"
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold">
-                    {subject === "math"
-                      ? "🔢 Number of Problems"
-                      : subject === "science"
-                        ? "🔬 Number of Questions"
-                        : languageArtsType === "spelling"
-                          ? "📝 Number of Words"
-                          : languageArtsType === "vocabulary"
-                            ? "📚 Number of Vocabulary Words"
-                            : "✍️ Number of Prompts"}
-                  </label>
-                  <Input
-                    type="number"
-                    min="5"
-                    max={
-                      subject === "language_arts" && languageArtsType === "vocabulary"
-                        ? "10"
-                        : "100"
-                    }
-                    value={problemCount}
-                    onChange={(e) => setProblemCount(parseInt(e.target.value) || 20)}
-                    className="border-2"
-                  />
-                  <p className="text-muted-foreground text-xs">
-                    {subject === "math"
-                      ? "Between 5 and 100 problems"
-                      : subject === "science"
-                        ? "Between 5 and 50 questions"
-                        : languageArtsType === "vocabulary"
-                          ? "Between 5 and 10 vocabulary words"
-                          : languageArtsType === "writing"
-                            ? "Between 1 and 5 writing prompts"
-                            : "Between 5 and 100 words"}
-                  </p>
-                </div>
-
-                {worksheetType === "traditional" ? (
-                  <Button
-                    onClick={handleGenerate}
-                    disabled={isGenerating}
-                    className="w-full text-lg shadow-md"
-                    size="lg"
-                  >
-                    {isGenerating
-                      ? "Generating..."
-                      : subject === "math"
-                        ? "🎲 Generate Problems"
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold">
+                      {subject === "math"
+                        ? "🔢 Number of Problems"
                         : subject === "science"
-                          ? "🔬 Generate Science Questions"
+                          ? "🔬 Number of Questions"
                           : languageArtsType === "spelling"
-                            ? "🔤 Generate Spelling Words"
+                            ? "📝 Number of Words"
                             : languageArtsType === "vocabulary"
-                              ? "📚 Generate Vocabulary"
-                              : "✍️ Generate Writing Prompts"}
+                              ? "📚 Number of Vocabulary Words"
+                              : "✍️ Number of Prompts"}
+                    </label>
+                    <Input
+                      type="number"
+                      min="5"
+                      max={
+                        subject === "language_arts" && languageArtsType === "vocabulary"
+                          ? "10"
+                          : "100"
+                      }
+                      value={problemCount}
+                      onChange={(e) => setProblemCount(parseInt(e.target.value) || 20)}
+                      className="border-2"
+                    />
+                    <p className="text-muted-foreground text-xs">
+                      {subject === "math"
+                        ? "Between 5 and 100 problems"
+                        : subject === "science"
+                          ? "Between 5 and 50 questions"
+                          : languageArtsType === "vocabulary"
+                            ? "Between 5 and 10 vocabulary words"
+                            : languageArtsType === "writing"
+                              ? "Between 1 and 5 writing prompts"
+                              : "Between 5 and 100 words"}
+                    </p>
+                  </div>
+
+                  {worksheetType === "traditional" ? (
+                    <Button
+                      onClick={handleGenerate}
+                      disabled={isGenerating}
+                      className="w-full text-lg shadow-md"
+                      size="lg"
+                    >
+                      {isGenerating
+                        ? "Generating..."
+                        : subject === "math"
+                          ? "🎲 Generate Problems"
+                          : subject === "science"
+                            ? "🔬 Generate Science Questions"
+                            : languageArtsType === "spelling"
+                              ? "🔤 Generate Spelling Words"
+                              : languageArtsType === "vocabulary"
+                                ? "📚 Generate Vocabulary"
+                                : "✍️ Generate Writing Prompts"}
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={handleCreateInteractiveWorksheet}
+                      disabled={isGenerating}
+                      className="w-full text-lg shadow-md"
+                      size="lg"
+                    >
+                      🎮 Create Interactive Worksheet
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Collaboration & Tools */}
+              <Card className="shadow-lg">
+                <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50">
+                  <CardTitle className="flex items-center gap-2">
+                    🤝 Collaboration & Tools
+                  </CardTitle>
+                  <CardDescription>Work together and track progress</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4 pt-6">
+                  <Button onClick={handleStartCollaboration} className="w-full" variant="outline">
+                    <Users className="mr-2 h-4 w-4" />
+                    Start Collaboration
                   </Button>
-                ) : (
+
                   <Button
-                    onClick={handleCreateInteractiveWorksheet}
-                    disabled={isGenerating}
-                    className="w-full text-lg shadow-md"
-                    size="lg"
+                    onClick={() => setShowAnalytics(!showAnalytics)}
+                    className="w-full"
+                    variant="outline"
                   >
-                    🎮 Create Interactive Worksheet
+                    <BarChart3 className="mr-2 h-4 w-4" />
+                    View Analytics
                   </Button>
-                )}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
 
-            {/* Advanced Customization */}
-            <Card className="shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50">
-                <CardTitle className="flex items-center gap-2">🎨 Advanced Customization</CardTitle>
-                <CardDescription>Fine-tune your worksheet appearance</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6 pt-6">
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold">📐 Layout</label>
-                  <Select
-                    value={layout}
-                    onValueChange={(value) => setLayout(value as "standard" | "wide" | "narrow")}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select layout" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="standard">Standard (8.5" × 11")</SelectItem>
-                      <SelectItem value="wide">Wide (11" × 8.5")</SelectItem>
-                      <SelectItem value="narrow">Narrow (6" × 9")</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+            {/* Step 3: Advanced Customization */}
+            <div className="mb-8 text-center">
+              <h2 className="mb-2 text-2xl font-bold text-gray-900">
+                Step 3: Advanced Customization
+              </h2>
+              <p className="text-gray-600">Fine-tune your worksheet appearance and behavior</p>
+            </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold">📏 Spacing</label>
-                  <Select
-                    value={spacing}
-                    onValueChange={(value) => setSpacing(value as "tight" | "normal" | "loose")}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select spacing" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="tight">Tight (More problems per page)</SelectItem>
-                      <SelectItem value="normal">Normal (Balanced spacing)</SelectItem>
-                      <SelectItem value="loose">Loose (More space for answers)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold">📝 Custom Instructions</label>
-                  <Input
-                    value={customInstructions}
-                    onChange={(e) => setCustomInstructions(e.target.value)}
-                    placeholder="Add special instructions for students..."
-                    className="border-2"
-                  />
-                </div>
-
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <label className="text-sm font-semibold">🔲 Show Borders</label>
-                    <Button
-                      variant={showBorders ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setShowBorders(!showBorders)}
+            <div className="mb-8 grid grid-cols-1 gap-8 lg:grid-cols-2">
+              {/* Advanced Settings */}
+              <Card className="shadow-lg">
+                <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50">
+                  <CardTitle className="flex items-center gap-2">🎨 Advanced Settings</CardTitle>
+                  <CardDescription>Fine-tune your worksheet appearance</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6 pt-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold">📐 Layout</label>
+                    <Select
+                      value={layout}
+                      onValueChange={(value) => setLayout(value as "standard" | "wide" | "narrow")}
                     >
-                      {showBorders ? "Yes" : "No"}
-                    </Button>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select layout" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="standard">Standard (8.5" × 11")</SelectItem>
+                        <SelectItem value="wide">Wide (11" × 8.5")</SelectItem>
+                        <SelectItem value="narrow">Narrow (6" × 9")</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
-                  <div className="flex items-center justify-between">
-                    <label className="text-sm font-semibold">🔑 Include Answer Key</label>
-                    <Button
-                      variant={includeAnswerKey ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setIncludeAnswerKey(!includeAnswerKey)}
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold">📏 Spacing</label>
+                    <Select
+                      value={spacing}
+                      onValueChange={(value) => setSpacing(value as "tight" | "normal" | "loose")}
                     >
-                      {includeAnswerKey ? "Yes" : "No"}
-                    </Button>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select spacing" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="tight">Tight (More problems per page)</SelectItem>
+                        <SelectItem value="normal">Normal (Balanced spacing)</SelectItem>
+                        <SelectItem value="loose">Loose (More space for answers)</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
 
-            {/* Styling Options */}
-            {problems.length > 0 && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold">📝 Custom Instructions</label>
+                    <Input
+                      value={customInstructions}
+                      onChange={(e) => setCustomInstructions(e.target.value)}
+                      placeholder="Add special instructions for students..."
+                      className="border-2"
+                    />
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <label className="text-sm font-semibold">🔲 Show Borders</label>
+                      <Button
+                        variant={showBorders ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setShowBorders(!showBorders)}
+                      >
+                        {showBorders ? "Yes" : "No"}
+                      </Button>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <label className="text-sm font-semibold">🔑 Include Answer Key</label>
+                      <Button
+                        variant={includeAnswerKey ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setIncludeAnswerKey(!includeAnswerKey)}
+                      >
+                        {includeAnswerKey ? "Yes" : "No"}
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Live Preview */}
               <Card className="shadow-lg">
                 <CardHeader className="bg-gradient-to-r from-pink-50 to-orange-50">
-                  <CardTitle className="flex items-center gap-2">🎨 Styling Options</CardTitle>
-                  <CardDescription>Make your worksheet beautiful</CardDescription>
+                  <CardTitle className="flex items-center gap-2">👁️ Live Preview</CardTitle>
+                  <CardDescription>See your worksheet as you create it</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6 pt-6">
                   <div className="space-y-3">
@@ -1353,11 +1367,86 @@ export default function CreateWorksheet() {
                   </div>
                 </CardContent>
               </Card>
-            )}
+            </div>
           </div>
 
+          {/* Step 4: Generate Your Worksheet */}
+          <div className="mb-8 text-center">
+            <h2 className="mb-2 text-2xl font-bold text-gray-900">
+              Step 4: Generate Your Worksheet
+            </h2>
+            <p className="text-gray-600">
+              Create your worksheet with all the settings you've configured
+            </p>
+          </div>
+
+          <div className="mx-auto mb-8 max-w-2xl">
+            <Card className="shadow-lg">
+              <CardContent className="p-8 text-center">
+                {worksheetType === "traditional" ? (
+                  <Button
+                    onClick={handleGenerate}
+                    disabled={isGenerating}
+                    className="w-full py-6 text-xl shadow-lg"
+                    size="lg"
+                  >
+                    {isGenerating ? (
+                      <div className="flex items-center gap-3">
+                        <div className="h-5 w-5 animate-spin rounded-full border-b-2 border-white"></div>
+                        <span>Generating...</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">🎲</span>
+                        <span>
+                          {subject === "math"
+                            ? "Generate Math Problems"
+                            : subject === "science"
+                              ? "Generate Science Questions"
+                              : languageArtsType === "spelling"
+                                ? "Generate Spelling Words"
+                                : languageArtsType === "vocabulary"
+                                  ? "Generate Vocabulary"
+                                  : "Generate Writing Prompts"}
+                        </span>
+                      </div>
+                    )}
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleCreateInteractiveWorksheet}
+                    disabled={isGenerating}
+                    className="w-full py-6 text-xl shadow-lg"
+                    size="lg"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">🎮</span>
+                      <span>Create Interactive Worksheet</span>
+                    </div>
+                  </Button>
+                )}
+
+                <p className="mt-4 text-sm text-gray-500">
+                  Your worksheet will be generated based on all the settings you've configured
+                  above.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Step 5: Preview and Export */}
+          {problems.length > 0 ||
+          spellingWords.length > 0 ||
+          vocabularyWords.length > 0 ||
+          writingPrompts.length > 0 ? (
+            <div className="mb-8 text-center">
+              <h2 className="mb-2 text-2xl font-bold text-gray-900">Step 5: Preview and Export</h2>
+              <p className="text-gray-600">Review your worksheet and export it when ready</p>
+            </div>
+          ) : null}
+
           {/* Preview Panel */}
-          <div className="lg:col-span-2">
+          <div className="mx-auto max-w-4xl">
             <Card className="shadow-lg">
               <CardHeader className="bg-gradient-to-r from-green-50 to-teal-50">
                 <CardTitle className="flex items-center gap-2">👀 Live Preview</CardTitle>
@@ -1378,14 +1467,14 @@ export default function CreateWorksheet() {
                 spellingWords.length === 0 &&
                 vocabularyWords.length === 0 &&
                 writingPrompts.length === 0 ? (
-                  <div className="flex h-[600px] items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gradient-to-br from-blue-50/50 to-purple-50/50">
+                  <div className="flex h-[400px] items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gradient-to-br from-blue-50/50 to-purple-50/50">
                     <div className="text-center">
                       <div className="mb-4 text-6xl">📋</div>
                       <p className="text-foreground text-xl font-medium">
                         Ready to create magic? ✨
                       </p>
                       <p className="text-muted-foreground mt-2">
-                        Configure your settings on the left and click "Generate"
+                        Configure your settings above and click "Generate"
                       </p>
                     </div>
                   </div>
@@ -1618,6 +1707,70 @@ export default function CreateWorksheet() {
                 ) : null}
               </CardContent>
             </Card>
+
+            {/* Export Controls */}
+            {problems.length > 0 ||
+            spellingWords.length > 0 ||
+            vocabularyWords.length > 0 ||
+            writingPrompts.length > 0 ? (
+              <div className="mx-auto mt-8 max-w-2xl">
+                <Card className="shadow-lg">
+                  <CardHeader className="bg-gradient-to-r from-orange-50 to-red-50">
+                    <CardTitle className="flex items-center gap-2">
+                      📄 Export Your Worksheet
+                    </CardTitle>
+                    <CardDescription>Download and print your completed worksheet</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6 pt-6">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                      <Button
+                        onClick={handleExport}
+                        disabled={isExporting}
+                        className="w-full py-6 text-lg shadow-md"
+                        size="lg"
+                        variant="default"
+                      >
+                        {isExporting ? (
+                          <div className="flex items-center gap-3">
+                            <div className="h-5 w-5 animate-spin rounded-full border-b-2 border-white"></div>
+                            <span>Creating...</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-3">
+                            <span className="text-xl">📄</span>
+                            <span>Print Worksheet</span>
+                          </div>
+                        )}
+                      </Button>
+
+                      <Button
+                        onClick={() => window.print()}
+                        className="w-full py-6 text-lg shadow-md"
+                        size="lg"
+                        variant="outline"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-xl">🖨️</span>
+                          <span>Print Preview</span>
+                        </div>
+                      </Button>
+                    </div>
+
+                    {/* Usage Warning */}
+                    <UsageLimitWarning
+                      userId="current-user"
+                      action="exportsPerMonth"
+                      className="mt-4"
+                    />
+
+                    {/* Upgrade Prompt for Free Users */}
+                    <div className="mt-4">
+                      <UpgradePrompt userId="current-user" variant="inline" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
