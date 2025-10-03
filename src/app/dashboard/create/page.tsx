@@ -1308,19 +1308,63 @@ export default function CreateWorksheet() {
                           background:
                             bg.id === "custom" && customImage
                               ? `url('${customImage}') center/cover`
-                              : bg.preview,
-                          backgroundSize: bg.id === "custom" && customImage ? "cover" : "100% 100%",
+                              : bg.id === "none"
+                                ? "#ffffff"
+                                : bg.id === "subtle-grid"
+                                  ? "white"
+                                  : bg.id === "notebook"
+                                    ? "#fef9e7"
+                                    : bg.id === "dots"
+                                      ? "white"
+                                      : bg.id === "nature"
+                                        ? "linear-gradient(135deg, #e8f5e9, #fff3e0)"
+                                        : bg.id === "sky"
+                                          ? "linear-gradient(180deg, #e3f2fd, #ffffff)"
+                                          : bg.id === "warm"
+                                            ? "linear-gradient(135deg, #fff9c4, #ffecb3)"
+                                            : bg.id === "pastel"
+                                              ? "linear-gradient(90deg, #fce4ec, #e1f5fe)"
+                                              : bg.id === "ocean"
+                                                ? "linear-gradient(45deg, #e0f7fa, #b3e5fc)"
+                                                : bg.id === "forest"
+                                                  ? "linear-gradient(135deg, #e8f5e9, #c8e6c9)"
+                                                  : bg.id === "lavender"
+                                                    ? "linear-gradient(135deg, #f3e5f5, #e1bee7)"
+                                                    : bg.id === "sunset"
+                                                      ? "linear-gradient(135deg, #ffecb3, #ffcc02)"
+                                                      : "linear-gradient(45deg, #f0f0f0, #e0e0e0)",
+                          backgroundSize: "100% 100%",
                           backgroundRepeat: "no-repeat",
+                          ...(bg.id === "subtle-grid" && {
+                            backgroundImage:
+                              "linear-gradient(rgba(0,0,0,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,.03) 1px, transparent 1px)",
+                            backgroundSize: "20px 20px",
+                          }),
+                          ...(bg.id === "notebook" && {
+                            backgroundImage:
+                              "repeating-linear-gradient(transparent, transparent 29px, #e8b4b4 29px, #e8b4b4 31px)",
+                          }),
+                          ...(bg.id === "dots" && {
+                            backgroundImage:
+                              "radial-gradient(circle, rgba(59, 130, 246, 0.08) 1px, transparent 1px)",
+                            backgroundSize: "20px 20px",
+                          }),
                         }}
                       >
                         <div className="bg-opacity-0 hover:bg-opacity-10 absolute inset-0 rounded-md bg-black transition-all" />
                         <div className="relative z-10 text-center">
                           <div
-                            className={`drop-shadow-sm ${
-                              bg.id === "none" || bg.id === "dots" || bg.id === "subtle-grid"
-                                ? "text-gray-800"
-                                : "text-white"
-                            }`}
+                            className="text-xs font-medium drop-shadow-lg"
+                            style={{
+                              color:
+                                bg.id === "none" ||
+                                bg.id === "dots" ||
+                                bg.id === "subtle-grid" ||
+                                bg.id === "notebook"
+                                  ? "#333333"
+                                  : "#ffffff",
+                              textShadow: "1px 1px 2px rgba(0,0,0,0.7)",
+                            }}
                           >
                             {bg.name}
                           </div>
