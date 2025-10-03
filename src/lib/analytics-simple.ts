@@ -39,7 +39,14 @@ export class AnalyticsManager {
     if (typeof window === "undefined") return [];
 
     const stored = localStorage.getItem(this.STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
+    if (!stored) return [];
+
+    try {
+      const parsed = JSON.parse(stored);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
   }
 
   static getUserAnalytics(userId: string) {

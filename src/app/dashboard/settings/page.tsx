@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useUser } from "@clerk/nextjs";
 import { MobileLayout } from "@/components/mobile-layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,7 +18,9 @@ import {
   Target,
   Star,
   Download,
+  Users,
 } from "lucide-react";
+import { StudentManager } from "@/components/student-manager";
 
 // Mock data - in a real app, this would come from an API
 const mockHomeworkHistory = [
@@ -80,6 +83,22 @@ const mockAnalytics = {
 
 export default function AccountSettings() {
   const [activeTab, setActiveTab] = useState("overview");
+  const { user } = useUser();
+  const [accountInfo, setAccountInfo] = useState({
+    displayName: "",
+    email: "",
+    gradeLevel: "K",
+  });
+
+  useEffect(() => {
+    if (user) {
+      setAccountInfo({
+        displayName: `${user.firstName || ""} ${user.lastName || ""}`.trim() || "User",
+        email: user.emailAddresses[0]?.emailAddress || "",
+        gradeLevel: "K", // Default for parent account
+      });
+    }
+  }, [user]);
 
   const formatDate = (date: Date) => {
     return date.toLocaleDateString("en-US", {
@@ -106,10 +125,14 @@ export default function AccountSettings() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <User className="h-4 w-4" />
               Overview
+            </TabsTrigger>
+            <TabsTrigger value="students" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              Students
             </TabsTrigger>
             <TabsTrigger value="analytics" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
@@ -224,6 +247,11 @@ export default function AccountSettings() {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* Students Tab */}
+          <TabsContent value="students" className="space-y-6">
+            <StudentManager userId="current-user" />
           </TabsContent>
 
           {/* Analytics Tab */}
@@ -382,7 +410,10 @@ export default function AccountSettings() {
                   <label className="text-sm font-medium">Display Name</label>
                   <input
                     type="text"
-                    defaultValue="Student Name"
+                    value={accountInfo.displayName}
+                    onChange={(e) =>
+                      setAccountInfo({ ...accountInfo, displayName: e.target.value })
+                    }
                     className="mt-1 w-full rounded-md border px-3 py-2"
                   />
                 </div>
@@ -390,18 +421,22 @@ export default function AccountSettings() {
                   <label className="text-sm font-medium">Email</label>
                   <input
                     type="email"
-                    defaultValue="student@example.com"
-                    className="mt-1 w-full rounded-md border px-3 py-2"
+                    value={accountInfo.email}
+                    readOnly
+                    className="mt-1 w-full rounded-md border bg-gray-50 px-3 py-2"
                   />
+                  <p className="mt-1 text-xs text-gray-500">
+                    Email is managed by your Google account
+                  </p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium">Grade Level</label>
-                  <select className="mt-1 w-full rounded-md border px-3 py-2">
-                    <option>Grades 1-2</option>
-                    <option>Grades 3-4</option>
-                    <option>Grades 5-6</option>
-                    <option>Grades 7-8</option>
+                  <label className="text-sm font-medium">Account Type</label>
+                  <select className="mt-1 w-full rounded-md border px-3 py-2" disabled>
+                    <option>Parent/Teacher Account</option>
                   </select>
+                  <p className="mt-1 text-xs text-gray-500">
+                    Create student accounts in the Students tab
+                  </p>
                 </div>
                 <Button className="homeschool-button">Save Changes</Button>
               </CardContent>
