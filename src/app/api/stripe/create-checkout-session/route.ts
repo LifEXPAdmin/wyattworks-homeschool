@@ -208,20 +208,7 @@ export async function POST(request: NextRequest) {
 
     // Create checkout session with trial period
     try {
-      const sessionConfig: {
-        customer: string;
-        payment_method_types: string[];
-        line_items: Array<{ price: string; quantity: number }>;
-        mode: string;
-        subscription_data: {
-          trial_period_days: number;
-          metadata: Record<string, string>;
-        };
-        success_url: string;
-        cancel_url: string;
-        metadata: Record<string, string>;
-        discounts?: Array<{ coupon: string }>;
-      } = {
+      const sessionConfig = {
         customer: customerId,
         payment_method_types: ["card"],
         line_items: [
