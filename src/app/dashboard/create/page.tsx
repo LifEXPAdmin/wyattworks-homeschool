@@ -675,63 +675,29 @@ export default function CreateWorksheet() {
     };
 
     try {
-      const response = await fetch("/api/export", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          config,
-          title,
-          subtitle: `${operation.charAt(0).toUpperCase() + operation.slice(1)} - ${DIFFICULTY_RANGES[difficulty].label}`,
-          instructions: "Solve each problem. Show your work.",
-        }),
-      });
+      console.log("🚀 Starting PDF export...");
 
-      const result = await response.json();
+      // Check if we have content to export
+      const hasContent =
+        problems.length > 0 ||
+        spellingWords.length > 0 ||
+        vocabularyWords.length > 0 ||
+        writingPrompts.length > 0 ||
+        scienceProblems.length > 0;
 
-      if (!response.ok) {
-        console.error("Export failed:", result);
-        if (result.paywall) {
-          alert(
-            `Quota exceeded! You've used ${result.quota?.used}/${result.quota?.limit} exports this month. Please upgrade to continue.`
-          );
-        } else {
-          const errorMsg = result.message || result.error || "Failed to export";
-          const details = result.details
-            ? `\n\nDetails: ${JSON.stringify(result.details, null, 2)}`
-            : "";
-          alert(`Error: ${errorMsg}${details}`);
-        }
+      if (!hasContent) {
+        alert("Please generate content first!");
         return;
       }
 
-      const selectedBg = BACKGROUND_TEMPLATES.find((t) => t.id === background);
-      const bgStyle =
-        background === "custom" && customImage
-          ? `background-image: url('${customImage}'); background-size: cover; background-position: center; background-repeat: no-repeat;`
-          : selectedBg?.css || "";
+      console.log("✅ Content validated, opening print window...");
 
-      // Generate PDF and download it
-      const contentData =
-        subject === "math"
-          ? {
-              problems,
-              title,
-              subtitle: `${operation.charAt(0).toUpperCase() + operation.slice(1)} - ${DIFFICULTY_RANGES[difficulty].label}`,
-            }
-          : subject === "science"
-            ? {
-                problems: scienceProblems,
-                title,
-                subtitle: `${scienceType.charAt(0).toUpperCase() + scienceType.slice(1)} - Grade ${gradeLevel}`,
-              }
-            : subject === "language_arts"
-              ? { spellingWords, vocabularyWords, writingPrompts, title }
-              : {};
-
-      // Open print window instead of generating PDF client-side
+      // Open print window directly - no need for API call
       const printWindow = window.open("", "_blank");
 
       if (printWindow) {
+        console.log("✅ Print window opened successfully");
+
         const selectedBg = BACKGROUND_TEMPLATES.find((t) => t.id === background);
         const backgroundStyle =
           background === "custom" && customImage
@@ -746,6 +712,8 @@ export default function CreateWorksheet() {
               : "gap: 20px; padding: 10px;";
 
         const borderStyle = showBorders ? "border: 1px solid #ccc;" : "border: none;";
+
+        console.log("📝 Writing HTML content to print window...");
 
         printWindow.document.write(`
         <html>
@@ -779,6 +747,7 @@ export default function CreateWorksheet() {
                 border-radius: 5px; 
                 font-family: "${selectedFont}", sans-serif;
                 font-size: ${spacing === "tight" ? "14px" : spacing === "loose" ? "18px" : "16px"};
+                padding: 8px;
               }
               h1 {
                 font-family: "${selectedFont}", sans-serif;
@@ -788,13 +757,32 @@ export default function CreateWorksheet() {
                 font-family: "${selectedFont}", sans-serif;
                 font-size: ${spacing === "tight" ? "12px" : spacing === "loose" ? "16px" : "14px"};
               }
+              .print-button {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #F2760A;
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-size: 16px;
+                cursor: pointer;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                z-index: 1000;
+              }
+              .print-button:hover {
+                background: #E05A00;
+              }
               @media print {
                 body { margin: 0; }
                 .worksheet { max-width: none; background: white; }
+                .print-button { display: none; }
               }
             </style>
           </head>
           <body>
+            <button class="print-button" onclick="window.print()">🖨️ Print Worksheet</button>
             <div class="worksheet">
               <div class="header">
                 <h1>${title}</h1>
@@ -853,25 +841,25 @@ export default function CreateWorksheet() {
           </body>
         </html>
       `);
+
         printWindow.document.close();
+        console.log("✅ HTML content written to print window");
+
         alert(
-          "✅ Worksheet Ready!\n\nA new window has opened with your worksheet.\n\nClick the 'Print Worksheet' button and use your browser's print dialog to:\n• Save as PDF\n• Print directly"
+          "✅ Worksheet Ready!\n\nA new window has opened with your worksheet.\n\n• Click the 'Print Worksheet' button in the top-right corner\n• Or use Ctrl+P (Cmd+P on Mac)\n• Choose 'Save as PDF' or print directly"
         );
 
         // Track usage
-        // subscriptionManager.incrementUsage(userId, "exportsPerMonth");
-        // subscriptionManager.incrementUsage(userId, "worksheetsPerMonth");
+        AnalyticsManager.trackEvent(userId, "worksheet_exported_success", {
+          subject,
+          type: currentType,
+          problemCount: problems.length || spellingWords.length || scienceProblems.length,
+        });
       } else {
+        console.error("❌ Failed to open print window - popup blocked");
         alert(
-          "Popup blocked! Please allow popups for this site, then try again.\n\nOr click OK and I'll show the worksheet on this page instead."
+          "❌ Popup Blocked!\n\nYour browser blocked the print window. Please:\n\n1. Allow popups for this site\n2. Try again\n\nOr use Ctrl+P (Cmd+P) on this page to print directly."
         );
-        // document.body.innerHTML = generatePrintHTML(
-        //   subject,
-        //   result.data || contentData,
-        //   bgStyle,
-        //   selectedFont,
-        //   currentTheme as unknown as { colors: Record<string, string> }
-        // );
       }
     } catch (error) {
       console.error("Export error:", error);
