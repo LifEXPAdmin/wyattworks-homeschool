@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Logo } from "@/components/logo";
+import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import {
   Menu,
   X,
@@ -21,6 +22,7 @@ import {
   Crown,
   Brain,
   FileText,
+  Home as HomeIcon,
 } from "lucide-react";
 import {
   MobileDetector,
@@ -147,6 +149,50 @@ export function MobileLayout({ children, className }: MobileLayoutProps) {
               </Link>
             </div>
 
+            {/* Desktop Navigation */}
+            <div className="hidden items-center space-x-2 md:flex">
+              <SignedOut>
+                <Link href="/sign-in">
+                  <Button variant="ghost">Sign In</Button>
+                </Link>
+                <Link href="/dashboard/build">
+                  <Button>Start Building</Button>
+                </Link>
+              </SignedOut>
+              <SignedIn>
+                <Link href="/dashboard">
+                  <Button variant="ghost" size="sm">
+                    <HomeIcon className="mr-2 h-4 w-4" />
+                    Dashboard
+                  </Button>
+                </Link>
+                <Link href="/dashboard/build">
+                  <Button variant="ghost" size="sm">
+                    <BookOpen className="mr-2 h-4 w-4" />
+                    Create
+                  </Button>
+                </Link>
+                <Link href="/dashboard/worksheets">
+                  <Button variant="ghost" size="sm">
+                    <FileText className="mr-2 h-4 w-4" />
+                    Worksheets
+                  </Button>
+                </Link>
+                <Link href="/dashboard/analytics">
+                  <Button variant="ghost" size="sm">
+                    <BarChart3 className="mr-2 h-4 w-4" />
+                    Analytics
+                  </Button>
+                </Link>
+                <Link href="/dashboard/settings">
+                  <Button variant="ghost" size="sm">
+                    <Settings className="mr-2 h-4 w-4" />
+                    Settings
+                  </Button>
+                </Link>
+              </SignedIn>
+            </div>
+
             {/* Mobile Actions */}
             <div className="flex items-center space-x-2">
               {mobileConfig.isMobile && (
@@ -169,6 +215,29 @@ export function MobileLayout({ children, className }: MobileLayoutProps) {
                   </Button>
                 </>
               )}
+
+              {/* Desktop Menu Button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="md:hidden"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+              >
+                {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </Button>
+
+              {/* Desktop User Button */}
+              <div className="hidden md:block">
+                <SignedIn>
+                  <UserButton
+                    appearance={{
+                      elements: {
+                        avatarBox: "w-10 h-10",
+                      },
+                    }}
+                  />
+                </SignedIn>
+              </div>
             </div>
           </div>
 
@@ -188,6 +257,44 @@ export function MobileLayout({ children, className }: MobileLayoutProps) {
             </div>
           )}
         </div>
+
+        {/* Desktop Mobile Menu Dropdown */}
+        {isMenuOpen && !mobileConfig.isMobile && (
+          <div className="bg-background/95 border-t backdrop-blur md:hidden">
+            <div className="container mx-auto space-y-2 px-4 py-4">
+              <Link href="/dashboard" onClick={() => setIsMenuOpen(false)}>
+                <Button variant="ghost" className="w-full justify-start">
+                  <HomeIcon className="mr-2 h-4 w-4" />
+                  Dashboard
+                </Button>
+              </Link>
+              <Link href="/dashboard/build" onClick={() => setIsMenuOpen(false)}>
+                <Button variant="ghost" className="w-full justify-start">
+                  <BookOpen className="mr-2 h-4 w-4" />
+                  Create Worksheets
+                </Button>
+              </Link>
+              <Link href="/dashboard/worksheets" onClick={() => setIsMenuOpen(false)}>
+                <Button variant="ghost" className="w-full justify-start">
+                  <FileText className="mr-2 h-4 w-4" />
+                  My Worksheets
+                </Button>
+              </Link>
+              <Link href="/dashboard/analytics" onClick={() => setIsMenuOpen(false)}>
+                <Button variant="ghost" className="w-full justify-start">
+                  <BarChart3 className="mr-2 h-4 w-4" />
+                  Analytics
+                </Button>
+              </Link>
+              <Link href="/dashboard/settings" onClick={() => setIsMenuOpen(false)}>
+                <Button variant="ghost" className="w-full justify-start">
+                  <Settings className="mr-2 h-4 w-4" />
+                  Settings
+                </Button>
+              </Link>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Mobile Navigation Overlay */}
