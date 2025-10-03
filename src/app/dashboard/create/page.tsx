@@ -1311,11 +1311,11 @@ export default function CreateWorksheet() {
                               : bg.id === "none"
                                 ? "#ffffff"
                                 : bg.id === "subtle-grid"
-                                  ? "white"
+                                  ? "#f0f0f0"
                                   : bg.id === "notebook"
                                     ? "#fef9e7"
                                     : bg.id === "dots"
-                                      ? "white"
+                                      ? "#ffffff"
                                       : bg.id === "nature"
                                         ? "linear-gradient(135deg, #e8f5e9, #fff3e0)"
                                         : bg.id === "sky"
@@ -1335,35 +1335,21 @@ export default function CreateWorksheet() {
                                                       : "linear-gradient(45deg, #f0f0f0, #e0e0e0)",
                           backgroundSize: "100% 100%",
                           backgroundRepeat: "no-repeat",
-                          ...(bg.id === "subtle-grid" && {
-                            backgroundImage:
-                              "linear-gradient(rgba(0,0,0,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,.03) 1px, transparent 1px)",
-                            backgroundSize: "20px 20px",
-                          }),
-                          ...(bg.id === "notebook" && {
-                            backgroundImage:
-                              "repeating-linear-gradient(transparent, transparent 29px, #e8b4b4 29px, #e8b4b4 31px)",
-                          }),
-                          ...(bg.id === "dots" && {
-                            backgroundImage:
-                              "radial-gradient(circle, rgba(59, 130, 246, 0.08) 1px, transparent 1px)",
-                            backgroundSize: "20px 20px",
-                          }),
                         }}
                       >
                         <div className="bg-opacity-0 hover:bg-opacity-10 absolute inset-0 rounded-md bg-black transition-all" />
                         <div className="relative z-10 text-center">
                           <div
-                            className="text-xs font-medium drop-shadow-lg"
+                            className="text-xs font-medium"
                             style={{
                               color:
                                 bg.id === "none" ||
                                 bg.id === "dots" ||
                                 bg.id === "subtle-grid" ||
                                 bg.id === "notebook"
-                                  ? "#333333"
+                                  ? "#000000"
                                   : "#ffffff",
-                              textShadow: "1px 1px 2px rgba(0,0,0,0.7)",
+                              textShadow: "1px 1px 2px rgba(0,0,0,0.8)",
                             }}
                           >
                             {bg.name}
