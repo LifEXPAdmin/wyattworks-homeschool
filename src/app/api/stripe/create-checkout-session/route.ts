@@ -208,7 +208,8 @@ export async function POST(request: NextRequest) {
 
     // Create checkout session with trial period
     try {
-      const sessionConfig = {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const sessionConfig: any = {
         customer: customerId,
         payment_method_types: ["card"],
         line_items: [
