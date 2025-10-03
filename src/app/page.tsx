@@ -5,7 +5,16 @@ import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Logo } from "@/components/logo";
-import { Menu, X, Home, Settings, BarChart3, FileText, Users, BookOpen } from "lucide-react";
+import {
+  Menu,
+  X,
+  Home as HomeIcon,
+  Settings,
+  BarChart3,
+  FileText,
+  Users,
+  BookOpen,
+} from "lucide-react";
 import { useState } from "react";
 
 export default function Home() {
@@ -45,7 +54,7 @@ export default function Home() {
                 <div className="hidden items-center space-x-2 md:flex">
                   <Link href="/dashboard">
                     <Button variant="ghost" size="sm">
-                      <Home className="mr-2 h-4 w-4" />
+                      <HomeIcon className="mr-2 h-4 w-4" />
                       Dashboard
                     </Button>
                   </Link>
@@ -93,7 +102,7 @@ export default function Home() {
             <div className="container mx-auto space-y-2 px-4 py-4">
               <Link href="/dashboard" onClick={() => setIsMenuOpen(false)}>
                 <Button variant="ghost" className="w-full justify-start">
-                  <Home className="mr-2 h-4 w-4" />
+                  <HomeIcon className="mr-2 h-4 w-4" />
                   Dashboard
                 </Button>
               </Link>
