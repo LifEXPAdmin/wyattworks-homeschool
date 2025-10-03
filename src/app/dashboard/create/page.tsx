@@ -62,19 +62,19 @@ const BACKGROUND_TEMPLATES = [
   {
     id: "subtle-grid",
     name: "Subtle Grid",
-    preview: "linear-gradient(#f0f0f0, #f0f0f0)",
+    preview: "#f0f0f0",
     css: "background: white; background-image: linear-gradient(rgba(0,0,0,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,.03) 1px, transparent 1px); background-size: 20px 20px;",
   },
   {
     id: "notebook",
     name: "Notebook Lines",
-    preview: "linear-gradient(#e3f2fd, #e3f2fd)",
+    preview: "#fef9e7",
     css: "background: #fef9e7; background-image: repeating-linear-gradient(transparent, transparent 29px, #e8b4b4 29px, #e8b4b4 31px);",
   },
   {
     id: "dots",
     name: "Polka Dots",
-    preview: "radial-gradient(circle, #ddd 10%, transparent 10%)",
+    preview: "#ffffff",
     css: "background-color: #fff; background-image: radial-gradient(circle, rgba(59, 130, 246, 0.08) 1px, transparent 1px); background-size: 20px 20px;",
   },
   {
@@ -1315,7 +1315,15 @@ export default function CreateWorksheet() {
                       >
                         <div className="bg-opacity-0 hover:bg-opacity-10 absolute inset-0 rounded-md bg-black transition-all" />
                         <div className="relative z-10 text-center">
-                          <div className="text-white drop-shadow-sm">{bg.name}</div>
+                          <div
+                            className={`drop-shadow-sm ${
+                              bg.id === "none" || bg.id === "dots" || bg.id === "subtle-grid"
+                                ? "text-gray-800"
+                                : "text-white"
+                            }`}
+                          >
+                            {bg.name}
+                          </div>
                         </div>
                       </button>
                     ))}
