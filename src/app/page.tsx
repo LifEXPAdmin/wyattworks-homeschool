@@ -1,10 +1,15 @@
+"use client";
+
 import Link from "next/link";
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Logo } from "@/components/logo";
+import { Menu, X, Home, Settings, BarChart3, FileText, Users, BookOpen } from "lucide-react";
+import { useState } from "react";
 
 export default function Home() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   return (
     <div className="bg-background min-h-screen">
       {/* Navbar */}
@@ -26,9 +31,50 @@ export default function Home() {
                 </Link>
               </SignedOut>
               <SignedIn>
-                <Link href="/dashboard">
-                  <Button>Dashboard</Button>
-                </Link>
+                {/* Mobile Menu Button */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="md:hidden"
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                >
+                  {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                </Button>
+
+                {/* Desktop Navigation */}
+                <div className="hidden items-center space-x-2 md:flex">
+                  <Link href="/dashboard">
+                    <Button variant="ghost" size="sm">
+                      <Home className="mr-2 h-4 w-4" />
+                      Dashboard
+                    </Button>
+                  </Link>
+                  <Link href="/dashboard/build">
+                    <Button variant="ghost" size="sm">
+                      <BookOpen className="mr-2 h-4 w-4" />
+                      Create
+                    </Button>
+                  </Link>
+                  <Link href="/dashboard/worksheets">
+                    <Button variant="ghost" size="sm">
+                      <FileText className="mr-2 h-4 w-4" />
+                      Worksheets
+                    </Button>
+                  </Link>
+                  <Link href="/dashboard/analytics">
+                    <Button variant="ghost" size="sm">
+                      <BarChart3 className="mr-2 h-4 w-4" />
+                      Analytics
+                    </Button>
+                  </Link>
+                  <Link href="/dashboard/settings">
+                    <Button variant="ghost" size="sm">
+                      <Settings className="mr-2 h-4 w-4" />
+                      Settings
+                    </Button>
+                  </Link>
+                </div>
+
                 <UserButton
                   appearance={{
                     elements: {
@@ -40,6 +86,44 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* Mobile Menu Dropdown */}
+        {isMenuOpen && (
+          <div className="bg-background/95 border-t backdrop-blur md:hidden">
+            <div className="container mx-auto space-y-2 px-4 py-4">
+              <Link href="/dashboard" onClick={() => setIsMenuOpen(false)}>
+                <Button variant="ghost" className="w-full justify-start">
+                  <Home className="mr-2 h-4 w-4" />
+                  Dashboard
+                </Button>
+              </Link>
+              <Link href="/dashboard/build" onClick={() => setIsMenuOpen(false)}>
+                <Button variant="ghost" className="w-full justify-start">
+                  <BookOpen className="mr-2 h-4 w-4" />
+                  Create Worksheets
+                </Button>
+              </Link>
+              <Link href="/dashboard/worksheets" onClick={() => setIsMenuOpen(false)}>
+                <Button variant="ghost" className="w-full justify-start">
+                  <FileText className="mr-2 h-4 w-4" />
+                  My Worksheets
+                </Button>
+              </Link>
+              <Link href="/dashboard/analytics" onClick={() => setIsMenuOpen(false)}>
+                <Button variant="ghost" className="w-full justify-start">
+                  <BarChart3 className="mr-2 h-4 w-4" />
+                  Analytics
+                </Button>
+              </Link>
+              <Link href="/dashboard/settings" onClick={() => setIsMenuOpen(false)}>
+                <Button variant="ghost" className="w-full justify-start">
+                  <Settings className="mr-2 h-4 w-4" />
+                  Settings
+                </Button>
+              </Link>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Hero Section */}
@@ -78,6 +162,10 @@ export default function Home() {
               variant="outline"
               size="lg"
               className="homeschool-button-secondary px-8 py-6 text-lg"
+              onClick={() => {
+                const featuresSection = document.getElementById("features");
+                featuresSection?.scrollIntoView({ behavior: "smooth" });
+              }}
             >
               Learn More
             </Button>
@@ -86,7 +174,7 @@ export default function Home() {
       </section>
 
       {/* Features Grid */}
-      <section className="bg-cool-gradient px-4 py-20 sm:px-6 lg:px-8">
+      <section id="features" className="bg-cool-gradient px-4 py-20 sm:px-6 lg:px-8">
         <div className="container mx-auto">
           <div className="mb-16 text-center">
             <h2 className="text-foreground mb-4 text-3xl font-bold sm:text-4xl">
