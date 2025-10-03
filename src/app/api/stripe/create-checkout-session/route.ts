@@ -4,6 +4,38 @@ import { stripe, STRIPE_CONFIG } from "@/lib/stripe";
 import prisma from "@/lib/prisma";
 
 /**
+ * Get or create a promo code coupon in Stripe
+ */
+async function getOrCreatePromoCoupon(promoCode: string, isFree: boolean = false): Promise<string> {
+  try {
+    // Try to find existing coupon
+    const coupons = await stripe.coupons.list({ limit: 100 });
+    const existingCoupon = coupons.data.find((coupon) => coupon.id === promoCode.toLowerCase());
+
+    if (existingCoupon) {
+      return existingCoupon.id;
+    }
+
+    // Create new coupon
+    const coupon = await stripe.coupons.create({
+      id: promoCode.toLowerCase(),
+      percent_off: isFree ? 100 : 50, // 100% off for free codes, 50% for regular promo codes
+      duration: isFree ? "forever" : "once", // Free codes are forever, others are one-time
+      name: isFree ? `Free Membership - ${promoCode}` : `Promo Code - ${promoCode}`,
+      metadata: {
+        isFree: isFree.toString(),
+        createdBy: "system",
+      },
+    });
+
+    return coupon.id;
+  } catch (error) {
+    console.error("Error creating promo coupon:", error);
+    throw error;
+  }
+}
+
+/**
  * POST /api/stripe/create-checkout-session
  * Create a Stripe checkout session for subscription
  */
@@ -21,7 +53,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { planKey, isYearly } = await request.json();
+    const { planKey, isYearly, promoCode } = await request.json();
 
     if (!planKey || planKey === "free") {
       return NextResponse.json(
@@ -77,6 +109,36 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check if user has already used a free trial
+    try {
+      const dbUser = await prisma.user.findUnique({
+        where: { clerkId: user.id },
+        include: { subscription: true },
+      });
+
+      // Check if user has already used a free trial
+      if (dbUser?.subscription?.trialEnd && new Date() < dbUser.subscription.trialEnd) {
+        return NextResponse.json(
+          {
+            error: "STRIPE_TRIAL_013",
+            message: "Free trial already used",
+            details: "You have already used your free trial. Please subscribe to continue.",
+          },
+          { status: 400 }
+        );
+      }
+    } catch (dbError) {
+      console.error("Database error checking trial:", dbError);
+      return NextResponse.json(
+        {
+          error: "STRIPE_DB_006",
+          message: "Database connection error",
+          details: "Unable to process subscription request. Please try again.",
+        },
+        { status: 500 }
+      );
+    }
+
     // Get or create Stripe customer
     let customerId: string;
 
@@ -101,7 +163,7 @@ export async function POST(request: NextRequest) {
         customerId = customer.id;
 
         // Update user with Stripe customer ID
-        await prisma.user.upsert({
+        const updatedUser = await prisma.user.upsert({
           where: { clerkId: user.id },
           update: {},
           create: {
@@ -114,10 +176,10 @@ export async function POST(request: NextRequest) {
         });
 
         await prisma.subscription.upsert({
-          where: { userId: dbUser?.id || "" },
+          where: { userId: updatedUser.id },
           update: { stripeCustomerId: customerId },
           create: {
-            userId: dbUser?.id || "",
+            userId: updatedUser.id,
             stripeCustomerId: customerId,
             plan: "free",
             status: "active",
@@ -136,9 +198,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check for special promo codes
+    const isFreePromoCode =
+      promoCode &&
+      (promoCode.toLowerCase() === "testfree" ||
+        promoCode.toLowerCase() === "freetest" ||
+        promoCode.toLowerCase() === "astra100" ||
+        promoCode.toLowerCase() === "beta");
+
     // Create checkout session with trial period
     try {
-      const session = await stripe.checkout.sessions.create({
+      const sessionConfig: {
+        customer: string;
+        payment_method_types: string[];
+        line_items: Array<{ price: string; quantity: number }>;
+        mode: string;
+        subscription_data: {
+          trial_period_days: number;
+          metadata: Record<string, string>;
+        };
+        success_url: string;
+        cancel_url: string;
+        metadata: Record<string, string>;
+        discounts?: Array<{ coupon: string }>;
+      } = {
         customer: customerId,
         payment_method_types: ["card"],
         line_items: [
@@ -154,6 +237,7 @@ export async function POST(request: NextRequest) {
             clerkUserId: user.id,
             planKey,
             isYearly: isYearly.toString(),
+            promoCode: promoCode || "",
           },
         },
         success_url: STRIPE_CONFIG.successUrl,
@@ -162,8 +246,20 @@ export async function POST(request: NextRequest) {
           clerkUserId: user.id,
           planKey,
           isYearly: isYearly.toString(),
+          promoCode: promoCode || "",
         },
-      });
+      };
+
+      // Add promo code if provided
+      if (promoCode) {
+        sessionConfig.discounts = [
+          {
+            coupon: await getOrCreatePromoCoupon(promoCode, isFreePromoCode),
+          },
+        ];
+      }
+
+      const session = await stripe.checkout.sessions.create(sessionConfig);
 
       return NextResponse.json({ sessionId: session.id, url: session.url });
     } catch (stripeError: unknown) {

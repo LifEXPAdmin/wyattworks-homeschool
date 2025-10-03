@@ -71,6 +71,7 @@ export async function POST(request: NextRequest) {
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const clerkUserId = session.metadata?.clerkUserId;
   const planKey = session.metadata?.planKey;
+  const promoCode = session.metadata?.promoCode;
 
   if (!clerkUserId || !planKey) {
     console.error("Missing metadata in checkout session");
@@ -87,6 +88,18 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     return;
   }
 
+  // Calculate trial end date (14 days from now)
+  const trialEnd = new Date();
+  trialEnd.setDate(trialEnd.getDate() + 14);
+
+  // Check if this is a free promo code
+  const isFreePromoCode =
+    promoCode &&
+    (promoCode.toLowerCase() === "testfree" ||
+      promoCode.toLowerCase() === "freetest" ||
+      promoCode.toLowerCase() === "astra100" ||
+      promoCode.toLowerCase() === "beta");
+
   await prisma.subscription.upsert({
     where: { userId: dbUser.id },
     update: {
@@ -96,6 +109,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       stripeSubscriptionId: session.subscription as string,
       currentPeriodStart: new Date(),
       currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+      trialEnd: isFreePromoCode ? null : trialEnd, // No trial end for free promo codes
+      promoCode: promoCode || null,
     },
     create: {
       userId: dbUser.id,
@@ -105,8 +120,14 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       stripeSubscriptionId: session.subscription as string,
       currentPeriodStart: new Date(),
       currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+      trialEnd: isFreePromoCode ? null : trialEnd, // No trial end for free promo codes
+      promoCode: promoCode || null,
     },
   });
+
+  console.log(
+    `Subscription created for user ${clerkUserId} with plan ${planKey}${promoCode ? ` and promo code ${promoCode}` : ""}`
+  );
 }
 
 async function handleSubscriptionChange(subscription: Stripe.Subscription) {

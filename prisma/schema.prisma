@@ -161,6 +161,7 @@ model Subscription {
   cancelAtPeriodEnd  Boolean   @default(false)
   stripeCustomerId   String?   @unique
   stripeSubscriptionId String? @unique
+  promoCode          String?   // Promo code used for this subscription
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
@@ -170,6 +171,7 @@ model Subscription {
   @@index([userId])
   @@index([status])
   @@index([plan])
+  @@index([promoCode])
 }
 
 // CreditLedger model - tracks credit-based usage (exports, AI features, etc.)

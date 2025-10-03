@@ -34,6 +34,8 @@ export function SubscriptionDashboard({ userId, className }: SubscriptionDashboa
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [isYearly, setIsYearly] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [promoCode, setPromoCode] = useState("");
+  const [showPromoCode, setShowPromoCode] = useState(false);
 
   const loadSubscriptionData = useCallback(() => {
     const subscription = subscriptionManager.getUserSubscription(userId);
@@ -56,7 +58,11 @@ export function SubscriptionDashboard({ userId, className }: SubscriptionDashboa
       const response = await fetch("/api/stripe/create-checkout-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ planKey: tierId, isYearly: yearly }),
+        body: JSON.stringify({
+          planKey: tierId,
+          isYearly: yearly,
+          promoCode: promoCode || undefined,
+        }),
       });
 
       if (!response.ok) {
@@ -98,6 +104,9 @@ export function SubscriptionDashboard({ userId, className }: SubscriptionDashboa
             break;
           case "STRIPE_API_010":
             userMessage = "Payment service is temporarily unavailable. Please try again later.";
+            break;
+          case "STRIPE_TRIAL_013":
+            userMessage = "You have already used your free trial. Please subscribe to continue.";
             break;
           case "STRIPE_UNKNOWN_011":
           case "STRIPE_GENERAL_012":
@@ -430,6 +439,60 @@ export function SubscriptionDashboard({ userId, className }: SubscriptionDashboa
               );
             })}
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Promo Code Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Star className="h-5 w-5" />
+            Promo Code
+          </CardTitle>
+          <CardDescription>
+            Have a promo code? Enter it here for discounts or free membership!
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {!showPromoCode ? (
+            <Button variant="outline" onClick={() => setShowPromoCode(true)} className="w-full">
+              <Star className="mr-2 h-4 w-4" />
+              Enter Promo Code
+            </Button>
+          ) : (
+            <div className="space-y-3">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Enter promo code (e.g., TESTFREE, BETA)"
+                  value={promoCode}
+                  onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                  className="flex-1 rounded-md border px-3 py-2"
+                />
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setPromoCode("");
+                    setShowPromoCode(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+              {promoCode && (
+                <div className="rounded-md bg-green-50 p-3">
+                  <p className="text-sm text-green-800">
+                    <strong>Promo code applied:</strong> {promoCode}
+                  </p>
+                  <p className="mt-1 text-xs text-green-600">
+                    {promoCode.toLowerCase() === "testfree" || promoCode.toLowerCase() === "beta"
+                      ? "This code provides 100% off - free membership!"
+                      : "Discount will be applied at checkout"}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
 
