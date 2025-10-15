@@ -198,8 +198,8 @@ export default function PrivacyPolicy() {
               </ul>
               <p className="text-muted-foreground mt-4">
                 To exercise these rights, please contact us at{" "}
-                <a href="mailto:privacy@wyattworks.com" className="text-primary underline">
-                  privacy@wyattworks.com
+                <a href="mailto:contact@wyatt-works.com" className="text-primary underline">
+                  contact@wyatt-works.com
                 </a>
               </p>
             </section>
@@ -292,11 +292,11 @@ export default function PrivacyPolicy() {
                   <strong>Wyatt Works</strong>
                   <br />
                   Email:{" "}
-                  <a href="mailto:privacy@wyattworks.com" className="text-primary underline">
-                    privacy@wyattworks.com
+                  <a href="mailto:contact@wyatt-works.com" className="text-primary underline">
+                    contact@wyatt-works.com
                   </a>
                   <br />
-                  Product: Astra Academy
+                  Product: Home²
                 </p>
               </div>
             </section>

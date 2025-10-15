@@ -281,11 +281,11 @@ export default function TermsOfService() {
                   <strong>Wyatt Works</strong>
                   <br />
                   Email:{" "}
-                  <a href="mailto:legal@wyattworks.com" className="text-primary underline">
-                    legal@wyattworks.com
+                  <a href="mailto:contact@wyatt-works.com" className="text-primary underline">
+                    contact@wyatt-works.com
                   </a>
                   <br />
-                  Product: Astra Academy
+                  Product: Home²
                   <br />
                   Website:{" "}
                   <a href="https://homeschool.lifexpapp.com" className="text-primary underline">

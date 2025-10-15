@@ -23,87 +23,81 @@ export function Logo({ size = "md", className = "", showText = true }: LogoProps
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      {/* Custom SVG Logo */}
+      {/* Custom SVG Logo - Home² Design */}
       <svg
         className={`${sizeClasses[size]} text-primary`}
         viewBox="0 0 32 32"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        {/* Book/Pages */}
-        <rect
-          x="4"
-          y="6"
-          width="20"
-          height="20"
-          rx="2"
+        {/* Main House Structure */}
+        <path
+          d="M16 4L4 12v16h8v-8h8v8h8V12L16 4z"
           fill="currentColor"
           fillOpacity="0.1"
           stroke="currentColor"
           strokeWidth="1.5"
         />
 
-        {/* Book spine */}
-        <rect x="4" y="6" width="4" height="20" rx="2" fill="currentColor" fillOpacity="0.2" />
-
-        {/* Pages lines */}
-        <line
-          x1="10"
-          y1="10"
-          x2="20"
-          y2="10"
+        {/* House Roof */}
+        <path
+          d="M16 4L4 12h24L16 4z"
+          fill="currentColor"
+          fillOpacity="0.15"
           stroke="currentColor"
-          strokeWidth="1"
-          strokeOpacity="0.6"
-        />
-        <line
-          x1="10"
-          y1="13"
-          x2="18"
-          y2="13"
-          stroke="currentColor"
-          strokeWidth="1"
-          strokeOpacity="0.6"
-        />
-        <line
-          x1="10"
-          y1="16"
-          x2="20"
-          y2="16"
-          stroke="currentColor"
-          strokeWidth="1"
-          strokeOpacity="0.6"
-        />
-        <line
-          x1="10"
-          y1="19"
-          x2="16"
-          y2="19"
-          stroke="currentColor"
-          strokeWidth="1"
-          strokeOpacity="0.6"
+          strokeWidth="1.5"
         />
 
-        {/* Star/Achievement symbol */}
-        <g transform="translate(20, 4)">
-          <path
-            d="M6 0L7.5 4.5L12 6L7.5 7.5L6 12L4.5 7.5L0 6L4.5 4.5Z"
+        {/* Door */}
+        <rect
+          x="12"
+          y="20"
+          width="8"
+          height="8"
+          rx="1"
+          fill="currentColor"
+          fillOpacity="0.2"
+          stroke="currentColor"
+          strokeWidth="1"
+        />
+
+        {/* Window */}
+        <rect
+          x="6"
+          y="16"
+          width="4"
+          height="4"
+          rx="0.5"
+          fill="currentColor"
+          fillOpacity="0.15"
+          stroke="currentColor"
+          strokeWidth="1"
+        />
+
+        {/* "Squared" Symbol - Small superscript 2 */}
+        <g transform="translate(20, 8)">
+          <text
+            x="0"
+            y="0"
+            fontSize="8"
+            fontWeight="bold"
             fill="currentColor"
             fillOpacity="0.8"
-          />
+            textAnchor="middle"
+            dominantBaseline="central"
+          >
+            ²
+          </text>
         </g>
 
-        {/* Graduation cap */}
-        <g transform="translate(2, 2)">
-          <path d="M2 4L6 2L10 4L6 6Z" fill="currentColor" fillOpacity="0.7" />
-          <line
-            x1="6"
-            y1="6"
-            x2="6"
-            y2="8"
+        {/* Subtle Learning Element - Small lightbulb */}
+        <g transform="translate(22, 18)">
+          <circle cx="2" cy="2" r="2" fill="currentColor" fillOpacity="0.3" />
+          <path
+            d="M2 0.5L2.5 2M2 3.5L2.5 2M0.5 2L2.5 2M3.5 2L2.5 2"
             stroke="currentColor"
-            strokeWidth="1"
-            strokeOpacity="0.7"
+            strokeWidth="0.5"
+            strokeOpacity="0.6"
           />
         </g>
       </svg>

@@ -149,10 +149,6 @@ export default function Home() {
         ></div>
 
         <div className="relative z-10 container mx-auto text-center">
-          <div className="mb-8">
-            <div className="edu-icon mx-auto mb-6">📚</div>
-          </div>
-
           <h1 className="text-foreground mb-6 text-4xl font-bold sm:text-6xl">
             Elevate Your Home
             <span className="text-primary block">with Powerful Education Tools</span>
@@ -478,7 +474,7 @@ export default function Home() {
               Terms of Service
             </Link>
             <a
-              href="mailto:support@wyattworks.com"
+              href="mailto:contact@wyatt-works.com"
               className="hover:text-primary transition-colors"
             >
               Contact Us
