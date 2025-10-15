@@ -1,4 +1,4 @@
-// Subscription and monetization system for Astra Academy
+// Subscription and monetization system for Home²
 // Handles subscription tiers, payment processing, and usage limits
 
 import { STRIPE_CONFIG } from "./stripe";
@@ -66,7 +66,7 @@ export const SUBSCRIPTION_TIERS: SubscriptionTier[] = [
   {
     id: "free",
     name: "Free",
-    description: "Perfect for trying out Astra Academy",
+    description: "Perfect for getting started with Home²",
     price: 0,
     yearlyPrice: 0,
     color: "gray",
@@ -130,7 +130,7 @@ export const SUBSCRIPTION_TIERS: SubscriptionTier[] = [
   {
     id: "homeschool",
     name: "Homeschool",
-    description: "Everything you need for homeschooling",
+    description: "Everything you need to elevate your home learning",
     price: 999, // $9.99/month
     yearlyPrice: 9999, // $99.99/year (17% discount)
     color: "blue",
@@ -209,7 +209,7 @@ export const SUBSCRIPTION_TIERS: SubscriptionTier[] = [
   {
     id: "school",
     name: "School",
-    description: "Perfect for schools and tutoring centers",
+    description: "Perfect for educators and learning communities",
     price: 2999, // $29.99/month
     yearlyPrice: 29999, // $299.99/year (17% discount)
     color: "purple",
@@ -259,7 +259,7 @@ export const SUBSCRIPTION_TIERS: SubscriptionTier[] = [
       {
         id: "white-label",
         name: "White Label",
-        description: "Remove Astra Academy branding",
+        description: "Remove Home² branding",
         included: true,
         icon: "🎭",
       },
@@ -288,7 +288,7 @@ export const SUBSCRIPTION_TIERS: SubscriptionTier[] = [
 
 // Subscription management utilities
 export class SubscriptionManager {
-  private storageKey = "astra-academy-subscription";
+  private storageKey = "home-squared-subscription";
 
   // Get user's current subscription
   getUserSubscription(userId: string): UserSubscription | null {
@@ -363,14 +363,14 @@ export class SubscriptionManager {
 
   // Get usage for specific action
   getUsageForAction(userId: string, action: keyof UsageLimits): number {
-    const usageKey = `astra-academy-usage-${userId}`;
+    const usageKey = `home-squared-usage-${userId}`;
     const usage = JSON.parse(localStorage.getItem(usageKey) || "{}");
     return usage[action] || 0;
   }
 
   // Increment usage for specific action
   incrementUsage(userId: string, action: keyof UsageLimits): void {
-    const usageKey = `astra-academy-usage-${userId}`;
+    const usageKey = `home-squared-usage-${userId}`;
     const usage = JSON.parse(localStorage.getItem(usageKey) || "{}");
     usage[action] = (usage[action] || 0) + 1;
     localStorage.setItem(usageKey, JSON.stringify(usage));
@@ -378,7 +378,7 @@ export class SubscriptionManager {
 
   // Reset monthly usage (called on first day of month)
   resetMonthlyUsage(userId: string): void {
-    const usageKey = `astra-academy-usage-${userId}`;
+    const usageKey = `home-squared-usage-${userId}`;
     const usage = JSON.parse(localStorage.getItem(usageKey) || "{}");
 
     // Reset monthly counters
@@ -523,13 +523,13 @@ export class PaymentProcessor {
 
   // Get payment intent
   getPaymentIntent(paymentIntentId: string): PaymentIntent | null {
-    const stored = localStorage.getItem("astra-academy-payment-intents");
+    const stored = localStorage.getItem("home-squared-payment-intents");
     const intents = stored ? JSON.parse(stored) : [];
     return intents.find((pi: PaymentIntent) => pi.id === paymentIntentId) || null;
   }
 
   private storePaymentIntent(paymentIntent: PaymentIntent): void {
-    const stored = localStorage.getItem("astra-academy-payment-intents");
+    const stored = localStorage.getItem("home-squared-payment-intents");
     const intents = stored ? JSON.parse(stored) : [];
     const index = intents.findIndex((pi: PaymentIntent) => pi.id === paymentIntent.id);
 
@@ -539,7 +539,7 @@ export class PaymentProcessor {
       intents.push(paymentIntent);
     }
 
-    localStorage.setItem("astra-academy-payment-intents", JSON.stringify(intents));
+    localStorage.setItem("home-squared-payment-intents", JSON.stringify(intents));
   }
 }
 

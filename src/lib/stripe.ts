@@ -32,9 +32,9 @@ export const STRIPE_CONFIG = {
       yearlyPrice: 0,
       features: [
         "Up to 15 worksheets per month",
-        "Basic math and language arts",
-        "PDF export",
-        "Basic progress tracking",
+        "Essential subjects for home learning",
+        "PDF export for printing",
+        "Basic progress insights",
       ],
       limits: {
         worksheets: 15,
@@ -52,9 +52,9 @@ export const STRIPE_CONFIG = {
       trialDays: 14, // 14-day free trial
       features: [
         "Unlimited worksheets",
-        "All subjects (Math, Science, Language Arts)",
-        "Advanced customization",
-        "Progress tracking & analytics",
+        "All subjects for comprehensive learning",
+        "Advanced customization tools",
+        "Detailed progress tracking",
         "Multiple student profiles",
         "Custom fonts & themes",
         "Priority support",
@@ -75,8 +75,8 @@ export const STRIPE_CONFIG = {
       features: [
         "Everything in Homeschool",
         "Unlimited students",
-        "Teacher collaboration",
-        "Classroom management",
+        "Educator collaboration",
+        "Learning community management",
         "Bulk worksheet generation",
         "Advanced reporting",
         "API access",
@@ -94,8 +94,8 @@ export const STRIPE_CONFIG = {
   webhookSecret: process.env.STRIPE_WEBHOOK_SECRET || "",
 
   // Success/cancel URLs
-  successUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://wyatt-works.education"}/dashboard/subscription?success=true`,
-  cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://wyatt-works.education"}/dashboard/subscription?canceled=true`,
+  successUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://homeschool.lifexpapp.com"}/dashboard/subscription?success=true`,
+  cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://homeschool.lifexpapp.com"}/dashboard/subscription?canceled=true`,
 };
 
 // Helper function to get plan by price ID

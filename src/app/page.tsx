@@ -154,17 +154,18 @@ export default function Home() {
           </div>
 
           <h1 className="text-foreground mb-6 text-4xl font-bold sm:text-6xl">
-            Build Amazing Worksheets
-            <span className="text-primary block">for Your Homeschool</span>
+            Elevate Your Home
+            <span className="text-primary block">with Powerful Education Tools</span>
           </h1>
           <p className="text-muted-foreground mx-auto mb-8 max-w-2xl text-xl">
-            Create custom worksheets, track progress, and make learning fun with our intuitive
-            worksheet builder designed specifically for homeschooling parents.
+            Transform your home into a thriving learning environment. Create custom worksheets,
+            track progress, and make homeschooling effortless with tools designed specifically for
+            families.
           </p>
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
             <Link href="/dashboard/build">
               <Button size="lg" className="homeschool-button px-8 py-6 text-lg">
-                Start Building
+                Start Elevating Your Home
               </Button>
             </Link>
             <Button
@@ -187,11 +188,11 @@ export default function Home() {
         <div className="container mx-auto">
           <div className="mb-16 text-center">
             <h2 className="text-foreground mb-4 text-3xl font-bold sm:text-4xl">
-              Everything You Need to Create
+              Everything You Need to Transform Learning
             </h2>
             <p className="text-muted-foreground mx-auto max-w-2xl text-xl">
-              Powerful tools designed specifically for homeschooling parents to create engaging
-              educational content.
+              Powerful tools designed specifically for families who want to create an exceptional
+              learning environment at home.
             </p>
           </div>
 
@@ -203,13 +204,14 @@ export default function Home() {
                   <CardTitle>Easy Worksheet Builder</CardTitle>
                 </div>
                 <CardDescription>
-                  Drag and drop interface to create custom worksheets in minutes
+                  Create beautiful, custom worksheets in minutes with our intuitive drag-and-drop
+                  builder
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm">
-                  No design skills needed. Choose from templates or start from scratch with our
-                  intuitive builder.
+                  No design experience needed. Choose from our library of beautiful templates or
+                  start from scratch with our family-friendly builder.
                 </p>
               </CardContent>
             </Card>
@@ -221,13 +223,14 @@ export default function Home() {
                   <CardTitle>Subject-Specific Templates</CardTitle>
                 </div>
                 <CardDescription>
-                  Pre-made templates for math, science, language arts, and more
+                  Beautiful templates for math, science, language arts, and more - all designed for
+                  home learning
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm">
                   Save time with professionally designed templates that align with educational
-                  standards.
+                  standards and work perfectly in your home environment.
                 </p>
               </CardContent>
             </Card>
@@ -239,13 +242,13 @@ export default function Home() {
                   <CardTitle>Progress Tracking</CardTitle>
                 </div>
                 <CardDescription>
-                  Monitor your child&apos;s learning progress with built-in analytics
+                  Watch your children grow with detailed progress tracking and insights
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm">
-                  Track completion rates, identify areas for improvement, and celebrate
-                  achievements.
+                  Track completion rates, celebrate achievements, and identify areas where your
+                  children can grow and excel.
                 </p>
               </CardContent>
             </Card>
@@ -349,7 +352,7 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            {/* Pro Plan */}
+            {/* Homeschool Plan */}
             <Card className="relative border-blue-200 bg-blue-50">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 transform">
                 <div className="rounded-full bg-blue-500 px-3 py-1 text-xs font-medium text-white">
@@ -357,8 +360,8 @@ export default function Home() {
                 </div>
               </div>
               <CardHeader className="text-center">
-                <CardTitle className="text-2xl">Pro</CardTitle>
-                <CardDescription>For active homeschooling families</CardDescription>
+                <CardTitle className="text-2xl">Homeschool</CardTitle>
+                <CardDescription>Perfect for active homeschooling families</CardDescription>
                 <div className="mt-4">
                   <div className="text-4xl font-bold">$9.99</div>
                   <div className="text-muted-foreground text-sm">per month</div>
@@ -388,16 +391,18 @@ export default function Home() {
                   </li>
                 </ul>
                 <Link href="/dashboard/subscription" className="mt-6 block">
-                  <Button className="w-full bg-blue-600 hover:bg-blue-700">Upgrade to Pro</Button>
+                  <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                    Upgrade to Homeschool
+                  </Button>
                 </Link>
               </CardContent>
             </Card>
 
-            {/* Premium Plan */}
+            {/* School Plan */}
             <Card className="relative">
               <CardHeader className="text-center">
-                <CardTitle className="text-2xl">Premium</CardTitle>
-                <CardDescription>For educators and co-ops</CardDescription>
+                <CardTitle className="text-2xl">School</CardTitle>
+                <CardDescription>Perfect for educators and co-ops</CardDescription>
                 <div className="mt-4">
                   <div className="text-4xl font-bold">$29.99</div>
                   <div className="text-muted-foreground text-sm">per month</div>
@@ -407,7 +412,7 @@ export default function Home() {
                 <ul className="space-y-3">
                   <li className="flex items-center gap-2">
                     <div className="h-2 w-2 rounded-full bg-purple-500"></div>
-                    <span className="text-sm">Everything in Pro</span>
+                    <span className="text-sm">Everything in Homeschool</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <div className="h-2 w-2 rounded-full bg-purple-500"></div>
@@ -428,7 +433,7 @@ export default function Home() {
                 </ul>
                 <Link href="/dashboard/subscription" className="mt-6 block">
                   <Button variant="outline" className="w-full">
-                    Upgrade to Premium
+                    Upgrade to School
                   </Button>
                 </Link>
               </CardContent>
@@ -448,15 +453,15 @@ export default function Home() {
       <section className="px-4 py-20 sm:px-6 lg:px-8">
         <div className="container mx-auto text-center">
           <h2 className="text-foreground mb-4 text-3xl font-bold sm:text-4xl">
-            Ready to Transform Your Homeschooling?
+            Ready to Elevate Your Home?
           </h2>
           <p className="text-muted-foreground mx-auto mb-8 max-w-2xl text-xl">
-            Join thousands of homeschooling parents who are already creating amazing worksheets with
-            Wyatt Works.
+            Join thousands of families who are already transforming their homes into powerful
+            learning environments with Home².
           </p>
           <Link href="/dashboard/build">
             <Button size="lg" className="px-8 py-6 text-lg">
-              Start Building Today
+              Start Your Journey Today
             </Button>
           </Link>
         </div>
@@ -480,8 +485,7 @@ export default function Home() {
             </a>
           </div>
           <p className="text-center">
-            &copy; {new Date().getFullYear()} Astra Academy. Made with ❤️ by{" "}
-            <strong>Wyatt Works</strong>.
+            &copy; {new Date().getFullYear()} Home². Made with ❤️ by <strong>Wyatt Works</strong>.
           </p>
         </div>
       </footer>

@@ -109,9 +109,7 @@ export function Logo({ size = "md", className = "", showText = true }: LogoProps
       </svg>
 
       {/* Text */}
-      {showText && (
-        <span className={`text-primary font-bold ${textSizes[size]}`}>Astra Academy</span>
-      )}
+      {showText && <span className={`text-primary font-bold ${textSizes[size]}`}>Home²</span>}
     </div>
   );
 }

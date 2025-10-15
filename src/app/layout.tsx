@@ -16,16 +16,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Astra Academy - Homeschool Worksheet Builder",
+  title: "Home² - Elevate Your Home with Education",
   description:
-    "Create custom worksheets, track progress, and make learning fun with our intuitive worksheet builder designed specifically for homeschooling parents. By Wyatt Works.",
+    "Transform your home into a powerful learning environment with Home². Create custom worksheets, track progress, and make homeschooling effortless with tools designed for families.",
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "32x32" },
       { url: "/favicon.svg", type: "image/svg+xml" },
-      { url: "/astra-academy-icon.svg", type: "image/svg+xml", sizes: "192x192" },
+      { url: "/home-squared-icon.svg", type: "image/svg+xml", sizes: "192x192" },
     ],
-    apple: "/astra-academy-icon.svg",
+    apple: "/home-squared-icon.svg",
   },
 };
 

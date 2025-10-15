@@ -307,7 +307,7 @@ For issues or questions, please open an issue on GitHub or contact the developme
 
 ## Stripe Integration
 
-Astra Academy now includes full Stripe integration for subscription management. To enable payments:
+Home² now includes full Stripe integration for subscription management. To enable payments:
 
 ### Required Environment Variables
 

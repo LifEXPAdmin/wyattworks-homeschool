@@ -1,4 +1,4 @@
-// Science content generators for Astra Academy
+// Science content generators for Home²
 // Supports Biology, Chemistry, Physics, and Earth Science
 
 export type ScienceSubject = "biology" | "chemistry" | "physics" | "earth-science";

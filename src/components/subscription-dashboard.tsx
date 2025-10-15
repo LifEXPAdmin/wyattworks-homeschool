@@ -80,7 +80,7 @@ export function SubscriptionDashboard({ userId, className }: SubscriptionDashboa
             break;
           case "STRIPE_CONFIG_003":
             userMessage =
-              "🚧 Subscription System Coming Soon!\n\nFor now, you can use the free plan with 15 exports per month. We're working on enabling payments soon!";
+              "🚧 Payment System Coming Soon!\n\nFor now, you can use the free plan with 15 worksheets per month. We're working on enabling payments to elevate your home learning experience!";
             break;
           case "STRIPE_PLAN_004":
             userMessage = "The selected plan is not available. Please choose a different plan.";
@@ -211,8 +211,8 @@ export function SubscriptionDashboard({ userId, className }: SubscriptionDashboa
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Subscription & Billing</h2>
-          <p className="text-gray-600">Manage your subscription and view usage</p>
+          <h2 className="text-2xl font-bold text-gray-900">Home² Subscription</h2>
+          <p className="text-gray-600">Manage your subscription and elevate your home learning</p>
         </div>
         <div className="flex items-center gap-2">
           <Badge className={`${getTierColor(currentTier?.id || "free")} text-white`}>
