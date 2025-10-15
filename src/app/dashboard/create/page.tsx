@@ -1255,8 +1255,8 @@ export default function CreateWorksheet() {
             title: title,
             subtitle: `Grade ${gradeLevel} • ${difficulty || scienceType || languageArtsType}`,
             instructions: customInstructions || "Solve each problem. Show your work.",
-            studentName: includeStudentName,
-            date: includeDate,
+            studentName: true,
+            date: true,
             problems: [
               ...problems,
               ...spellingWords.map((w) => ({ problem: w.word, answer: w.word })),
@@ -1267,7 +1267,7 @@ export default function CreateWorksheet() {
           }}
           printOptions={{
             background,
-            customImage,
+            customImage: customImage || undefined,
             selectedFont,
             spacing,
             showBorders,
