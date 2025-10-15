@@ -773,13 +773,7 @@ export default function CreateWorksheet() {
                         Worksheet Ready!
                       </h3>
                       <p className="mb-4 text-green-600">
-                        Your{" "}
-                        {problems.length +
-                          spellingWords.length +
-                          vocabularyWords.length +
-                          writingPrompts.length +
-                          scienceProblems.length}{" "}
-                        problems have been generated.
+                        Your {problems.length + spellingWords.length + vocabularyWords.length + writingPrompts.length + scienceProblems.length} problems have been generated.
                       </p>
                       <p className="text-sm text-green-600">
                         Click "📄 Export" above to preview and print your worksheet
@@ -789,8 +783,445 @@ export default function CreateWorksheet() {
                 )}
               </div>
             </div>
+                    style={{
+                      fontFamily: selectedFont,
+                      ...(background === "custom" && customImage
+                        ? {
+                            backgroundImage: `url('${customImage}')`,
+                            backgroundSize: "cover",
+                            backgroundPosition: "center",
+                            backgroundRepeat: "no-repeat",
+                          }
+                        : BACKGROUND_TEMPLATES.find((t) => t.id === background)
+                            ?.css.split(";")
+                            .reduce(
+                              (acc, rule) => {
+                                const [property, value] = rule.split(":");
+                                if (property && value) {
+                                  acc[property.trim()] = value.trim();
+                                }
+                                return acc;
+                              },
+                              {} as Record<string, string>
+                            )),
+                    }}
+                  >
+                    {/* Worksheet Content */}
+                    {subject === "math" && problems.length > 0 ? (
+                      <div className="space-y-6">
+                        <div className="text-center">
+                          <h2 className="mb-2 text-2xl font-bold">{title}</h2>
+                          <p className="text-gray-600">
+                            Grade {gradeLevel} • {difficulty} • {problems.length} problems
+                          </p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          {problems.map((problem, index) => (
+                            <div key={index} className="flex items-center gap-2 rounded border p-3">
+                              <span className="font-medium">{index + 1}.</span>
+                              <span>{problem.problem}</span>
+                              <span className="ml-auto text-gray-500">= ____</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : subject === "language_arts" && spellingWords.length > 0 ? (
+                      <div className="space-y-6">
+                        <div className="text-center">
+                          <h2 className="mb-2 text-2xl font-bold">{title}</h2>
+                          <p className="text-gray-600">Grade {gradeLevel} • Spelling Words</p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          {spellingWords.map((word, index) => (
+                            <div key={index} className="rounded border p-3">
+                              <span className="font-medium">{index + 1}.</span>
+                              <span className="ml-2">{word.word}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : subject === "science" && scienceProblems.length > 0 ? (
+                      <div className="space-y-6">
+                        <div className="text-center">
+                          <h2 className="mb-2 text-2xl font-bold">{title}</h2>
+                          <p className="text-gray-600">
+                            Grade {gradeLevel} • {scienceType}
+                          </p>
+                        </div>
+                        <div className="space-y-4">
+                          {scienceProblems.map((problem, index) => (
+                            <div key={index} className="rounded border p-4">
+                              <div className="mb-2">
+                                <span className="font-medium">{index + 1}.</span>
+                                <span className="ml-2">{problem.question}</span>
+                              </div>
+                              <div className="h-8 border-b border-gray-300"></div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Sidebar - Compact settings */}
+            <div className="w-80 overflow-auto border-l bg-white p-4">
+              <div className="space-y-4">
+                {/* Quick Settings */}
+                <div>
+                  <h3 className="mb-3 font-semibold">Quick Settings</h3>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-sm font-medium">Title</label>
+                      <Input
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        className="mt-1"
+                      />
+                    </div>
+
+                    {/* Answer Key Toggle - Moved from toolbar */}
+                    <div>
+                      <label className="text-sm font-medium">Answer Key</label>
+                      <div className="mt-1">
+                        <Button
+                          variant={includeAnswerKey ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setIncludeAnswerKey(!includeAnswerKey)}
+                          className="w-full"
+                        >
+                          {includeAnswerKey ? "✓ Answer Key On" : "✗ Answer Key Off"}
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Customize PDF Button - Moved from toolbar */}
+                    <div>
+                      <label className="text-sm font-medium">PDF Styling</label>
+                      <div className="mt-1">
+                        <Button
+                          onClick={() => setShowCustomizeModal(true)}
+                          variant="outline"
+                          className="homeschool-button-secondary w-full"
+                        >
+                          🎨 Customize PDF
+                        </Button>
+                      </div>
+                    </div>
+
+                    {subject === "math" && (
+                      <div>
+                        <label className="text-sm font-medium">Operation</label>
+                        <Select
+                          value={operation}
+                          onValueChange={(value) =>
+                            setOperation(
+                              value as "addition" | "subtraction" | "multiplication" | "division"
+                            )
+                          }
+                        >
+                          <SelectTrigger className="mt-1">
+                            <SelectValue placeholder="Operation" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="addition">➕ Addition</SelectItem>
+                            <SelectItem value="subtraction">➖ Subtraction</SelectItem>
+                            <SelectItem value="multiplication">✖️ Multiplication</SelectItem>
+                            <SelectItem value="division">➗ Division</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+
+                    {subject === "language_arts" && (
+                      <div>
+                        <label className="text-sm font-medium">Type</label>
+                        <Select
+                          value={languageArtsType}
+                          onValueChange={(value) => setLanguageArtsType(value as LanguageArtsType)}
+                        >
+                          <SelectTrigger className="mt-1">
+                            <SelectValue placeholder="Type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="spelling">🔤 Spelling Words</SelectItem>
+                            <SelectItem value="vocabulary">📚 Vocabulary</SelectItem>
+                            <SelectItem value="writing">✍️ Writing Prompts</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Template Selection */}
+                <div>
+                  <h3 className="mb-3 font-semibold">Templates</h3>
+                  <div className="space-y-2">
+                    <Button
+                      variant={useTemplate ? "default" : "outline"}
+                      size="sm"
+                      className="w-full justify-start"
+                      onClick={() => setUseTemplate(true)}
+                    >
+                      📚 Use Template
+                    </Button>
+                    <Button
+                      variant={!useTemplate ? "default" : "outline"}
+                      size="sm"
+                      className="w-full justify-start"
+                      onClick={() => setUseTemplate(false)}
+                    >
+                      ✏️ From Scratch
+                    </Button>
+                  </div>
+
+                  {useTemplate && (
+                    <div className="mt-3">
+                      <TemplateSelector
+                        onTemplateSelect={handleTemplateSelect}
+                        selectedTemplate={selectedTemplate}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Collaboration Tools */}
+                <div>
+                  <h3 className="mb-3 font-semibold">Tools</h3>
+                  <div className="space-y-2">
+                    <Button
+                      onClick={handleStartCollaboration}
+                      variant="outline"
+                      size="sm"
+                      className="w-full justify-start"
+                    >
+                      <Users className="mr-2 h-4 w-4" />
+                      Start Collaboration
+                    </Button>
+                    <Button
+                      onClick={() => setShowAnalytics(!showAnalytics)}
+                      variant="outline"
+                      size="sm"
+                      className="w-full justify-start"
+                    >
+                      <BarChart3 className="mr-2 h-4 w-4" />
+                      View Analytics
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Usage Info */}
+                <div className="border-t pt-4">
+                  <QuotaDisplay userId="current-user" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+
+        {/* Customize PDF Modal */}
+        {showCustomizeModal && (
+          <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4">
+            <div className="max-h-[90vh] w-full max-w-2xl overflow-auto rounded-lg bg-white">
+              <div className="sticky top-0 flex items-center justify-between border-b bg-white p-4">
+                <h2 className="text-lg font-semibold">🎨 Customize PDF Appearance</h2>
+                <Button variant="outline" onClick={() => setShowCustomizeModal(false)}>
+                  Close
+                </Button>
+              </div>
+              <div className="space-y-6 p-6">
+                {/* Font Selection */}
+                <div>
+                  <label className="text-sm font-medium">Font</label>
+                  <Select value={selectedFont} onValueChange={(value) => setSelectedFont(value)}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Select Font" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {FONT_OPTIONS.map((font) => (
+                        <SelectItem key={font.id} value={font.id}>
+                          <span style={{ fontFamily: font.id }}>{font.name}</span>
+                          <span className="ml-2 text-xs text-gray-500">({font.category})</span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Background Selection */}
+                <div>
+                  <label className="text-sm font-medium">Background</label>
+                  <div className="mt-2 grid grid-cols-3 gap-2">
+                    {BACKGROUND_TEMPLATES.map((bg) => (
+                      <button
+                        key={bg.id}
+                        onClick={() => setBackground(bg.id)}
+                        className={`relative h-16 rounded-lg border-2 p-2 text-xs font-medium transition-all ${
+                          background === bg.id
+                            ? "border-orange-500 ring-2 ring-orange-200"
+                            : "border-gray-200 hover:border-gray-300"
+                        }`}
+                        style={{
+                          background:
+                            bg.id === "custom" && customImage
+                              ? `url('${customImage}') center/cover`
+                              : bg.id === "none"
+                                ? "#ffffff"
+                                : bg.id === "subtle-grid"
+                                  ? "#f0f0f0"
+                                  : bg.id === "notebook"
+                                    ? "#fef9e7"
+                                    : bg.id === "dots"
+                                      ? "#ffffff"
+                                      : bg.id === "nature"
+                                        ? "linear-gradient(135deg, #e8f5e9, #fff3e0)"
+                                        : bg.id === "sky"
+                                          ? "linear-gradient(180deg, #e3f2fd, #ffffff)"
+                                          : bg.id === "warm"
+                                            ? "linear-gradient(135deg, #fff9c4, #ffecb3)"
+                                            : bg.id === "pastel"
+                                              ? "linear-gradient(90deg, #fce4ec, #e1f5fe)"
+                                              : bg.id === "ocean"
+                                                ? "linear-gradient(45deg, #e0f7fa, #b3e5fc)"
+                                                : bg.id === "forest"
+                                                  ? "linear-gradient(135deg, #e8f5e9, #c8e6c9)"
+                                                  : bg.id === "lavender"
+                                                    ? "linear-gradient(135deg, #f3e5f5, #e1bee7)"
+                                                    : bg.id === "sunset"
+                                                      ? "linear-gradient(135deg, #ffecb3, #ffcc02)"
+                                                      : "linear-gradient(45deg, #f0f0f0, #e0e0e0)",
+                          backgroundSize: "100% 100%",
+                          backgroundRepeat: "no-repeat",
+                        }}
+                      >
+                        <div className="bg-opacity-0 hover:bg-opacity-10 absolute inset-0 rounded-md bg-black transition-all" />
+                        <div className="relative z-10 text-center">
+                          <div
+                            className="text-xs font-medium"
+                            style={{
+                              color:
+                                bg.id === "none" ||
+                                bg.id === "dots" ||
+                                bg.id === "subtle-grid" ||
+                                bg.id === "notebook"
+                                  ? "#000000"
+                                  : "#ffffff",
+                              textShadow: "1px 1px 2px rgba(0,0,0,0.8)",
+                            }}
+                          >
+                            {bg.name}
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Custom Image Upload */}
+                {background === "custom" && (
+                  <div>
+                    <label className="text-sm font-medium">Upload Custom Background</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-orange-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-orange-700 hover:file:bg-orange-100"
+                    />
+                    {customImage && (
+                      <div className="mt-2">
+                        <img
+                          src={customImage}
+                          alt="Custom background preview"
+                          className="h-20 w-full rounded-lg object-cover"
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium">Layout</label>
+                    <Select
+                      value={layout}
+                      onValueChange={(value) => setLayout(value as "standard" | "wide" | "narrow")}
+                    >
+                      <SelectTrigger className="mt-1">
+                        <SelectValue placeholder="Layout" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="standard">Standard (8.5" × 11")</SelectItem>
+                        <SelectItem value="wide">Wide (11" × 8.5")</SelectItem>
+                        <SelectItem value="narrow">Narrow (6" × 9")</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium">Spacing</label>
+                    <Select
+                      value={spacing}
+                      onValueChange={(value) => setSpacing(value as "tight" | "normal" | "loose")}
+                    >
+                      <SelectTrigger className="mt-1">
+                        <SelectValue placeholder="Spacing" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="tight">Tight</SelectItem>
+                        <SelectItem value="normal">Normal</SelectItem>
+                        <SelectItem value="loose">Loose</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium">Custom Instructions</label>
+                  <Input
+                    value={customInstructions}
+                    onChange={(e) => setCustomInstructions(e.target.value)}
+                    placeholder="Add special instructions for students..."
+                    className="mt-1"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium">Show Borders</label>
+                  <Button
+                    variant={showBorders ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setShowBorders(!showBorders)}
+                  >
+                    {showBorders ? "Yes" : "No"}
+                  </Button>
+                </div>
+
+                <div className="flex justify-end gap-2 border-t pt-4">
+                  <Button variant="outline" onClick={() => setShowCustomizeModal(false)}>
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setShowCustomizeModal(false);
+                      // Regenerate with new settings
+                      if (problems.length > 0 || spellingWords.length > 0) {
+                        handleGenerate();
+                      }
+                    }}
+                    className="homeschool-button"
+                  >
+                    Save Changes
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Removed Interactive Worksheet Viewer */}
 
         {/* Collaboration Panel */}
         {showCollaboration && collaborationSession && (
