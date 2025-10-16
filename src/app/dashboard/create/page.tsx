@@ -624,6 +624,22 @@ export default function CreateWorksheet() {
           <p className="text-muted-foreground text-lg">
             Customize, generate, and print beautiful math worksheets in seconds ✨
           </p>
+
+          {/* Mobile Desktop Features Notice */}
+          <div className="mx-auto mt-4 max-w-md rounded-lg border border-blue-200 bg-blue-50 p-4">
+            <div className="flex items-start gap-3">
+              <div className="text-xl text-blue-600">💻</div>
+              <div className="text-left">
+                <h3 className="mb-1 text-sm font-semibold text-blue-800">
+                  More Features on Desktop
+                </h3>
+                <p className="text-xs text-blue-700">
+                  Switch to desktop for advanced customization: background themes, fonts, spacing,
+                  borders, and more styling options.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Word-like Interface */}

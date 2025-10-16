@@ -288,8 +288,8 @@ export default function TermsOfService() {
                   Product: Home²
                   <br />
                   Website:{" "}
-                  <a href="https://homeschool.lifexpapp.com" className="text-primary underline">
-                    homeschool.lifexpapp.com
+                  <a href="https://wyatt-works.education" className="text-primary underline">
+                    wyatt-works.education
                   </a>
                 </p>
               </div>
